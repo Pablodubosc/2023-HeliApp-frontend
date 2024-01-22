@@ -211,6 +211,9 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
                 Name
               </TableCell>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+                Type
+              </TableCell>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
                 State
               </TableCell>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
@@ -239,6 +242,9 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
                       align="center"
                     >
                       {row.name}
+                    </TableCell>
+                    <TableCell style={{ width: 130 }} align="center">
+                      {`${row.type}`}
                     </TableCell>
                     <TableCell style={{ width: 130 }} align="center">
                       {`${row.state}`}
@@ -318,8 +324,18 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
                   fullWidth
                 />
                 <TextField
-                  label="Calories Consumed/Goal"
-                  value={`${selectedGoal.totalCalorias}/${selectedGoal.calories}`}
+                  label="Type"
+                  value={`${selectedGoal.type}`}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  variant="outlined"
+                  style={{ marginBottom: 8 }}
+                  fullWidth
+                />
+                <TextField
+                  label=" Consumed/Goal"
+                  value={`${selectedGoal.totalConsumido}/${selectedGoal.objetive}`}
                   InputProps={{
                     readOnly: true,
                   }}

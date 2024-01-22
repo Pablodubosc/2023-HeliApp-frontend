@@ -49,6 +49,7 @@ const LineChartContainer = () => {
       }
     );
     const data = await response.json();
+    console.log(data)
     setData(data.fechasIntermedias);
   };
 

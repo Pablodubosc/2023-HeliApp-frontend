@@ -10,7 +10,10 @@ import {
   FormControlLabel,
   Radio,
   FormGroup,
-  RadioGroup
+  RadioGroup,
+  MenuItem,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import CloseIcon from "@mui/icons-material/Close";
@@ -23,7 +26,8 @@ const apiUrl = getApiUrl();
 
 const initialGoalState = {
   name: "",
-  calories: "",
+  type: "",
+  objetive: "",
   userId: localStorage.getItem("userId"),
   startDate: new Date(),
   endDate: new Date(),
@@ -32,6 +36,11 @@ const initialGoalState = {
 const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [selectedRecuringValue, setSelectedRecurringValue] = useState('Non-Recurring');
+
+  const handleSelectChange = (e) => {
+    setNewGoal({ ...newGoal, type: e.target.value });
+  };
+
   const closeModal = () => {
     setOpen(false);
     setSelectedRecurringValue("Non-Recurring")
@@ -40,7 +49,8 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
 
   const [newGoal, setNewGoal] = useState({
     name: "",
-    calories: "",
+    type: "",
+    objetive: "",
     userId: localStorage.getItem("userId"),
     startDate: new Date(),
     endDate: new Date(),
@@ -60,7 +70,8 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
     } else {
       setNewGoal({
         name: "",
-        calories: "",
+        type: "",
+        objetive: "",
         userId: localStorage.getItem("userId"),
         startDate: new Date(),
         endDate: new Date(),
@@ -72,7 +83,8 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
   const handleAddGoal = () => {
     if (
       newGoal.name === "" ||
-      newGoal.calories === "" ||
+      newGoal.type === "" ||
+      newGoal.objetive === "" ||
       newGoal.userId === "" ||
       newGoal.startDate === "" ||
       newGoal.endDate === "" ||
@@ -128,9 +140,9 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
   const handleCaloriesInputChange = (e, index) => {
     const inputValue = Number(e.target.value);
     if (!isNaN(inputValue) && inputValue >= 1) {
-      setNewGoal({ ...newGoal, calories: inputValue });
+      setNewGoal({ ...newGoal, objetive: inputValue });
     } else {
-      setNewGoal({ ...newGoal, calories: "" });
+      setNewGoal({ ...newGoal, objetive: "" });
     }
   };
   const handleRecurrencyChange = (event) => {
@@ -186,24 +198,46 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
             }}
           />
 
-          <TextField
-            InputProps={{
-              inputProps: { min: 1 },
-            }}
-            label="Goal (calories)"
-            type="number"
-            variant="outlined"
-            fullWidth
-            value={newGoal.calories}
-            onChange={(e) => handleCaloriesInputChange(e)}
-            style={{ marginBottom: "7px" }}
-            onKeyPress={(event) => {
-              if (event.key === "Enter") {
-                handleAddGoal();
-              }
-            }}
-          />
+<Grid container spacing={2}>
+      <Grid item xs={8}>
+        <FormControl variant="outlined" fullWidth>
+          <InputLabel id="goal-type-label">Goal Type</InputLabel>
+          <Select
+            labelId="goal-type-label"
+            id="goal-type-select"
+            value={newGoal.type}
+            onChange={handleSelectChange}
+            label="Goal Type"
+          >
+            <MenuItem value="calories">Calories</MenuItem>
+            <MenuItem value="flats">Flats</MenuItem>
+            <MenuItem value="carbs">Carbs</MenuItem>
+            <MenuItem value="proteins">Proteins</MenuItem>
+            <MenuItem value="exercise">Exercise</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
 
+      <Grid item xs={4}>
+        <TextField
+          InputProps={{
+            inputProps: { min: 1 },
+          }}
+          label="Goal"
+          type="number"
+          variant="outlined"
+          fullWidth
+          value={newGoal.objetive}
+          onChange={handleCaloriesInputChange}
+          style={{ marginBottom: '7px' }}
+          onKeyPress={(event) => {
+            if (event.key === 'Enter') {
+              handleAddGoal();
+            }
+          }}
+        />
+      </Grid>
+    </Grid>
           <Grid item xs={12} style={{ marginBottom: "7px" }}>
             <FormControl fullWidth>
               <LocalizationProvider dateAdapter={AdapterDateFns}>

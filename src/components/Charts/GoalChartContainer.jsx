@@ -15,7 +15,7 @@ const GoalChartContainer = () => {
     setSelectedGoal(aGoal);
   };
 
-  const getCaloriesForGoal = async () => {
+  const getProgressForGoal = async () => {
     setIsLoading(true);
     const response = await fetch(
       apiUrl +
@@ -24,7 +24,9 @@ const GoalChartContainer = () => {
       "/startDate/" +
       selectedGoal.startDate +
       "/endDate/" +
-      selectedGoal.endDate,
+      selectedGoal.endDate+
+      "/type/" +
+      selectedGoal.type,
       {
         method: "GET",
         headers: {
@@ -35,13 +37,13 @@ const GoalChartContainer = () => {
     );
 
     const data = await response.json();
-    setProgress(data.totalCalorias);
+    setProgress(data.totalConsumido);
     setIsLoading(false);
   };
 
   useEffect(() => {
     if (selectedGoal) {
-      getCaloriesForGoal();
+      getProgressForGoal();
     }
   }, [selectedGoal]);
 
@@ -82,7 +84,7 @@ const GoalChartContainer = () => {
               width: "100%",
             }}
           >
-            <GoalChart goal={selectedGoal.calories} progress={progress} />
+            <GoalChart goal={selectedGoal.objetive} progress={progress} />
           </div>
           <Typography
             style={{
@@ -92,20 +94,20 @@ const GoalChartContainer = () => {
               textAlign: "center",
             }}
           >
-            {progress > selectedGoal.calories
+            {progress > selectedGoal.objetive
               ? <>
                 You exceeded by
-                <span style={{ fontWeight: 'bold' }}> {progress - selectedGoal.calories} </span>
-                calories
+                <span style={{ fontWeight: 'bold' }}> {progress - selectedGoal.objetive} </span>
+                {selectedGoal.type}
               </>
               : <>
                 You are missing
-                <span style={{ fontWeight: 'bold' }}> {selectedGoal.calories - progress} </span>
-                calories
+                <span style={{ fontWeight: 'bold' }}> {selectedGoal.objetive - progress} </span>
+                {selectedGoal.type}
               </>
             }
           </Typography>
-          {progress < selectedGoal.calories && (
+          {progress < selectedGoal.objetive && (
             <Typography
               style={{
                 color: "black",
