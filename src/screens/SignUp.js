@@ -38,6 +38,7 @@ const SignUp = () => {
     height: "",
     weight: "",
     role: "",
+    allergies:[{ name: ""}],
   });
 
   const handleSexChange = (event) => {

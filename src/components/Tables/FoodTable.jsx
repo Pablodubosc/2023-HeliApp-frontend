@@ -79,7 +79,7 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
   }, []);
 
   const getFoods = async () => {
-    const response = await fetch(apiUrl + "/api/foods/", {
+    const response = await fetch(apiUrl + "/api/foods/" + localStorage.getItem("userId") , {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -87,6 +87,7 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
       },
     });
     const data = await response.json();
+    console.log(data.data)
     setFoods(data.data);
     setTotalItems(data.data.length);
   };
@@ -94,7 +95,7 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
   const getFoodByCategory = async () => {
     if (selectedCategory !== "") {
       const response = await fetch(
-        apiUrl + "/api/foods/category/" + selectedCategory,
+        apiUrl + "/api/foods/category/" + selectedCategory + "/" +  localStorage.getItem("userId"),
         {
           method: "GET",
           headers: {

@@ -60,7 +60,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
   }, [open]);
 
   const getFoods = async () => {
-    const response = await fetch(apiUrl + "/api/foods/", {
+    const response = await fetch(apiUrl + "/api/foods/" + localStorage.getItem("userId") , {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
