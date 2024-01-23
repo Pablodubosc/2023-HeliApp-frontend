@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { IconButton, Typography } from "@mui/material";
-import MealForm from "./Forms/MealForm";
+import ExerciseDoneForm from "../Forms/ExerciseDoneForm";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
-import MealTable from "./Tables/MealTable";
+import ExerciseDoneTable from "../Tables/ExerciseDoneTable";
 
-const MealList = () => {
+const ExerciseDoneList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -15,7 +15,7 @@ const MealList = () => {
         align="center"
         marginBottom="2%"
       >
-        MEALS TABLE
+       EXERCISE DONE TABLE
       </Typography>
       <div
         style={{
@@ -24,11 +24,11 @@ const MealList = () => {
           maxWidth: "100%",
         }}
       >
-        <MealTable modalOpen={isModalOpen}/>
+        <ExerciseDoneTable modalOpen={isModalOpen}/>
       </div>
 
       <React.Fragment>
-        <MealForm open={isModalOpen} setOpen={setIsModalOpen} />
+        <ExerciseDoneForm open={isModalOpen} setOpen={setIsModalOpen} />
       </React.Fragment>
       {localStorage.getItem("viewAs") === "false" && (
       <IconButton
@@ -42,4 +42,4 @@ const MealList = () => {
   );
 };
 
-export default MealList;
+export default ExerciseDoneList;

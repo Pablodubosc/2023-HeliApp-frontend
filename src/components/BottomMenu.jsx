@@ -9,7 +9,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { useNavigate, useLocation } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 export default function LabelBottomNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,17 +20,14 @@ export default function LabelBottomNavigation() {
       case "/main":
         setValue("home");
         break;
-      case "/mainNutritionist":
-        setValue("return");
-        break;
       case "/meals":
         setValue("meals");
         break;
       case "/statistics":
         setValue("stats");
         break;
-      case "/nutritionist":
-        setValue("nutritionist");
+      case "/fitness":
+        setValue("fitness");
         break;
       case "/myProfile":
         setValue("profile");
@@ -64,8 +61,8 @@ export default function LabelBottomNavigation() {
       case "meals":
         navigate("/meals");
         break;
-      case "nutritionist":
-        navigate("/nutritionist");
+      case "fitness":
+        navigate("/fitness");
         break;
       case "logout":
         localStorage.removeItem("token");
@@ -141,9 +138,9 @@ export default function LabelBottomNavigation() {
       />
       {localStorage.getItem("viewAs") === "false" && (
         <BottomNavigationAction
-          label="Nutritionist"
-          value="nutritionist"
-          icon={<AssignmentIndIcon />}
+          label="Fitness"
+          value="fitness"
+          icon={<FitnessCenterIcon />}
           sx={{
             minWidth: 0,
             paddingLeft: 0,

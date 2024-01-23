@@ -210,10 +210,10 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
             label="Goal Type"
           >
             <MenuItem value="calories">Calories</MenuItem>
-            <MenuItem value="flats">Flats</MenuItem>
+            <MenuItem value="fats">Fats</MenuItem>
             <MenuItem value="carbs">Carbs</MenuItem>
             <MenuItem value="proteins">Proteins</MenuItem>
-            <MenuItem value="exercise">Exercise</MenuItem>
+            <MenuItem value="calories burn">Calories Burn</MenuItem>
           </Select>
         </FormControl>
       </Grid>

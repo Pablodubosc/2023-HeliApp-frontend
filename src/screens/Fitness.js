@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import Drawer from "../components/Drawer";
-import MealList from "../components/List/MealList";
-import FoodList from "../components/List/FoodList";
+import ExerciseDoneList from "../components/List/ExerciseDoneList";
+import ExerciseList from "../components/List/ExerciseList";
 import LabelBottomNavigation from "../components/BottomMenu";
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
@@ -15,8 +15,8 @@ import ViewingMessage from "../components/ViewingMessage";
 
 const apiUrl = getApiUrl();
 
-const Meals = () => {
-  const { enqueueSnackbar } = useSnackbar();
+const Fitness = () => {
+    const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
   const [isMobile, setIsMobile] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -82,7 +82,6 @@ const Meals = () => {
       onClick: handleIntermittentFasting,
     },
   ];
-
   return (
     <div className="container">
       {isMobile ? (
@@ -116,10 +115,10 @@ const Meals = () => {
         <div className="col-lg-10">
           <div className="row justify-content-center">
             <div className="col-lg-6 col-md-6">
-              <FoodList />
+              <ExerciseList />
             </div>
             <div className="col-lg-6 col-md-6">
-              <MealList />
+              <ExerciseDoneList/>
             </div>
           </div>
         </div>
@@ -132,4 +131,4 @@ const Meals = () => {
   );
 };
 
-export default Meals;
+export default Fitness;

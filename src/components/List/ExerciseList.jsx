@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import { IconButton, Typography } from "@mui/material";
-import FoodForm from "./Forms/FoodForm";
+import ExerciseForm from "../Forms/ExerciseForm";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
-import FoodTable from "./Tables/FoodTable";
+import ExerciseTable from "../Tables/ExerciseTable";
 
-const FoodList = () => {
+const ExerciseList = () => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filterOpen, setFilterOpen] = useState(false);
 
   return (
     <div style={{ textAlign: "center", color: "black" }}>
-      <Typography variant="h5" fontWeight="bold" align='center' marginBottom='2%'>FOODS TABLE</Typography>
+      <Typography variant="h5" fontWeight="bold" align='center' marginBottom='2%'>EXERCISE TABLE</Typography>
       <div
         style={{
           display: "flex",
@@ -20,10 +19,10 @@ const FoodList = () => {
           maxWidth: "100%",
         }}
       >
-        <FoodTable filterOpen={filterOpen} modalOpen={isModalOpen} />
+        <ExerciseTable modalOpen={isModalOpen} />
       </div>
       <React.Fragment>
-        <FoodForm open={isModalOpen} setOpen={setIsModalOpen} />
+        <ExerciseForm open={isModalOpen} setOpen={setIsModalOpen} />
       </React.Fragment>
       {localStorage.getItem("viewAs") === "false" && (
       <IconButton
@@ -33,15 +32,8 @@ const FoodList = () => {
       >
         <AddCircleRoundedIcon />
       </IconButton>)}
-      <IconButton
-        onClick={() => {
-          setFilterOpen(!filterOpen);
-        }}
-      >
-        <FilterAltRoundedIcon />
-      </IconButton>
     </div>
   );
 };
 
-export default FoodList;
+export default ExerciseList;
