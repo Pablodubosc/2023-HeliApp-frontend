@@ -46,12 +46,6 @@ export default function LabelBottomNavigation() {
       case "home":
         navigate("/main");
         break;
-      case "return":
-        localStorage.setItem("userId", localStorage.getItem("nutritionistUserId"));
-        localStorage.removeItem("nutritionistUserId");
-        localStorage.setItem("viewAs", false);
-        navigate("/mainNutritionist");
-        break;
       case "stats":
         navigate("/statistics");
         break;
@@ -88,18 +82,6 @@ export default function LabelBottomNavigation() {
       value={value}
       onChange={handleChange}
     >
-      <BottomNavigationAction
-        label="Return"
-        value="return"
-        icon={<ArrowBackIcon />}
-        sx={{
-          minWidth: 0,
-          paddingLeft: 0,
-          paddingRight: 0,
-          marginLeft: 0,
-          marginRight: 0,
-        }}
-      />
       <BottomNavigationAction
         label="Home"
         value="home"
