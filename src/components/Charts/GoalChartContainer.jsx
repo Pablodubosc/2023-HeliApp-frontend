@@ -17,7 +17,27 @@ const GoalChartContainer = () => {
 
   const getProgressForGoal = async () => {
     setIsLoading(true);
-    const response = await fetch(
+    if(selectedGoal.type == "calories burn")
+    {
+      var response = await fetch(
+        apiUrl +
+        "/api/exerciseDone/user/" +
+        localStorage.getItem("userId") +
+        "/startDate/" +
+        selectedGoal.startDate +
+        "/endDate/" +
+        selectedGoal.endDate,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+    }
+    else{
+    var response = await fetch(
       apiUrl +
       "/api/meals/user/" +
       localStorage.getItem("userId") +
@@ -35,7 +55,7 @@ const GoalChartContainer = () => {
         },
       }
     );
-
+  }
     const data = await response.json();
     setProgress(data.totalConsumido);
     setIsLoading(false);
