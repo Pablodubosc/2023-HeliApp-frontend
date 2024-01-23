@@ -41,7 +41,7 @@ const WaterGlassBarChartContainer = ({flag}) => {
       }}
     >
       <Grid sx={{ maxHeight: "450px", minWidth: "310px", alignContent: 'center', textAlign: 'center' }}>
-        <h2 style={{fontWeight: 'bold'}}>Water Glass By Day</h2>
+        <h2 style={{fontWeight: 'bold'}}>Water Glass History</h2>
         <div style={{ position: "relative", minHeight: 320, marginTop: "10%" }}>
           {loading ? (
             <CircularProgress />

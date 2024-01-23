@@ -87,7 +87,7 @@ const PieChartContainer = () => {
       }}
     >
       <Grid sx={{ maxHeight: "450px", minWidth: "320px", alignContent: 'center', textAlign: 'center' }}>
-        <h2 style={{ fontWeight: 'bold' }}>Foods by Day</h2>
+        <h2 style={{ fontWeight: 'bold' }}>Foods per Day</h2>
         <TextField
           style={{ width: "73%", minWidth: 200 }}
           InputLabelProps={{ shrink: true }}
