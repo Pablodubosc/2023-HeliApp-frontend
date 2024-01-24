@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MyResponsiveLine from "./LineChart";
-import { Button, CircularProgress, Grid } from "@mui/material";
+import { Button, CircularProgress, Grid, Autocomplete, TextField } from "@mui/material";
 import getApiUrl from '../../helpers/apiConfig';
 import { addDays } from 'date-fns';
 import { DayPicker } from 'react-day-picker';
@@ -29,17 +29,24 @@ const LineChartContainer = () => {
   const [data, setData] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState("calories");
   const [range, setRange] = useState({
     from: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0, 0, 0, 0),
     to: addDays(new Date().setHours(0, 0), 7)
   });
 
-  const getMeals = async (selectedStartDate, selectedEndDate) => {
+  const typeOptions = ["calories", "fats","carbs","proteins","Calories Burn"];
+
+  const handleTypeChange = (selectedType) => {
+    setSelectedType(selectedType);
+  };
+
+  const getMealsBetweenDays = async (selectedStartDate, selectedEndDate) => {
     const response = await fetch(
       apiUrl + "/api/meals/user/" +
       localStorage.getItem("userId") +
       "/between/" +
-      selectedStartDate+"/"+selectedEndDate,
+      selectedStartDate+"/"+selectedEndDate+"/type/"+selectedType,
       {
         method: "GET",
         headers: {
@@ -49,17 +56,16 @@ const LineChartContainer = () => {
       }
     );
     const data = await response.json();
-    console.log(data)
     setData(data.fechasIntermedias);
   };
 
   useEffect(() => {
     if (range) {
       if(range.from && range.to){
-        getMeals(range.from, range.to);
+        getMealsBetweenDays(range.from, range.to);
       }
     }
-  }, [range]);
+  }, [range,selectedType]);
 
   return (
     <div
@@ -73,7 +79,26 @@ const LineChartContainer = () => {
       margin: 'auto'
     }}
   >
-    <h2 style={{ fontWeight: 'bold' }}>Calories By Date</h2>
+    <Grid sx={{ width: "73%", minWidth: 200, marginLeft: '13.5%' }}>
+            <Autocomplete
+                style={{ width: "100%", maxWidth: 400, minWidth: 200 }}
+                value={selectedType}
+                onChange={(event, newValue) => {
+                  handleTypeChange(newValue);
+                }}
+                options={typeOptions}
+                getOptionLabel={(option) => option}
+                renderInput={(params) => (
+                  <TextField {...params} label="Choose a Type" variant="outlined" />
+                )}
+                ListboxProps={{
+                  style: {
+                    maxHeight: 110,
+                  },
+                }}
+            />
+        </Grid>
+    <h2 style={{ fontWeight: 'bold' }}>{selectedType} By Date</h2>
 
     <Button
       variant="contained"
@@ -132,7 +157,8 @@ const LineChartContainer = () => {
             />
           </div>
         ) : data && data.length > 0 ? (
-          <MyResponsiveLine data={data} />
+          console.log("selectedType: ", selectedType),
+          <MyResponsiveLine data={data} type={selectedType} />
         ) : (
           <div>No calories to show</div>
         )}

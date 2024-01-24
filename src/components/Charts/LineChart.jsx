@@ -1,14 +1,14 @@
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip } from "recharts";
 
-export default function LineChartWithCustomFontSize(data) {
-  const caloriasArray = data.data.map((item) => item.calories);
+export default function LineChartWithCustomFontSize({ data, type }) {
+  const caloriasArray = data.map((item) => item[type]);
   const totalCalorias = caloriasArray.reduce((acc, curr) => acc + curr, 0);
   const promedioCalorias = totalCalorias / caloriasArray.length;
 
-  const dataWithAverage = data.data.map((item) => ({
+  const dataWithAverage = data.map((item) => ({
     date: item.date.split('T')[0],
-    calories: item.calories,
+    calories: item[type],
     promedio: promedioCalorias,
   }));
 
