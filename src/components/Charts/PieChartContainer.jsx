@@ -161,6 +161,7 @@ const PieChartContainer = () => {
                     maxHeight: 110,
                   },
                 }}
+                disableClearable 
             />
         </Grid>
       <Grid sx={{ maxHeight: "450px", minWidth: "320px", alignContent: 'center', textAlign: 'center' }}>

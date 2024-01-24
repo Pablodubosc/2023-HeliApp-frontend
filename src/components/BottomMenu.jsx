@@ -94,10 +94,11 @@ export default function LabelBottomNavigation() {
           marginRight: 0,
         }}
       />
+     
       <BottomNavigationAction
-        label="My Meals"
-        value="meals"
-        icon={<RestaurantIcon />}
+        label="Stats"
+        value="stats"
+        icon={<BarChartIcon />}
         sx={{
           minWidth: 0,
           paddingLeft: 0,
@@ -106,10 +107,10 @@ export default function LabelBottomNavigation() {
           marginRight: 0,
         }}
       />
-      <BottomNavigationAction
-        label="Stats"
-        value="stats"
-        icon={<BarChartIcon />}
+       <BottomNavigationAction
+        label="My Meals"
+        value="meals"
+        icon={<RestaurantIcon />}
         sx={{
           minWidth: 0,
           paddingLeft: 0,

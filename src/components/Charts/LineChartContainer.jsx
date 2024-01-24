@@ -29,13 +29,13 @@ const LineChartContainer = () => {
   const [data, setData] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState("calories");
+  const [selectedType, setSelectedType] = useState("Calories");
   const [range, setRange] = useState({
     from: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0, 0, 0, 0),
     to: addDays(new Date().setHours(0, 0), 7)
   });
 
-  const typeOptions = ["calories", "fats","carbs","proteins","Calories Burn"];
+  const typeOptions = ["Calories", "Fats","Carbs","Proteins","Calories Burn"];
 
   const handleTypeChange = (selectedType) => {
     setSelectedType(selectedType);
@@ -59,10 +59,34 @@ const LineChartContainer = () => {
     setData(data.fechasIntermedias);
   };
 
+
+  const getExerciseDoneBetweenDays = async (selectedStartDate, selectedEndDate) => {
+    const response = await fetch(
+      apiUrl + "/api/exerciseDone/user/" +
+      localStorage.getItem("userId") +
+      "/between/" +
+      selectedStartDate+"/"+selectedEndDate,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    const data = await response.json();
+    setData(data.fechasIntermedias);
+  };
+
   useEffect(() => {
     if (range) {
       if(range.from && range.to){
-        getMealsBetweenDays(range.from, range.to);
+        if(selectedType != "Calories Burn")
+        {getMealsBetweenDays(range.from, range.to);}
+        else{
+        getExerciseDoneBetweenDays(range.from, range.to);
+        }
+        
       }
     }
   }, [range,selectedType]);
@@ -79,9 +103,9 @@ const LineChartContainer = () => {
       margin: 'auto'
     }}
   >
-    <Grid sx={{ width: "73%", minWidth: 200, marginLeft: '13.5%' }}>
+    <Grid sx={{ width: "73%", minWidth: 200}}>
             <Autocomplete
-                style={{ width: "100%", maxWidth: 400, minWidth: 200 }}
+                style={{ width: "100%", maxWidth: 600, minWidth: 200 }}
                 value={selectedType}
                 onChange={(event, newValue) => {
                   handleTypeChange(newValue);
@@ -96,6 +120,7 @@ const LineChartContainer = () => {
                     maxHeight: 110,
                   },
                 }}
+                disableClearable 
             />
         </Grid>
     <h2 style={{ fontWeight: 'bold' }}>{selectedType} By Date</h2>
@@ -157,8 +182,7 @@ const LineChartContainer = () => {
             />
           </div>
         ) : data && data.length > 0 ? (
-          console.log("selectedType: ", selectedType),
-          <MyResponsiveLine data={data} type={selectedType} />
+          <MyResponsiveLine data={data} type={selectedType.toLowerCase()} />
         ) : (
           <div>No calories to show</div>
         )}
