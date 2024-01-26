@@ -25,6 +25,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
@@ -162,6 +163,10 @@ export default function MiniDrawer({ user }) {
 
   const navigateToMyMealsScreen = () => {
     navigate("/meals", { replace: true });
+  };
+
+  const navigateToMyPlanifierScreen = () => {
+    navigate("/planifier", { replace: true });
   };
 
   const navigateToFitnessScreen = () => {
@@ -325,6 +330,28 @@ export default function MiniDrawer({ user }) {
                 primary="Fitness"
                 sx={{ opacity: open ? 1 : 0 }}
               />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding sx={{ display: "block" }}>
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? "initial" : "center",
+                px: 2.5,
+              }}
+              onClick={navigateToMyPlanifierScreen}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: open ? 3 : "auto",
+                  justifyContent: "center",
+                }}
+              >
+                <ContentPasteSearchIcon />
+              </ListItemIcon>
+              <ListItemText primary="Meals Planifier" sx={{ opacity: open ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
           

@@ -4,11 +4,10 @@ import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import LogoutIcon from "@mui/icons-material/Logout";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import HomeIcon from "@mui/icons-material/Home";
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import SettingsIcon from '@mui/icons-material/Settings';
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { useNavigate, useLocation } from "react-router-dom";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 export default function LabelBottomNavigation() {
   const navigate = useNavigate();
@@ -57,6 +56,9 @@ export default function LabelBottomNavigation() {
         break;
       case "fitness":
         navigate("/fitness");
+        break;
+      case "planifier":
+        navigate("/planifier");
         break;
       case "logout":
         localStorage.removeItem("token");
@@ -124,6 +126,19 @@ export default function LabelBottomNavigation() {
           label="Fitness"
           value="fitness"
           icon={<FitnessCenterIcon />}
+          sx={{
+            minWidth: 0,
+            paddingLeft: 0,
+            paddingRight: 0,
+            marginLeft: 0,
+            marginRight: 0,
+          }}
+        />)}
+        {localStorage.getItem("viewAs") === "false" && (
+        <BottomNavigationAction
+          label="Planifier"
+          value="planifier"
+          icon={<ContentPasteSearchIcon />}
           sx={{
             minWidth: 0,
             paddingLeft: 0,

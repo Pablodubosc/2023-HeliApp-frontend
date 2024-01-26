@@ -149,6 +149,8 @@ const MealForm = ({ open, setOpen, initialData }) => {
 
   const closeModal = () => {
     setOpen(false);
+    if(!initialData)
+    {
     setMealData({
       name: "",
       date: new Date(),
@@ -157,6 +159,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
       foods: [{ name: "", calories: "", weight: "", category: "" }],
       userId: localStorage.getItem("userId"),
     });
+  }
   };
 
   const handleAddFoodInput = () => {
