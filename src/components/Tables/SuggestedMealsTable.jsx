@@ -22,11 +22,9 @@ import getApiUrl from "../../helpers/apiConfig";
 const apiUrl = getApiUrl();
 
 function Row(props) {
-  const { row, onEditClick } = props;
+  console.log("ENTRA ACA")
+  const { row, onEditClick } = props.meals;
   const [open, setOpen] = React.useState(false);
-
-  const { enqueueSnackbar } = useSnackbar();
-
 
   return (
     <React.Fragment>
@@ -43,6 +41,17 @@ function Row(props) {
         <TableCell component="th" scope="row" align="center">
           {row.name}
         </TableCell>
+        {localStorage.getItem("viewAs") === "false" && (
+        <TableCell align="center">
+          <IconButton
+            aria-label="edit row"
+            size="small"
+            onClick={() => onEditClick(row)}
+          >
+            <EditIcon />
+          </IconButton>
+        </TableCell>
+        )}
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -111,46 +120,21 @@ function Row(props) {
 
 const rowsPerPage = 5;
 
-export default function SuggestedMealsTable()  {
+export default function SuggestedMealsTable({selectedPlan})  {
   const [page, setPage] = useState(0);
-  const [meals, setMeals] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [totalMeals, setTotalMeals] = useState(0);
-
-  const startIndex = page * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(rowsPerPage);
 
   useEffect(() => {
-    getMeals();
-  }, []);
+    const newStartIndex = page * rowsPerPage;
+    const newEndIndex = newStartIndex + rowsPerPage;
 
-  const getMeals = async () => {
-    const response = await fetch(
-      apiUrl + "/api/meals/user/" + localStorage.getItem("userId"),
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      }
-    );
-    const data = await response.json();
+    setStartIndex(newStartIndex);
+    setEndIndex(newEndIndex);
+  }, [page,selectedPlan]);
 
-    const mealsWithShortenedDates = data.data.map((meal) => {
-      return {
-        ...meal,
-        date: meal.date.substring(0, 10),
-      };
-    });
-
-    setMeals(mealsWithShortenedDates);
-    setTotalMeals(mealsWithShortenedDates.length);
-  };
-
-
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
+  const handlePageChange = async (newPage) => {
+    await setPage(newPage);
   };
 
 
@@ -173,8 +157,9 @@ export default function SuggestedMealsTable()  {
           </TableRow>
         </TableHead>
         <TableBody sx={{ textAlign: "center" }}>
-          {meals.length > 0 ? (
-            meals
+          {selectedPlan.length > 0  ? (
+            console.log("ESTO"+selectedPlan),
+            selectedPlan.meals
               .slice(startIndex, endIndex)
               .map((row) => (
                 <Row
@@ -183,14 +168,14 @@ export default function SuggestedMealsTable()  {
                   sx={{ textAlign: "center" }}
                   page={page}
                   endIndex={endIndex}
-                  totalMeals={totalMeals}
                   onPageChange={handlePageChange}
                 />
               ))
           ) : (
+            console.log("length"+selectedPlan),
             <TableRow>
               <TableCell colSpan={5} align="center">
-                No meals to show
+                Please select a plan.
               </TableCell>
             </TableRow>
           )}
@@ -206,7 +191,7 @@ export default function SuggestedMealsTable()  {
         </IconButton>
         <IconButton
           onClick={(e) => handlePageChange(page + 1)}
-          disabled={endIndex >= totalMeals}
+          disabled={endIndex >= selectedPlan.length}
         >
           <ArrowForwardIosIcon />
         </IconButton>

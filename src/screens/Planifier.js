@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import Drawer from "../components/Drawer";
-import SuggestedMealList from "../components/List/SuggestedMealList";
-import { Typography } from "@mui/material";
+import MealList from "../components/List/MealList";
+import FoodList from "../components/List/FoodList";
 import LabelBottomNavigation from "../components/BottomMenu";
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
@@ -12,7 +12,8 @@ import getApiUrl from "../helpers/apiConfig";
 import { useSnackbar } from "notistack";
 import IntermittentFastingForm from "../components/Forms/IntermittentFastingForm";
 import ViewingMessage from "../components/ViewingMessage";
-import PlanCalculator from "../components/PlanCalculator";
+import SuggestedMealList from "../components/List/SuggestedMealList";
+import PlanList from "../components/List/PlanList";
 
 const apiUrl = getApiUrl();
 
@@ -21,6 +22,7 @@ const Planifier = () => {
   const theme = useTheme();
   const [isMobile, setIsMobile] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState([]);
   const [openIntermittentFastingModal, setOpenIntermittentFastingModal] =
     useState(false);
 
@@ -115,12 +117,12 @@ const Planifier = () => {
       )}
       <div className="row justify-content-center">
         <div className="col-lg-10">
-          <div className="row justify-content-start"> {/* Cambié justify-content-center a justify-content-start */}
-          <div className="col-lg-6 col-md-6 d-flex align-items-center justify-content-center">
-              <PlanCalculator />
+          <div className="row justify-content-center">
+            <div className="col-lg-6 col-md-6">
+              <PlanList selectedPlan={selectedPlan} setSelectedPlan={setSelectedPlan} />
             </div>
             <div className="col-lg-6 col-md-6">
-              <SuggestedMealList />
+            <SuggestedMealList selectedPlan={selectedPlan}/>
             </div>
           </div>
         </div>

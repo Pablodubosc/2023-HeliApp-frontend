@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { IconButton, Typography } from "@mui/material";
 import SuggestedMealsTable from "../Tables/SuggestedMealsTable";
 
-const SuggestedMealList = () => {
+const SuggestedMealList = ({selectedPlan}) => {
 
   return (
     <div style={{ textAlign: "center", marginBottom: "250px", color: "black" }}>
@@ -21,7 +21,7 @@ const SuggestedMealList = () => {
           maxWidth: "100%",
         }}
       >
-        <SuggestedMealsTable/>
+        <SuggestedMealsTable selectedPlan={selectedPlan}/>
       </div>
     </div>
   );
