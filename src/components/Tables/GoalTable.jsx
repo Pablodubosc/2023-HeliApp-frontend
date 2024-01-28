@@ -152,7 +152,7 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
   }
 
   const getFaceIcon = (goal) => {
-    const progress = goal.totalCalorias / goal.calories;
+    const progress = goal.totalConsumido / goal.objetive;
 
     if (progress >= 1) {
       return <SentimentVerySatisfiedIcon style={{ color: "green" }} />;

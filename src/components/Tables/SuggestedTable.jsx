@@ -14,16 +14,14 @@ import Collapse from "@mui/material/Collapse";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import EditIcon from "@mui/icons-material/Edit";
-import MealForm from "../Forms/MealForm";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useSnackbar } from "notistack";
 import getApiUrl from "../../helpers/apiConfig";
 
 const apiUrl = getApiUrl();
 
+
 function Row(props) {
-  console.log("ENTRA ACA")
-  const { row, onEditClick } = props.meals;
+  const planTypeWithoutQuotes = props.planType.replace(/"/g, "");
+  const { row, onEditClick } = props;
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -53,6 +51,7 @@ function Row(props) {
         </TableCell>
         )}
       </TableRow>
+      {planTypeWithoutQuotes !== "calories burn" ? (
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
@@ -113,14 +112,57 @@ function Row(props) {
             </Box>
           </Collapse>
         </TableCell>
+      </TableRow>):(
+        <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 1 }}>
+              <Table size="small" aria-label="purchases">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Name
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Calories Burn
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Time (minutes)
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {row.exercises.map((exercise) => (
+                    <TableRow key={exercise.name}>
+                      <TableCell component="th" scope="row" align="center">
+                        {exercise.name}
+                      </TableCell>
+                      <TableCell align="center">
+                        {exercise.totalCaloriesBurn}
+                      </TableCell>
+                      <TableCell align="center">{exercise.timeDoing}</TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Total
+                    </TableCell>
+                    <TableCell align="center">{row.caloriesBurn}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
       </TableRow>
+      )}
     </React.Fragment>
   );
 }
 
 const rowsPerPage = 5;
 
-export default function SuggestedMealsTable({selectedPlan})  {
+export default function SuggestedTable({selectedPlan})  {
   const [page, setPage] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(rowsPerPage);
@@ -131,7 +173,11 @@ export default function SuggestedMealsTable({selectedPlan})  {
 
     setStartIndex(newStartIndex);
     setEndIndex(newEndIndex);
-  }, [page,selectedPlan]);
+  }, [page]);
+
+  useEffect(() => {
+    handlePageChange(0)
+  }, [selectedPlan]);
 
   const handlePageChange = async (newPage) => {
     await setPage(newPage);
@@ -157,14 +203,14 @@ export default function SuggestedMealsTable({selectedPlan})  {
           </TableRow>
         </TableHead>
         <TableBody sx={{ textAlign: "center" }}>
-          {selectedPlan.length > 0  ? (
-            console.log("ESTO"+selectedPlan),
-            selectedPlan.meals
+          {selectedPlan.suggestions.length > 0  ? (
+            selectedPlan.suggestions
               .slice(startIndex, endIndex)
               .map((row) => (
                 <Row
                   key={row.name}
                   row={row}
+                  planType = {JSON.stringify(selectedPlan.planType)}
                   sx={{ textAlign: "center" }}
                   page={page}
                   endIndex={endIndex}
@@ -172,7 +218,6 @@ export default function SuggestedMealsTable({selectedPlan})  {
                 />
               ))
           ) : (
-            console.log("length"+selectedPlan),
             <TableRow>
               <TableCell colSpan={5} align="center">
                 Please select a plan.
@@ -191,7 +236,7 @@ export default function SuggestedMealsTable({selectedPlan})  {
         </IconButton>
         <IconButton
           onClick={(e) => handlePageChange(page + 1)}
-          disabled={endIndex >= selectedPlan.length}
+          disabled={endIndex >= selectedPlan.suggestions.length}
         >
           <ArrowForwardIosIcon />
         </IconButton>

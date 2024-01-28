@@ -160,7 +160,6 @@ const MyProfile = () => {
   };
 
   const handleUpdateUser = () => {
-    console.log(user)
     if (
       user.firstName === "" ||
       user.lastName === "" ||
@@ -169,7 +168,12 @@ const MyProfile = () => {
       user.sex === "" ||
       user.age === "" ||
       user.height === "" ||
-      user.weight === "" 
+      user.weight === "" ||
+      (user.allergies.length > 1 &&
+      user.allergies.some(
+        (allergy) =>
+          allergy.name == ""
+      ))
     ) {
       enqueueSnackbar("Some fields are empty.", { variant: "error" });
       return;
@@ -416,11 +420,6 @@ const MyProfile = () => {
     </React.Fragment>
   ))}
 </div>
-
-
-
-
-
 
               <Button
                 type="submit"

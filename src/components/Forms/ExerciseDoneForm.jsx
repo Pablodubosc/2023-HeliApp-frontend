@@ -126,12 +126,15 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
 
   const closeModal = () => {
     setOpen(false);
+    if(!initialData)
+    {
     setExerciseDoneData({
       name: "",
       date: new Date(),
       exercises: [{ name: "", caloriesBurn: "", time: "", timeDoing: ""}],
       userId: localStorage.getItem("userId"),
     });
+  }
   };
 
   const handleAddExerciseInput = () => {

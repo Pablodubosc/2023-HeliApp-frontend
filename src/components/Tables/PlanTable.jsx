@@ -79,12 +79,12 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
     });
     const data = await response.json();
     setPlans(data.data);
+    console.log(data.data)
     setTotalItems(data.data.length);
   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    setSelectedPlan([]);
   };
 
   const handleRowCheckboxChange = (event, row) => {
@@ -106,25 +106,33 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
           <TableHead sx={{ fontWeight: "bold" }}>
             <TableRow sx={{ fontWeight: "bold" }}>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Plan name</TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Calories Wanted</TableCell>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Objetive</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }} align="center">From&nbsp;</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }} align="center">To&nbsp;</TableCell>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Tracking</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {noResults ? (
+            {plans.length == 0 ? (
               <TableRow>
                 <TableCell colSpan={3} align="center">
-                  No results found.{" "}
+                  You dont have any plans.{" "}
                 </TableCell>
               </TableRow>
             ) : (
               (5 > 0 ? plans.slice(page * 5, page * 5 + 5) : plans).map((row) => (
                 <TableRow key={row.name} selected={selectedPlan === row}>
-                  <TableCell component="th" scope="row" style={{ width: 160 }} align="center">
+                  <TableCell component="th" scope="row" style={{ width: 200, height:70 }} align="center">
                     {row.name}
                   </TableCell>
-                  <TableCell style={{ width: 160 }} align="center">
-                    {row.calories}
+                  <TableCell style={{ width: 100 }} align="center">
+                    {row.planObjetive} {row.planType}
+                  </TableCell>
+                  <TableCell style={{ width: 200 }} align="center">
+                    {row.startDate ? row.startDate.substring(0, 10) : ""}
+                  </TableCell>
+                  <TableCell style={{ width: 200 }} align="center">
+                    {row.endDate ? row.endDate.substring(0, 10) : ""}
                   </TableCell>
                   <TableCell style={{ width: 50 }} align="center">
                     <input
