@@ -121,7 +121,7 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
               </TableRow>
             ) : (
               (5 > 0 ? plans.slice(page * 5, page * 5 + 5) : plans).map((row) => (
-                <TableRow key={row.name} selected={selectedPlan === row}>
+                <TableRow key={row._id} selected={selectedPlan === row}>
                   <TableCell component="th" scope="row" style={{ width: 200, height:70 }} align="center">
                     {row.name}
                   </TableCell>

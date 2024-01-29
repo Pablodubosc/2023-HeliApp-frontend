@@ -234,7 +234,7 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
             ) : (
               (5 > 0 ? goals.slice(page * 5, page * 5 + 5) : goals).map(
                 (row) => (
-                  <TableRow key={row.name}>
+                  <TableRow key={row._id}>
                     <TableCell
                       component="th"
                       scope="row"

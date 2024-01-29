@@ -15,13 +15,16 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import EditIcon from "@mui/icons-material/Edit";
 import getApiUrl from "../../helpers/apiConfig";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import SuggestionForm from  "../Forms/SuggestionForm";
 
 const apiUrl = getApiUrl();
 
 
 function Row(props) {
   const planTypeWithoutQuotes = props.planType.replace(/"/g, "");
-  const { row, onEditClick } = props;
+  const { row, onDoneClick } = props;
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -39,14 +42,37 @@ function Row(props) {
         <TableCell component="th" scope="row" align="center">
           {row.name}
         </TableCell>
-        {localStorage.getItem("viewAs") === "false" && (
+        {planTypeWithoutQuotes !== "calories burn" ? (
         <TableCell align="center">
+          {row.done == false  ? (
+              <IconButton
+                aria-label="done row"
+                size="small"
+                onClick={() => onDoneClick(row)}
+              >
+                <RestaurantIcon />
+              </IconButton>
+            ) : (
+              <div style={{ opacity: 0.5, pointerEvents: 'none' }}>
+                <IconButton
+                  aria-label="done row"
+                  size="small"
+                  onClick={() => onDoneClick(row)}
+                  disabled
+                >
+                  <RestaurantIcon />
+                </IconButton>
+              </div>
+            )}
+        </TableCell>
+        ):(
+          <TableCell align="center">
           <IconButton
-            aria-label="edit row"
+            aria-label="done row"
             size="small"
-            onClick={() => onEditClick(row)}
+            onClick={() => onDoneClick(row)}
           >
-            <EditIcon />
+            <FitnessCenterIcon />
           </IconButton>
         </TableCell>
         )}
@@ -81,7 +107,7 @@ function Row(props) {
                 </TableHead>
                 <TableBody>
                   {row.foods.map((foodRow) => (
-                    <TableRow key={foodRow.name}>
+                    <TableRow key={foodRow._id}>
                       <TableCell component="th" scope="row" align="center">
                         {foodRow.name}
                       </TableCell>
@@ -133,7 +159,7 @@ function Row(props) {
                 </TableHead>
                 <TableBody>
                   {row.exercises.map((exercise) => (
-                    <TableRow key={exercise.name}>
+                    <TableRow key={exercise._id}>
                       <TableCell component="th" scope="row" align="center">
                         {exercise.name}
                       </TableCell>
@@ -166,6 +192,13 @@ export default function SuggestedTable({selectedPlan})  {
   const [page, setPage] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(rowsPerPage);
+  const [isDoneSuggestionlModalOpen, setIsDoneSuggestionlModalOpen] = useState(false);
+  const [suggestion, setSuggestion] = useState(null);
+
+  const handleDoneClick = (suggestion) => {
+    setSuggestion(suggestion);
+    setIsDoneSuggestionlModalOpen(true);
+  };
 
   useEffect(() => {
     const newStartIndex = page * rowsPerPage;
@@ -208,9 +241,11 @@ export default function SuggestedTable({selectedPlan})  {
               .slice(startIndex, endIndex)
               .map((row) => (
                 <Row
-                  key={row.name}
+                  key={row._id}
                   row={row}
                   planType = {JSON.stringify(selectedPlan.planType)}
+                  planStart = {selectedPlan.startDate}
+                  onDoneClick = {handleDoneClick}
                   sx={{ textAlign: "center" }}
                   page={page}
                   endIndex={endIndex}
@@ -226,7 +261,7 @@ export default function SuggestedTable({selectedPlan})  {
           )}
         </TableBody>
       </Table>
-
+      <SuggestionForm open={isDoneSuggestionlModalOpen} setOpen={setIsDoneSuggestionlModalOpen} suggestion={suggestion} selectedPlan={selectedPlan}/>
       <div>
         <IconButton
           onClick={(e) => handlePageChange(page - 1)}
@@ -242,5 +277,6 @@ export default function SuggestedTable({selectedPlan})  {
         </IconButton>
       </div>
     </TableContainer>
+    
   );
 }

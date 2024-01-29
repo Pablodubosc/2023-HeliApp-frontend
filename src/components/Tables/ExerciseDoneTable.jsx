@@ -115,7 +115,7 @@ function Row(props) {
                 </TableHead>
                 <TableBody>
                   {row.exercises.map((exercise) => (
-                    <TableRow key={exercise.name}>
+                    <TableRow key={exercise._id}>
                       <TableCell component="th" scope="row" align="center">
                         {exercise.name}
                       </TableCell>
@@ -219,7 +219,7 @@ export default function ExerciseDoneTable({modalOpen  })  {
               .slice(startIndex, endIndex)
               .map((row) => (
                 <Row
-                  key={row.name}
+                  key={row._id}
                   row={row}
                   sx={{ textAlign: "center" }}
                   onEditClick={handleEditClick}

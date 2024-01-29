@@ -126,7 +126,7 @@ export default function ExerciseTable({ modalOpen  }) {
             ) : (
               (5 > 0 ? exercises.slice(page * 5, page * 5 + 5) : exercises).map(
                 (row) => (
-                  <TableRow key={row.name}>
+                  <TableRow key={row._id}>
                     <TableCell
                       component="th"
                       scope="row"
