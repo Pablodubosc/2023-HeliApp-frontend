@@ -57,6 +57,8 @@ const PlanForm = ({ open, setOpen }) => {
       });
       return;
     } else {
+      newPlan.startDate.setHours(0, 0);
+      newPlan.endDate.setHours(23, 59);
       fetch(apiUrl + "/api/plans/", {
         method: "POST",
         headers: {

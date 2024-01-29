@@ -44,7 +44,7 @@ function Row(props) {
         </TableCell>
         {planTypeWithoutQuotes !== "calories burn" ? (
         <TableCell align="center">
-          {row.done == false  ? (
+          {row.done == false && new Date(props.planStart) <= new Date() ? (
               <IconButton
                 aria-label="done row"
                 size="small"
@@ -67,13 +67,25 @@ function Row(props) {
         </TableCell>
         ):(
           <TableCell align="center">
-          <IconButton
+          {row.done == false && new Date(props.planStart) <= new Date() ? (
+            <IconButton
+              aria-label="done row"
+              size="small"
+              onClick={() => onDoneClick(row)}
+            >
+              <FitnessCenterIcon />
+            </IconButton>
+          ):(
+            <div style={{ opacity: 0.5, pointerEvents: 'none' }}>
+            <IconButton
             aria-label="done row"
             size="small"
             onClick={() => onDoneClick(row)}
           >
             <FitnessCenterIcon />
           </IconButton>
+           </div>
+          )}
         </TableCell>
         )}
       </TableRow>

@@ -129,10 +129,10 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
                     {row.planObjetive} {row.planType}
                   </TableCell>
                   <TableCell style={{ width: 200 }} align="center">
-                    {row.startDate ? row.startDate.substring(0, 10) : ""}
+                    {row.startDate ? row.startDate.substring(5, 10) : ""}
                   </TableCell>
                   <TableCell style={{ width: 200 }} align="center">
-                    {row.endDate ? row.endDate.substring(0, 10) : ""}
+                    {row.endDate ? row.endDate.substring(5, 10) : ""}
                   </TableCell>
                   <TableCell style={{ width: 50 }} align="center">
                     <input

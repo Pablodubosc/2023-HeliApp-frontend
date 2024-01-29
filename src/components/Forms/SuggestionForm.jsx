@@ -34,7 +34,7 @@ const initialMealState = {
   userId: localStorage.getItem("userId"),
 };
 
-const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan }) => {
+const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [exerciseDoneData, setExerciseDoneData] = useState(initialExerciseDoneState);
@@ -50,6 +50,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan }) => {
       date: e,
     }));
   };
+
 
 
   useEffect(() => {
@@ -71,8 +72,28 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan }) => {
     } 
   }, [suggestion]);
 
+
+  const handleUpdateSuggestion = () => {
+    const selectedPlanModify = selectedPlan.suggestions.find(sugerencia => sugerencia._id === suggestion._id);
+
+    if (selectedPlanModify) {
+       selectedPlanModify.done = true; }
+  
+      // Envía la sugerencia actualizada al servidor
+      fetch(apiUrl + "/api/plans", {
+        method: "PUT", // Utiliza el método correcto según tu API
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify(selectedPlan),
+      })
+    }
+
   const handleAddSuggestion = () => {
+    suggestion.done = true;
     if(selectedPlan.planType === "calories burn"){
+
 
       exerciseDoneData.caloriesBurn = exerciseDoneData.exercises
         .map((exercise) => parseInt(exercise.totalCaloriesBurn))
@@ -90,7 +111,9 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan }) => {
           enqueueSnackbar("The exercise was created successfully.", {
             variant: "success",
           });
+          handleUpdateSuggestion();
           closeModal();
+
         } else {
           enqueueSnackbar("An error occurred while creating the exercise.", {
             variant: "error",
@@ -131,6 +154,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan }) => {
           enqueueSnackbar("The exercise was created successfully.", {
             variant: "success",
           });
+          handleUpdateSuggestion();
           closeModal();
         } else {
           enqueueSnackbar("An error occurred while creating the exercise.", {
