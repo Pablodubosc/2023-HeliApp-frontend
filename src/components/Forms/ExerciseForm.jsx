@@ -117,7 +117,7 @@ const ExerciseForm = ({ open, setOpen }) => {
             value={newExercise.name}
             onChange={(e) => setNewExercise({ ...newExercise, name: e.target.value })}
           />
-            <Grid >
+            <Grid sx={{ marginBottom: 1 }}>
               <TextField
                 InputProps={{
                   inputProps: {
@@ -161,7 +161,7 @@ const ExerciseForm = ({ open, setOpen }) => {
             }}
             fullWidth
           >
-            Add Food
+            Add Exercise
           </Button>
         </div>
       </Box>

@@ -128,11 +128,11 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
                   <TableCell style={{ width: 100 }} align="center">
                     {row.planObjetive} {row.planType}
                   </TableCell>
-                  <TableCell style={{ width: 200 }} align="center">
-                    {row.startDate ? row.startDate.substring(5, 10) : ""}
+                  <TableCell style={{ width: 220 }} align="center">
+                    {row.startDate ? row.startDate.substring(0, 10) : ""}
                   </TableCell>
-                  <TableCell style={{ width: 200 }} align="center">
-                    {row.endDate ? row.endDate.substring(5, 10) : ""}
+                  <TableCell style={{ width: 220 }} align="center">
+                    {row.endDate ? row.endDate.substring(0, 10) : ""}
                   </TableCell>
                   <TableCell style={{ width: 50 }} align="center">
                     <input

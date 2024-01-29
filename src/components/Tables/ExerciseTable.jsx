@@ -127,10 +127,10 @@ export default function ExerciseTable({ modalOpen  }) {
               (5 > 0 ? exercises.slice(page * 5, page * 5 + 5) : exercises).map(
                 (row) => (
                   <TableRow key={row._id}>
-                    <TableCell
+                    <TableCell 
                       component="th"
                       scope="row"
-                      style={{ width: 160 }}
+                      style={{ width: 160, height:70 }}
                       align="center"
                     >
                       {row.name}

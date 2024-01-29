@@ -151,13 +151,13 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
         body: JSON.stringify(mealDoneData),
       }).then(function (response) {
         if (response.status === 200) {
-          enqueueSnackbar("The exercise was created successfully.", {
+          enqueueSnackbar("The meal was created successfully.", {
             variant: "success",
           });
           handleUpdateSuggestion();
           closeModal();
         } else {
-          enqueueSnackbar("An error occurred while creating the exercise.", {
+          enqueueSnackbar("An error occurred while creating the meal.", {
             variant: "error",
           });
         }
@@ -237,7 +237,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
             }}
             fullWidth
           >
-           Add suggestion
+           Done as suggested
           </Button>
       </Box>
     </Modal>
