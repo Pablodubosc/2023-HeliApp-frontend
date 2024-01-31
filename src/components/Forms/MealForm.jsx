@@ -254,6 +254,8 @@ const MealForm = ({ open, setOpen, initialData }) => {
     >
       <Box
         sx={{
+          maxHeight: "80vh !important",
+          overflowY: "auto !important",
           position: "absolute",
           top: "50%",
           left: "50%",
