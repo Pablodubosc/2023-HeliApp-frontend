@@ -429,6 +429,7 @@ const MyProfile = () => {
                   mt: 3,
                   mb: 2,
                   backgroundColor: "#373D20",
+                  marginBottom:10,
                   "&:hover": { backgroundColor: "#373D20" },
                   fontWeight: "bold",
                 }}
