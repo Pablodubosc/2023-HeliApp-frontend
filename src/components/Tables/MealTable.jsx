@@ -175,7 +175,7 @@ export default function MealTable({modalOpen  })  {
 
   useEffect(() => {
     getMeals();
-  }, [modalOpen]);
+  }, [modalOpen, isModalOpen]);
 
   const getMeals = async () => {
     const response = await fetch(

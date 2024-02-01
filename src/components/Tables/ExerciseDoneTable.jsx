@@ -155,7 +155,7 @@ export default function ExerciseDoneTable({modalOpen  })  {
 
   useEffect(() => {
     getExerciseDone();
-  }, [modalOpen]);
+  }, [modalOpen,isModalOpen]);
 
   const getExerciseDone = async () => {
     const response = await fetch(
