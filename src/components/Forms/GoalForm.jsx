@@ -123,9 +123,6 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
           );
           if (initialData) {
             setSelectedGoal(newGoal);
-            console.log(
-              "## " + typeof newGoal + " - " + typeof newGoal.startDate
-            );
           }
           closeModal();
         } else {

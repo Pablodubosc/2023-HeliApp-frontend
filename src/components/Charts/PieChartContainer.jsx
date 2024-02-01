@@ -78,7 +78,6 @@ const getExerciseByUserIdAndDay = async (
     }
   );
   const data = await response.json();
-  console.log(data)
   const groupedExercises = {};
   if (data.data && data.data.length > 0) {
     data.data.forEach((item) => {

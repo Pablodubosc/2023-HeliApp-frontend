@@ -72,7 +72,6 @@ const MealForm = ({ open, setOpen, initialData }) => {
   };
 
   const handleAddMeal = () => {
-    console.log(mealData)
     if (
       mealData.name === "" ||
       mealData.date === "" ||
@@ -240,7 +239,6 @@ const MealForm = ({ open, setOpen, initialData }) => {
       )
       setMealData({ ...mealData, foods: updatedFoods });
     }else {
-      console.log("ENTRA")
       updatedFoods[index].weightConsumed = "";
     }
   };

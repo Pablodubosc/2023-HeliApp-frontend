@@ -79,7 +79,6 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
     });
     const data = await response.json();
     setPlans(data.data);
-    console.log(data.data)
     setTotalItems(data.data.length);
   };
 
