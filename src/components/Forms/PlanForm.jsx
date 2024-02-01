@@ -72,6 +72,12 @@ const PlanForm = ({ open, setOpen }) => {
             variant: "success",
           });
           closeModal();
+        }
+        else if (response.status === 400) {
+          enqueueSnackbar("The system could not generate the suggestions for that plan.", {
+            variant: "error",
+          });
+          closeModal();
         } else {
           enqueueSnackbar("An error occurred while creating the plan.", {
             variant: "error",
