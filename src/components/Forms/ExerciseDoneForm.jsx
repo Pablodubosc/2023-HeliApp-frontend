@@ -11,7 +11,6 @@ import {
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
 import { useSnackbar } from "notistack";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -20,47 +19,41 @@ import getApiUrl from "../../helpers/apiConfig";
 import { Autocomplete } from "@mui/material";
 const apiUrl = getApiUrl();
 
-const initialMealState = {
+const initialExerciseDoneState = {
   name: "",
   date: new Date(),
-  hour: new Date(),
-  calories: 0,
-  foods: [{ name: "", calories: "", weight: "", category: "" }],
+  exercises: [{ name: "", caloriesBurn: "", time: "", timeDoing: ""}],
   userId: localStorage.getItem("userId"),
 };
 
-const MealForm = ({ open, setOpen, initialData }) => {
-  const [mealData, setMealData] = useState(initialMealState);
-  const [foodOptions, setFoodOptions] = useState([]);
+const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
+  const [exerciseDoneData, setExerciseDoneData] = useState(initialExerciseDoneState);
+  const [exerciseOptions, setExerciseOptions] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (initialData) {
-      const initialTime = new Date(`2023-01-01T${initialData.hour}`);
       const initialDate = new Date(initialData.date + "T10:00:00Z");
-      setMealData({
+      setExerciseDoneData({
         ...initialData,
-        hour: initialTime,
         date: initialDate,
       });
     } else {
-      setMealData({
+      setExerciseDoneData({
         name: "",
         date: new Date(),
-        hour: new Date(),
-        calories: 0,
-        foods: [{ name: "", calories: "", weight: "", category: "" }],
+        exercises: [{ name: "", caloriesBurn: "", time: "", timeDoing: ""}],
         userId: localStorage.getItem("userId"),
       });
     }
   }, [initialData]);
 
   useEffect(() => {
-    getFoods();
+    getExercise();
   }, [open]);
 
-  const getFoods = async () => {
-    const response = await fetch(apiUrl + "/api/foods/" + localStorage.getItem("userId") , {
+  const getExercise = async () => {
+    const response = await fetch(apiUrl + "/api/exercise" , {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -68,19 +61,18 @@ const MealForm = ({ open, setOpen, initialData }) => {
       },
     });
     const data = await response.json();
-    setFoodOptions(data.data);
+    setExerciseOptions(data.data);
   };
 
-  const handleAddMeal = () => {
+  const handleAddExercise = () => {
     if (
-      mealData.name === "" ||
-      mealData.date === "" ||
-      mealData.hour === "" ||
-      !mealData.foods.every(
-        (food) =>
-          food.name !== "" &&
-          food.weight !== "" &&
-          Number(food.weightConsumed) > 0
+      exerciseDoneData.name === "" ||
+      exerciseDoneData.date === "" ||
+      !exerciseDoneData.exercises.every(
+        (exercise) =>
+        exercise.name !== "" &&
+        exercise.time !== "" &&
+        Number(exercise.timeDoing) > 0
       )
     ) {
       enqueueSnackbar("Please complete all the fields correctly.", {
@@ -88,29 +80,15 @@ const MealForm = ({ open, setOpen, initialData }) => {
       });
       return;
     } else {
-      mealData.calories = mealData.foods
-        .map((food) => parseInt(food.totalCalories))
-        .reduce((acc, calories) => acc + calories, 0);
+      exerciseDoneData.caloriesBurn = exerciseDoneData.exercises
+        .map((exercise) => parseInt(exercise.totalCaloriesBurn))
+        .reduce((acc, caloriesBurn) => acc + caloriesBurn, 0);
 
-      mealData.carbs = mealData.foods
-        .map((food) => parseInt(food.totalCarbs))
-        .reduce((acc, carbs) => acc + carbs, 0);
-
-      mealData.proteins = mealData.foods
-        .map((food) => parseInt(food.totalProteins))
-        .reduce((acc, proteins) => acc + proteins, 0);
-
-      mealData.fats = mealData.foods
-        .map((food) => parseInt(food.totalFats))
-        .reduce((acc, fats) => acc + fats, 0);
-
-      mealData.hour = mealData.hour.toTimeString().slice(0, 5);
-
-      mealData.date.setHours(1, 0);
+      exerciseDoneData.date.setHours(1, 0);
 
       const url = initialData
-        ? apiUrl + `/api/meals/${initialData._id}`
-        : apiUrl + "/api/meals";
+        ? apiUrl + `/api/exerciseDone/${initialData._id}`
+        : apiUrl + "/api/exerciseDone";
       const method = initialData ? "PUT" : "POST";
 
       fetch(url, {
@@ -119,27 +97,27 @@ const MealForm = ({ open, setOpen, initialData }) => {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
-        body: JSON.stringify(mealData),
+        body: JSON.stringify(exerciseDoneData),
       })
         .then(function (response) {
           if (response.status === 200) {
             enqueueSnackbar(
               initialData
-                ? "The meal was updated successfully."
-                : "The meal was created successfully.",
+                ? "The exercise was updated successfully."
+                : "The exercise was created successfully.",
               {
                 variant: "success",
               }
             );
             closeModal();
           } else {
-            enqueueSnackbar("An error occurred while saving the meal.", {
+            enqueueSnackbar("An error occurred while saving the exercise.", {
               variant: "error",
             });
           }
         })
         .catch(function (error) {
-          enqueueSnackbar("An error occurred while saving the meal.", {
+          enqueueSnackbar("An error occurred while saving the exercise.", {
             variant: "error",
           });
         });
@@ -150,96 +128,60 @@ const MealForm = ({ open, setOpen, initialData }) => {
     setOpen(false);
     if(!initialData)
     {
-    setMealData({
+    setExerciseDoneData({
       name: "",
       date: new Date(),
-      hour: new Date(),
-      calories: 0,
-      foods: [{ name: "", calories: "", weight: "", category: "" }],
+      exercises: [{ name: "", caloriesBurn: "", time: "", timeDoing: ""}],
       userId: localStorage.getItem("userId"),
     });
   }
   };
 
-  const handleAddFoodInput = () => {
-    const updatedFoods = [
-      ...mealData.foods,
-      { name: "", calories: "", weight: "", category: "" },
+  const handleAddExerciseInput = () => {
+    const updatedExercises = [
+      ...exerciseDoneData.exercises,
+      { name: "", caloriesBurn: "", time: "" },
     ];
-    setMealData({ ...mealData, foods: updatedFoods });
+    setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
   };
 
-  const handleRemoveFoodInput = (index) => {
-    const updatedFoods = [...mealData.foods];
-    updatedFoods.splice(index, 1);
-    setMealData({ ...mealData, foods: updatedFoods });
+  const handleRemoveExerciseInput = (index) => {
+    const updatedExercises = [...exerciseDoneData.exercises];
+    updatedExercises.splice(index, 1);
+    setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
   };
 
-  const handleFoodInputChange = (newValue, index) => {
-    const updatedFoods = [...mealData.foods];
+  const handleExerciseInputChange = (newValue, index) => {
+    const updatedExercises = [...exerciseDoneData.exercises];
     if (newValue) {
-      updatedFoods[index].name = newValue.name ? newValue.name : "";
-      updatedFoods[index].calories = newValue.calories;
-      updatedFoods[index].carbs = newValue.carbs;
-      updatedFoods[index].proteins = newValue.proteins;
-      updatedFoods[index].fats = newValue.fats;
-      updatedFoods[index].weight = newValue.weight;
-      updatedFoods[index].category = newValue.category;
-      if (updatedFoods[index].weightConsumed) {
-        updatedFoods[index].totalCalories = Math.round(
-          updatedFoods[index].weightConsumed *
-            (updatedFoods[index].calories / updatedFoods[index].weight)
-        )
-
-        updatedFoods[index].totalCarbs = Math.round(
-          updatedFoods[index].weightConsumed *
-            (updatedFoods[index].carbs / updatedFoods[index].weight)
-        )
-
-        updatedFoods[index].totalProteins = Math.round(
-          updatedFoods[index].weightConsumed *
-            (updatedFoods[index].proteins / updatedFoods[index].weight)
-        )
-
-        updatedFoods[index].totalFats = Math.round(
-          updatedFoods[index].weightConsumed *
-            (updatedFoods[index].fats / updatedFoods[index].weight)
+      updatedExercises[index].name = newValue.name ? newValue.name : "";
+      updatedExercises[index].caloriesBurn = newValue.caloriesBurn;
+      updatedExercises[index].time = newValue.time;
+      if (updatedExercises[index].timeDoing) {
+        updatedExercises[index].totalCaloriesBurn = Math.round(
+          updatedExercises[index].timeDoing *
+            (updatedExercises[index].caloriesBurn / updatedExercises[index].time)
         )
       }
     } else {
-      updatedFoods[index].name = "";
-      updatedFoods[index].calories = 0;
-      updatedFoods[index].weight = 0;
-      updatedFoods[index].category = "";
+      updatedExercises[index].name = "";
+      updatedExercises[index].caloriesBurn = 0;
+      updatedExercises[index].time = 0;
     }
-    setMealData({ ...mealData, foods: updatedFoods });
+    setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
   };
 
   const handleQuantityInputChange = (e, index) => {
     const inputValue = Number(e.target.value);
-    const updatedFoods = [...mealData.foods];
+    const updatedExercises = [...exerciseDoneData.exercises];
     if (!isNaN(inputValue) && inputValue >= 1) {
-      updatedFoods[index].weightConsumed = inputValue;
-      updatedFoods[index].totalCalories = Math.round(
-        inputValue * (updatedFoods[index].calories / updatedFoods[index].weight)
+      updatedExercises[index].timeDoing = inputValue;
+      updatedExercises[index].totalCaloriesBurn = Math.round(
+        inputValue * (updatedExercises[index].caloriesBurn / updatedExercises[index].time)
       );
-      updatedFoods[index].totalCarbs = Math.round(
-        updatedFoods[index].weightConsumed *
-          (updatedFoods[index].carbs / updatedFoods[index].weight)
-      )
-
-      updatedFoods[index].totalProteins = Math.round(
-        updatedFoods[index].weightConsumed *
-          (updatedFoods[index].proteins / updatedFoods[index].weight)
-      )
-
-      updatedFoods[index].totalFats = Math.round(
-        updatedFoods[index].weightConsumed *
-          (updatedFoods[index].fats / updatedFoods[index].weight)
-      )
-      setMealData({ ...mealData, foods: updatedFoods });
+      setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
     }else {
-      updatedFoods[index].weightConsumed = "";
+      updatedExercises[index].timeDoing = "";
     }
   };
 
@@ -285,9 +227,9 @@ const MealForm = ({ open, setOpen, initialData }) => {
               variant="outlined"
               fullWidth
               margin="normal"
-              value={mealData.name}
+              value={exerciseDoneData.name}
               onChange={(e) =>
-                setMealData({ ...mealData, name: e.target.value })
+                setExerciseDoneData({ ...exerciseDoneData, name: e.target.value })
               }
             />
           </Grid>
@@ -306,62 +248,37 @@ const MealForm = ({ open, setOpen, initialData }) => {
                   inputProps={{
                     step: 60,
                   }}
-                  value={mealData.date}
+                  value={exerciseDoneData.date}
                   onChange={(newDate) =>
-                    setMealData({ ...mealData, date: newDate })
+                    setExerciseDoneData({ ...exerciseDoneData, date: newDate })
                   }
                 />
               </LocalizationProvider>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <TimePicker
-                  label="Hour"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    step: 60,
-                  }}
-                  value={mealData.hour}
-                  onChange={(newTime) =>
-                    setMealData({
-                      ...mealData,
-                      hour: newTime,
-                    })
-                  }
-                />
-              </LocalizationProvider>
-            </FormControl>
-          </Grid>
-          {mealData.foods.map((food, index) => (
+          {exerciseDoneData.exercises.map((exercise, index) => (
             <React.Fragment key={index}>
               <Grid item xs={6}>
                 <Autocomplete
-                  id={`food-autocomplete-${index}`}
-                  options={foodOptions}
+                  id={`exercise-autocomplete-${index}`}
+                  options={exerciseOptions}
                   value={
-                    foodOptions.find((option) => option.name === food.name) ||
+                    exerciseOptions.find((option) => option.name === exercise.name) ||
                     null
                   }
                   onChange={(e, newValue) =>
-                    handleFoodInputChange(newValue, index)
+                    handleExerciseInputChange(newValue, index)
                   }
                   getOptionLabel={(option) => option.name}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Food"
+                      label="Exercise"
                       variant="outlined"
                       fullWidth
                     />
                   )}
-                  noOptionsText="No foods available."
+                  noOptionsText="No exercises available."
                   ListboxProps={{
                     style: {
                       maxHeight: 110,
@@ -374,11 +291,11 @@ const MealForm = ({ open, setOpen, initialData }) => {
                   InputProps={{
                     inputProps: { min: 1 },
                   }}
-                  label={`Weight (gr/ml)`}
+                  label={`Time (minutes)`}
                   type="number"
                   variant="outlined"
                   fullWidth
-                  value={food.weightConsumed}
+                  value={exercise.timeDoing}
                   onChange={(e) => handleQuantityInputChange(e, index)}
                 />
               </Grid>
@@ -388,7 +305,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
                   xs={2}
                   sx={{ display: "flex", alignItems: "center" }}
                 >
-                  <IconButton color="primary" onClick={handleAddFoodInput}>
+                  <IconButton color="primary" onClick={handleAddExerciseInput}>
                     <AddCircleRoundedIcon />
                   </IconButton>
                 </Grid>
@@ -401,7 +318,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
                 >
                   <IconButton
                     color="primary"
-                    onClick={() => handleRemoveFoodInput(index)}
+                    onClick={() => handleRemoveExerciseInput(index)}
                   >
                     <RemoveCircleRoundedIcon />
                   </IconButton>
@@ -413,7 +330,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
             <Button
               variant="contained"
               color="primary"
-              onClick={handleAddMeal}
+              onClick={handleAddExercise}
               sx={{
                 mt: 3,
                 mb: 2,
@@ -423,7 +340,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
               }}
               fullWidth
             >
-              {initialData ? "Update Meal" : "Add Meal"}
+              {initialData ? "Update Exercise" : "Add Exercise"}
             </Button>
           </Grid>
         </Grid>
@@ -432,4 +349,4 @@ const MealForm = ({ open, setOpen, initialData }) => {
   );
 };
 
-export default MealForm;
+export default ExerciseDoneForm;

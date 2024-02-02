@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   TextField,
   Button,
@@ -16,117 +16,70 @@ import {
   Select,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
+import CategoryForm from "./CategoryForm";
 import CloseIcon from "@mui/icons-material/Close";
+import getApiUrl from "../../helpers/apiConfig";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import getApiUrl from "../../helpers/apiConfig";
 
 const apiUrl = getApiUrl();
 
-const initialGoalState = {
+const initialPlanState = {
   name: "",
-  type: "",
-  objetive: "",
+  planObjetive: "",
+  planType: "",
+  suggestions:[],
   userId: localStorage.getItem("userId"),
   startDate: new Date(),
   endDate: new Date(),
 };
 
-const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
+const PlanForm = ({ open, setOpen }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const [selectedRecuringValue, setSelectedRecurringValue] = useState('Non-Recurring');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newPlan, setNewPlan] = useState(initialPlanState);
 
   const handleSelectChange = (e) => {
-    setNewGoal({ ...newGoal, type: e.target.value });
+    setNewPlan({ ...newPlan, planType: e.target.value });
   };
 
-  const closeModal = () => {
-    setOpen(false);
-    setSelectedRecurringValue("Non-Recurring")
-    setNewGoal(initialGoalState);
-  };
-
-  const [newGoal, setNewGoal] = useState({
-    name: "",
-    type: "",
-    objetive: "",
-    userId: localStorage.getItem("userId"),
-    startDate: new Date(),
-    endDate: new Date(),
-    recurrency: "Non-Recurring"
-  });
-
-  useEffect(() => {
-    if (initialData) {
-      const parsedStartDate = new Date(initialData.startDate);
-      const parsedEndDate = new Date(initialData.endDate);
-      setSelectedRecurringValue(initialData.recurrency)
-      setNewGoal({
-        ...initialData,
-        startDate: parsedStartDate,
-        endDate: parsedEndDate,
-      });
-    } else {
-      setNewGoal({
-        name: "",
-        type: "",
-        objetive: "",
-        userId: localStorage.getItem("userId"),
-        startDate: new Date(),
-        endDate: new Date(),
-        recurrency: "Non-Recurring"
-      });
-    }
-  }, [initialData, open]);
-
-  const handleAddGoal = () => {
+  const handleAddPlan = () => {
     if (
-      newGoal.name === "" ||
-      newGoal.type === "" ||
-      newGoal.objetive === "" ||
-      newGoal.userId === "" ||
-      newGoal.startDate === "" ||
-      newGoal.endDate === "" ||
-      newGoal.endDate < newGoal.startDate
+      newPlan.name === "" ||
+      newPlan.planObjetive === "" ||
+      Number(newPlan.planObjetive) < 1   ||    
+      newPlan.endDate === "" ||
+      newPlan.endDate < newPlan.startDate
     ) {
       enqueueSnackbar("Please complete all the fields correctly.", {
         variant: "error",
       });
       return;
     } else {
-      const url = initialData
-        ? apiUrl + `/api/goals/${initialData._id}`
-        : apiUrl + "/api/goals";
-      const method = initialData ? "PUT" : "POST";
-
-      newGoal.startDate.setHours(0, 0);
-      newGoal.endDate.setHours(23, 59);
-
-      fetch(url, {
-        method: method,
+      newPlan.startDate.setHours(0, 0);
+      newPlan.endDate.setHours(23, 59);
+      fetch(apiUrl + "/api/plans/", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
-        body: JSON.stringify(newGoal),
+        body: JSON.stringify(newPlan),
       }).then(function (response) {
-
         if (response.status === 200) {
-          enqueueSnackbar(
-            initialData
-              ? "The goal was updated successfully."
-              : "The goal was created successfully.",
-            {
-              variant: "success",
-            }
-          );
-          if (initialData) {
-            setSelectedGoal(newGoal);
-          }
+          enqueueSnackbar("The plan was created successfully.", {
+            variant: "success",
+          });
+          closeModal();
+        }
+        else if (response.status === 400) {
+          enqueueSnackbar("The system could not generate the suggestions for that plan.", {
+            variant: "error",
+          });
           closeModal();
         } else {
-          enqueueSnackbar("An error occurred while creating the goal.", {
+          enqueueSnackbar("An error occurred while creating the plan.", {
             variant: "error",
           });
         }
@@ -134,18 +87,20 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
     }
   };
 
+  const closeModal = () => {
+    setOpen(false);
+    setNewPlan(initialPlanState);
+  };
+
   const handleCaloriesInputChange = (e, index) => {
     const inputValue = Number(e.target.value);
     if (!isNaN(inputValue) && inputValue >= 1) {
-      setNewGoal({ ...newGoal, objetive: inputValue });
+      setNewPlan({ ...newPlan, planObjetive: inputValue });
     } else {
-      setNewGoal({ ...newGoal, objetive: "" });
+      setNewPlan({ ...newPlan, planObjetive: "" });
     }
   };
-  const handleRecurrencyChange = (event) => {
-    setSelectedRecurringValue(event.target.value)
-    setNewGoal({ ...newGoal, recurrency: event.target.value });
-  };
+
 
   return (
     <Modal
@@ -161,7 +116,7 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: "100%",
-          maxWidth: 450,
+          maxWidth: 500,
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 5,
@@ -186,23 +141,22 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
             variant="outlined"
             fullWidth
             margin="normal"
-            value={newGoal.name}
-            onChange={(e) => setNewGoal({ ...newGoal, name: e.target.value })}
+            value={newPlan.name}
+            onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })}
             onKeyPress={(event) => {
               if (event.key === "Enter") {
-                handleAddGoal();
+                handleAddPlan();
               }
             }}
           />
-
-<Grid container spacing={2}>
+          <Grid container spacing={2}>
       <Grid item xs={8}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id="goal-type-label">Goal Type</InputLabel>
           <Select
             labelId="goal-type-label"
             id="goal-type-select"
-            value={newGoal.type}
+            value={newPlan.planType}
             onChange={handleSelectChange}
             label="Goal Type"
           >
@@ -224,18 +178,14 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
           type="number"
           variant="outlined"
           fullWidth
-          value={newGoal.objetive}
+          value={newPlan.planObjetive}
           onChange={handleCaloriesInputChange}
           style={{ marginBottom: '7px' }}
-          onKeyPress={(event) => {
-            if (event.key === 'Enter') {
-              handleAddGoal();
-            }
-          }}
         />
       </Grid>
     </Grid>
-          <Grid item xs={12} style={{ marginBottom: "7px" }}>
+
+        <Grid item xs={12} style={{ marginBottom: "7px" }}>
             <FormControl fullWidth>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
@@ -250,9 +200,9 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
                   inputProps={{
                     step: 60,
                   }}
-                  value={newGoal.startDate}
+                  value={newPlan.startDate}
                   onChange={(newDate) => {
-                    setNewGoal((prevGoal) => ({
+                    setNewPlan((prevGoal) => ({
                       ...prevGoal,
                       startDate: newDate,
                     }));
@@ -270,8 +220,8 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
                   variant="outlined"
                   fullWidth
                   margin="normal"
-                  disabled={!newGoal.startDate}
-                  minDate={newGoal.startDate}
+                  disabled={!newPlan.startDate}
+                  minDate={newPlan.startDate}
                   minDateMessage="La fecha de fin debe ser posterior a la fecha de inicio"
                   InputLabelProps={{
                     shrink: true,
@@ -279,9 +229,9 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
                   inputProps={{
                     step: 60,
                   }}
-                  value={newGoal.endDate}
+                  value={newPlan.endDate}
                   onChange={(newDate) => {
-                    setNewGoal((prevGoal) => ({
+                    setNewPlan((prevGoal) => ({
                       ...prevGoal,
                       endDate: newDate,
                     }));
@@ -289,31 +239,11 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
                 />
               </LocalizationProvider>
             </FormControl>
-            <FormGroup>
-              <RadioGroup onChange={handleRecurrencyChange} row value={selectedRecuringValue} style={{ justifyContent: 'center' }}>
-                <FormControlLabel
-                  control={<Radio />}
-                  label="Non-Recurring"
-                  value="Non-Recurring"
-                />
-                <FormControlLabel
-                  control={<Radio />}
-                  label="Weekly"
-                  value="Weekly"
-                />
-                <FormControlLabel
-                  control={<Radio />}
-                  label="Monthly"
-                  value="Monthly"
-                />
-              </RadioGroup>
-            </FormGroup>
           </Grid>
-
           <Button
             variant="contained"
             color="primary"
-            onClick={handleAddGoal}
+            onClick={handleAddPlan}
             sx={{
               mt: 3,
               mb: 2,
@@ -323,12 +253,13 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
             }}
             fullWidth
           >
-            {initialData ? "Update Goal" : "Add Goal"}
+            Add Plan
           </Button>
         </div>
+        <CategoryForm open={isModalOpen} setOpen={setIsModalOpen} />
       </Box>
     </Modal>
   );
 };
 
-export default GoalForm;
+export default PlanForm;

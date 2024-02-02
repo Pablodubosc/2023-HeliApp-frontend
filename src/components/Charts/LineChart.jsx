@@ -1,14 +1,15 @@
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip } from "recharts";
 
-export default function LineChartWithCustomFontSize(data) {
-  const caloriasArray = data.data.map((item) => item.calories);
+export default function LineChartWithCustomFontSize({ data, type }) {
+  const typeValidator = (type) => {if(type==="calories burn"){return "caloriesBurn" } else{return type}}
+  const caloriasArray = data.map((item) => item[typeValidator(type)]);
   const totalCalorias = caloriasArray.reduce((acc, curr) => acc + curr, 0);
   const promedioCalorias = totalCalorias / caloriasArray.length;
 
-  const dataWithAverage = data.data.map((item) => ({
+  const dataWithAverage = data.map((item) => ({
     date: item.date.split('T')[0],
-    calories: item.calories,
+    calories: item[typeValidator(type)],
     promedio: promedioCalorias,
   }));
 
@@ -65,7 +66,7 @@ export default function LineChartWithCustomFontSize(data) {
         />
         <YAxis
           label={{
-            value: "Calories",
+            value: [type],
             angle: -90,
             position: "insideLeft",
             fontSize: 14,
@@ -78,7 +79,7 @@ export default function LineChartWithCustomFontSize(data) {
         <Line
           type="monotone"
           dataKey="calories"
-          name="Calories"
+          name={[type]}
           stroke="#936639"
           strokeWidth={2}
           dot={false}
@@ -86,7 +87,7 @@ export default function LineChartWithCustomFontSize(data) {
         <Line
           type="monotone"
           dataKey="promedio"
-          name={`Calories average (${promedioCalorias.toFixed(2)})`}
+          name={`${[type]} average (${promedioCalorias.toFixed(2)})`}
           stroke="#6a994e"
           dot={false}
           strokeWidth={2}

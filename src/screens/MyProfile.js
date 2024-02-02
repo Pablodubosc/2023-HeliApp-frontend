@@ -11,12 +11,17 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import LabelBottomNavigation from "../components/BottomMenu";
 import LabelBottomNavigationNutritionist from "../components/BottomMenuNutritionist";
 import DrawerNutritionist from "../components/DrawerNutritionist";
+import { Autocomplete } from "@mui/material";
+import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
+import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
 import {
   FormControl,
   FormControlLabel,
   FormLabel,
   Radio,
   RadioGroup,
+  IconButton,
+  Typography
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import getApiUrl from "../helpers/apiConfig";
@@ -27,6 +32,55 @@ const defaultTheme = createTheme();
 
 const MyProfile = () => {
   const theme = useTheme();
+  const [foodOptions, setFoodOptions] = useState([]);
+
+  useEffect(() => {
+    getFoods();
+  }, []);
+
+  const getFoods = async () => {
+    const response = await fetch(apiUrl + "/api/foods/", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+    const data = await response.json();
+    setFoodOptions(data.data);
+  };
+
+  const handleAddFoodAllergyInput = () => {
+    const newFood = { name: '' };
+    setUser((prevData) => ({
+      ...prevData,
+      allergies:  [...prevData.allergies, newFood]
+    }));
+  };
+  
+  const handleRemoveFoodAllergyInput = (index) => {
+    const updatedFoods = [...user.allergies];
+    updatedFoods.splice(index, 1);
+    setUser((prevData) => ({
+      ...prevData,
+      allergies: updatedFoods,
+    }));
+  };
+
+  const handleFoodAllergyInputChange = (newValue, index) => {
+    const updatedFoods = [...user.allergies];
+    
+    // Verifica si newValue es null, si es así, establece el nombre en una cadena vacía
+    const updatedName = newValue ? newValue.name : "";
+    updatedFoods[index].name = updatedName;
+  
+    // Actualiza el objeto user manteniendo la inmutabilidad
+    setUser((prevUser) => ({
+      ...prevUser,
+      allergies: updatedFoods,
+    }));
+  };
+
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     function handleResize() {
@@ -50,6 +104,7 @@ const MyProfile = () => {
     sex: "",
     height: "",
     weight: "",
+    allergies: [{ name: ""}],
   });
 
   React.useEffect(() => {
@@ -69,6 +124,7 @@ const MyProfile = () => {
     );
 
     const data = await response.json();
+    console.log(data.data)
     setUser(data.data);
   };
 
@@ -112,7 +168,12 @@ const MyProfile = () => {
       user.sex === "" ||
       user.age === "" ||
       user.height === "" ||
-      user.weight === ""
+      user.weight === "" ||
+      (user.allergies.length > 1 &&
+      user.allergies.some(
+        (allergy) =>
+          allergy.name == ""
+      ))
     ) {
       enqueueSnackbar("Some fields are empty.", { variant: "error" });
       return;
@@ -308,6 +369,58 @@ const MyProfile = () => {
                   />
                 </Grid>
               </Grid>
+
+              <div style={{ border: '1px solid black', padding: '10px', borderRadius: '5px', maxWidth: '600px', margin: 'auto', marginTop: '20px' }}>
+  <Typography variant="h6" style={{ color: 'black', marginBottom: '10px', textAlign: 'center' }}>
+    Set Your Allergies
+  </Typography>
+
+  {user.allergies.map((food, index) => (
+    <React.Fragment key={index}>
+      <Grid container spacing={2} alignItems="center" style={{ marginTop: 10 }}>
+        <Grid item xs={10}>
+          <Autocomplete
+          id={`food-autocomplete-${index}`}
+          options={foodOptions}
+          value={foodOptions.find((option) => option.name === food.name) || null}
+          onChange={(e, newValue) => handleFoodAllergyInputChange(newValue, index)}
+          getOptionLabel={(option) => option.name}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Food"
+              variant="outlined"
+              fullWidth
+              size="small"
+            />
+          )}
+          noOptionsText="No foods available."
+          ListboxProps={{
+            style: {
+              maxHeight: 90,
+            },
+          }}
+        />
+        </Grid>
+        <Grid item xs={2}>
+          {index === 0 ? (
+            <IconButton color="primary" onClick={handleAddFoodAllergyInput}>
+              <AddCircleRoundedIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              color="primary"
+              onClick={() => handleRemoveFoodAllergyInput(index)}
+            >
+              <RemoveCircleRoundedIcon />
+            </IconButton>
+          )}
+        </Grid>
+      </Grid>
+    </React.Fragment>
+  ))}
+</div>
+
               <Button
                 type="submit"
                 fullWidth
@@ -316,6 +429,7 @@ const MyProfile = () => {
                   mt: 3,
                   mb: 2,
                   backgroundColor: "#373D20",
+                  marginBottom:10,
                   "&:hover": { backgroundColor: "#373D20" },
                   fontWeight: "bold",
                 }}

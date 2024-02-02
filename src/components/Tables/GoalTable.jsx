@@ -152,7 +152,7 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
   }
 
   const getFaceIcon = (goal) => {
-    const progress = goal.totalCalorias / goal.calories;
+    const progress = goal.totalConsumido / goal.objetive;
 
     if (progress >= 1) {
       return <SentimentVerySatisfiedIcon style={{ color: "green" }} />;
@@ -211,6 +211,9 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
                 Name
               </TableCell>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+                Type
+              </TableCell>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
                 State
               </TableCell>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
@@ -231,7 +234,7 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
             ) : (
               (5 > 0 ? goals.slice(page * 5, page * 5 + 5) : goals).map(
                 (row) => (
-                  <TableRow key={row.name}>
+                  <TableRow key={row._id}>
                     <TableCell
                       component="th"
                       scope="row"
@@ -239,6 +242,9 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
                       align="center"
                     >
                       {row.name}
+                    </TableCell>
+                    <TableCell style={{ width: 130 }} align="center">
+                      {`${row.type}`}
                     </TableCell>
                     <TableCell style={{ width: 130 }} align="center">
                       {`${row.state}`}
@@ -318,8 +324,18 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
                   fullWidth
                 />
                 <TextField
-                  label="Calories Consumed/Goal"
-                  value={`${selectedGoal.totalCalorias}/${selectedGoal.calories}`}
+                  label="Type"
+                  value={`${selectedGoal.type}`}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  variant="outlined"
+                  style={{ marginBottom: 8 }}
+                  fullWidth
+                />
+                <TextField
+                  label=" Consumed/Goal"
+                  value={`${selectedGoal.totalConsumido}/${selectedGoal.objetive}`}
                   InputProps={{
                     readOnly: true,
                   }}

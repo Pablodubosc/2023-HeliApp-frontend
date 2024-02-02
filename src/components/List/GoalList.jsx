@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Typography } from "@mui/material";
-import GoalTable from "./Tables/GoalTable";
-import GoalForm from "./Forms/GoalForm";
+import GoalTable from "../Tables/GoalTable";
+import GoalForm from "../Forms/GoalForm";
 import { IconButton } from "@mui/material";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import FilterAltRoundedIcon from "@mui/icons-material/FilterAltRounded";

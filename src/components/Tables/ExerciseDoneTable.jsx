@@ -14,10 +14,10 @@ import Collapse from "@mui/material/Collapse";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import EditIcon from "@mui/icons-material/Edit";
-import MealForm from "../Forms/MealForm";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useSnackbar } from "notistack";
 import getApiUrl from "../../helpers/apiConfig";
+import ExerciseDoneForm from "../Forms/ExerciseDoneForm";
 
 const apiUrl = getApiUrl();
 
@@ -27,9 +27,9 @@ function Row(props) {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleDeleteClick = (meal) => {
+  const handleDeleteClick = (exercise) => {
     try {
-      fetch(apiUrl + "/api/meals/" + meal._id, {
+      fetch(apiUrl + "/api/exerciseDone/" + exercise._id, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -37,24 +37,24 @@ function Row(props) {
         },
       }).then(function (response) {
         if (response.status === 200) {
-          enqueueSnackbar("The meal was deleted successfully.", {
+          enqueueSnackbar("The exercise was deleted successfully.", {
             variant: "success",
           });
 
-          props.onDelete(meal);
+          props.onDelete(exercise);
 
-          if (props.endIndex >= props.totalMeals - 1) {
+          if (props.endIndex >= props.totalExercise - 1) {
             const newPage = props.page === 0 ? 0 : props.page - 1;
             props.onPageChange(newPage);
           }
         } else {
-          enqueueSnackbar("An error occurred while deleting the meal.", {
+          enqueueSnackbar("An error occurred while deleting the exercise.", {
             variant: "error",
           });
         }
       });
     } catch (error) {
-      enqueueSnackbar("An error occurred while deleting the meal.", {
+      enqueueSnackbar("An error occurred while deleting the exercise.", {
         variant: "error",
       });
     }
@@ -76,7 +76,6 @@ function Row(props) {
           {row.name}
         </TableCell>
         <TableCell align="center">{row.date}</TableCell>
-        <TableCell align="center">{row.hour}</TableCell>
         {localStorage.getItem("viewAs") === "false" && (
         <TableCell align="center">
           <IconButton
@@ -107,49 +106,30 @@ function Row(props) {
                       Name
                     </TableCell>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Calories
+                      Calories Burn
                     </TableCell>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Carbs
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Proteins
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Fats
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Weight (gr/ml)
+                      Time (minutes)
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.foods.map((foodRow) => (
-                    <TableRow key={foodRow._id}>
+                  {row.exercises.map((exercise) => (
+                    <TableRow key={exercise._id}>
                       <TableCell component="th" scope="row" align="center">
-                        {foodRow.name}
+                        {exercise.name}
                       </TableCell>
                       <TableCell align="center">
-                        {foodRow.totalCalories}
+                        {exercise.totalCaloriesBurn}
                       </TableCell>
-                      <TableCell align="center">{foodRow.totalCarbs}</TableCell>
-                      <TableCell align="center">
-                        {foodRow.totalProteins}
-                      </TableCell>
-                      <TableCell align="center">{foodRow.totalFats}</TableCell>
-                      <TableCell align="center">
-                        {foodRow.weightConsumed}
-                      </TableCell>
+                      <TableCell align="center">{exercise.timeDoing}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.calories}</TableCell>
-                    <TableCell align="center">{row.carbs}</TableCell>
-                    <TableCell align="center">{row.proteins}</TableCell>
-                    <TableCell align="center">{row.fats}</TableCell>
+                    <TableCell align="center">{row.caloriesBurn}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -163,23 +143,23 @@ function Row(props) {
 
 const rowsPerPage = 5;
 
-export default function MealTable({modalOpen  })  {
+export default function ExerciseDoneTable({modalOpen  })  {
   const [page, setPage] = useState(0);
-  const [meals, setMeals] = useState([]);
+  const [exerciseDone, setExerciseDone] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editMeal, setEditMeal] = useState(null);
-  const [totalMeals, setTotalMeals] = useState(0);
+  const [editExerciseDone, setEditExerciseDone] = useState(null);
+  const [totalExerciseDone, setTotalExerciseDone] = useState(0);
 
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
 
   useEffect(() => {
-    getMeals();
-  }, [modalOpen, isModalOpen]);
+    getExerciseDone();
+  }, [modalOpen,isModalOpen]);
 
-  const getMeals = async () => {
+  const getExerciseDone = async () => {
     const response = await fetch(
-      apiUrl + "/api/meals/user/" + localStorage.getItem("userId"),
+      apiUrl + "/api/exerciseDone/user/" + localStorage.getItem("userId"),
       {
         method: "GET",
         headers: {
@@ -189,20 +169,18 @@ export default function MealTable({modalOpen  })  {
       }
     );
     const data = await response.json();
-
-    const mealsWithShortenedDates = data.data.map((meal) => {
+    const exerciseDoneWithShortenedDates = data.data.map((exercise) => {
       return {
-        ...meal,
-        date: meal.date.substring(0, 10),
+        ...exercise,
+        date: exercise.date.substring(0, 10),
       };
     });
-
-    setMeals(mealsWithShortenedDates);
-    setTotalMeals(mealsWithShortenedDates.length);
+    setExerciseDone(exerciseDoneWithShortenedDates);
+    setTotalExerciseDone(exerciseDoneWithShortenedDates.length);
   };
 
-  const handleEditClick = (meal) => {
-    setEditMeal(meal);
+  const handleEditClick = (exercise) => {
+    setEditExerciseDone(exercise);
     setIsModalOpen(true);
   };
 
@@ -210,8 +188,8 @@ export default function MealTable({modalOpen  })  {
     setPage(newPage);
   };
 
-  const handleDelete = (deletedMeal) => {
-    setMeals(meals.filter((meal) => meal._id !== deletedMeal._id));
+  const handleDelete = (deletedExerciseDone) => {
+    setExerciseDone(exerciseDone.filter((exercise) => exercise._id !== deletedExerciseDone._id));
   };
 
   return (
@@ -229,9 +207,6 @@ export default function MealTable({modalOpen  })  {
             <TableCell sx={{ fontWeight: "bold" }} align="center">
               Date&nbsp;
             </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="center">
-              Hours&nbsp;
-            </TableCell>
             {localStorage.getItem("viewAs") === "false" && (
             <TableCell sx={{ fontWeight: "bold" }} align="center">
               Actions&nbsp;
@@ -239,8 +214,8 @@ export default function MealTable({modalOpen  })  {
           </TableRow>
         </TableHead>
         <TableBody sx={{ textAlign: "center" }}>
-          {meals.length > 0 ? (
-            meals
+          {exerciseDone.length > 0 ? (
+            exerciseDone
               .slice(startIndex, endIndex)
               .map((row) => (
                 <Row
@@ -251,14 +226,14 @@ export default function MealTable({modalOpen  })  {
                   onDelete={handleDelete}
                   page={page}
                   endIndex={endIndex}
-                  totalMeals={totalMeals}
+                  totalExerciseDone={totalExerciseDone}
                   onPageChange={handlePageChange}
                 />
               ))
           ) : (
             <TableRow>
               <TableCell colSpan={5} align="center">
-                No meals to show
+                No exercises to show
               </TableCell>
             </TableRow>
           )}
@@ -274,16 +249,16 @@ export default function MealTable({modalOpen  })  {
         </IconButton>
         <IconButton
           onClick={(e) => handlePageChange(page + 1)}
-          disabled={endIndex >= totalMeals}
+          disabled={endIndex >= totalExerciseDone}
         >
           <ArrowForwardIosIcon />
         </IconButton>
       </div>
 
-      <MealForm
+      <ExerciseDoneForm
         open={isModalOpen}
         setOpen={setIsModalOpen}
-        initialData={editMeal}
+        initialData={editExerciseDone}
       />
     </TableContainer>
   );
