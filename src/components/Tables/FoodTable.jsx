@@ -56,30 +56,34 @@ function TablePaginationActions(props) {
   );
 }
 
+const initialSelectedCategoryState = {
+  name: "",
+}
+
 export default function FoodTable({ filterOpen, modalOpen  }) {
   const [foods, setFoods] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(initialSelectedCategoryState);
   const [page, setPage] = React.useState(0);
   const [noResults, setNoResults] = useState(false);
 
   useEffect(() => {
-    selectedCategory ? getFoodByCategory() : getFoods();
+    selectedCategory && filterOpen == true ? getFoodByCategory() : getFoods();
   }, [selectedCategory]);
 
   useEffect(() => {
     if (filterOpen === false) {
-      setSelectedCategory("");
+      setSelectedCategory(initialSelectedCategoryState);
       getFoods();
     }
   }, [filterOpen, modalOpen]);
 
-  useEffect(() => {
+    useEffect(() => {
     getFoods();
   }, []);
 
   const getFoods = async () => {
-    const response = await fetch(apiUrl + "/api/foods/" + localStorage.getItem("userId") , {
+    const response = await fetch(apiUrl + "/api/foods/", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -87,14 +91,20 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
       },
     });
     const data = await response.json();
-    setFoods(data.data);
-    setTotalItems(data.data.length);
+    if (data.data.length === 0) {
+      setNoResults(true);
+    } else {
+      setNoResults(false);
+      setFoods(data.data);
+      setTotalItems(data.data.length);
+    }
   };
 
   const getFoodByCategory = async () => {
-    if (selectedCategory !== "") {
+    if (selectedCategory.name !== "") {
+      console.log("ENTRA ACA "+selectedCategory.name)
       const response = await fetch(
-        apiUrl + "/api/foods/category/" + selectedCategory + "/" +  localStorage.getItem("userId"),
+        apiUrl + "/api/foods/category/" + selectedCategory.name + "/" ,
         {
           method: "GET",
           headers: {
@@ -112,6 +122,7 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
         setTotalItems(data.data.length);
       }
     } else {
+      setNoResults(false)
       getFoods();
     }
   };
@@ -208,7 +219,7 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
                       {row.fats === "0" ? "-" : row.fats}
                     </TableCell>
                     <TableCell style={{ width: 160 }} align="center">
-                      {row.category}
+                      {row.category.name}
                     </TableCell>
                   </TableRow>
                 )

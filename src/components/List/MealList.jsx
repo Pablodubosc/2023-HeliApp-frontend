@@ -30,14 +30,13 @@ const MealList = () => {
       <React.Fragment>
         <MealForm open={isModalOpen} setOpen={setIsModalOpen} />
       </React.Fragment>
-      {localStorage.getItem("viewAs") === "false" && (
       <IconButton
         onClick={() => {
           setIsModalOpen(true);
         }}
       >
         <AddCircleRoundedIcon />
-      </IconButton>)}
+      </IconButton>
     </div>
   );
 };

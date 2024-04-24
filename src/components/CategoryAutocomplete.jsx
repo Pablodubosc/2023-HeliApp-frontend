@@ -20,8 +20,7 @@ const CategoryAutocomplete = ({ selectedCategory, onCategoryChange, addModalOpen
       },
     });
     const data = await response.json();
-    const categories = data.data.map((item) => item.name);
-    setCategoriesOptions(categories);
+    setCategoriesOptions(data.data);
   };
 
   return (
@@ -32,7 +31,7 @@ const CategoryAutocomplete = ({ selectedCategory, onCategoryChange, addModalOpen
         onCategoryChange(newValue);
       }}
       options={categoriesOptions}
-      getOptionLabel={(option) => option}
+      getOptionLabel={(option) => option.name}
       renderInput={(params) => (
         <TextField {...params} label="Choose a Category" variant="outlined" />
       )}

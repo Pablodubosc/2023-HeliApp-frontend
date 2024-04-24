@@ -15,7 +15,7 @@ const initialFoodState = {
   name: "",
   calories: "",
   weight: "",
-  category: "",
+  category: {name:""},
   carbs: "",
   proteins: "",
   fats: ""
@@ -32,7 +32,7 @@ const FoodForm = ({ open, setOpen }) => {
       newFood.name === "" ||
       newFood.calories === "" ||
       newFood.weight === "" ||
-      newFood.category === "" ||
+      newFood.category.name === "" ||
       Number(newFood.calories) < 1 ||
       Number(newFood.weight) < 1
     ) {
@@ -41,6 +41,7 @@ const FoodForm = ({ open, setOpen }) => {
       });
       return;
     } else {
+      setNewFood({ ...newFood, category: newFood.category._id});
       fetch(apiUrl + "/api/foods", {
         method: "POST",
         headers: {
@@ -87,7 +88,7 @@ const FoodForm = ({ open, setOpen }) => {
   };
 
   const handleCategoryChange = (selectedCategory) => {
-    setNewFood({ ...newFood, category: selectedCategory });
+    setNewFood({ ...newFood, category: selectedCategory});
   };
 
   const shouldBlink = () => {

@@ -37,7 +37,6 @@ const SignUp = () => {
     sex: "",
     height: "",
     weight: "",
-    role: "",
     allergies:[{ name: ""}],
   });
 
@@ -81,8 +80,7 @@ const SignUp = () => {
       user.sex === "" ||
       user.age === "" ||
       user.height === "" ||
-      user.weight === "" ||
-      user.role === ""
+      user.weight === "" 
     ) {
       enqueueSnackbar("Some fields are empty.", { variant: "error" });
       return;
@@ -103,9 +101,6 @@ const SignUp = () => {
     });
   };
 
-  const handleUserRoleChange = (event) => {
-    setUser({ ...user, role: event.target.value });
-  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -131,35 +126,6 @@ const SignUp = () => {
           </Typography>
           <Box sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                sx={{ alignItems: "center", textAlign: "center" }}
-              >
-                <FormControl component="fieldset">
-                  <RadioGroup
-                    row
-                    aria-label="user role"
-                    name="userRole"
-                    value={user.role}
-                    onChange={handleUserRoleChange}
-                  >
-                    <FormControlLabel
-                      value="user"
-                      control={<Radio style={{ color: "black" }} />}
-                      label="User"
-                      style={{ color: "black" }}
-                    />
-                    <FormControlLabel
-                      value="nutritionist"
-                      control={<Radio style={{ color: "black" }} />}
-                      label="Nutritionist"
-                      style={{ color: "black" }}
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   autoComplete="given-name"

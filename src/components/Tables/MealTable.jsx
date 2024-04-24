@@ -77,7 +77,6 @@ function Row(props) {
         </TableCell>
         <TableCell align="center">{row.date}</TableCell>
         <TableCell align="center">{row.hour}</TableCell>
-        {localStorage.getItem("viewAs") === "false" && (
         <TableCell align="center">
           <IconButton
             aria-label="edit row"
@@ -94,7 +93,6 @@ function Row(props) {
             <DeleteIcon />
           </IconButton>
         </TableCell>
-        )}
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -127,16 +125,16 @@ function Row(props) {
                   {row.foods.map((foodRow) => (
                     <TableRow key={foodRow._id}>
                       <TableCell component="th" scope="row" align="center">
-                        {foodRow.name}
+                        {foodRow.foodId.name}
                       </TableCell>
                       <TableCell align="center">
-                        {foodRow.totalCalories}
+                        {foodRow.caloriesPerFood}
                       </TableCell>
-                      <TableCell align="center">{foodRow.totalCarbs}</TableCell>
+                      <TableCell align="center">{foodRow.carbsPerFood}</TableCell>
                       <TableCell align="center">
-                        {foodRow.totalProteins}
+                        {foodRow.proteinsPerFood}
                       </TableCell>
-                      <TableCell align="center">{foodRow.totalFats}</TableCell>
+                      <TableCell align="center">{foodRow.fatsPerFood}</TableCell>
                       <TableCell align="center">
                         {foodRow.weightConsumed}
                       </TableCell>
@@ -146,10 +144,10 @@ function Row(props) {
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.calories}</TableCell>
-                    <TableCell align="center">{row.carbs}</TableCell>
-                    <TableCell align="center">{row.proteins}</TableCell>
-                    <TableCell align="center">{row.fats}</TableCell>
+                    <TableCell align="center">{row.totalCalories}</TableCell>
+                    <TableCell align="center">{row.totalCarbs}</TableCell>
+                    <TableCell align="center">{row.totalProteins}</TableCell>
+                    <TableCell align="center">{row.totalFats}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -179,7 +177,7 @@ export default function MealTable({modalOpen  })  {
 
   const getMeals = async () => {
     const response = await fetch(
-      apiUrl + "/api/meals/user/" + localStorage.getItem("userId"),
+      apiUrl + "/api/meals/user/",
       {
         method: "GET",
         headers: {
