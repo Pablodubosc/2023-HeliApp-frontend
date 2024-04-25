@@ -9,8 +9,6 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import LabelBottomNavigation from "../components/BottomMenu";
-import LabelBottomNavigationNutritionist from "../components/BottomMenuNutritionist";
-import DrawerNutritionist from "../components/DrawerNutritionist";
 import { Autocomplete } from "@mui/material";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";

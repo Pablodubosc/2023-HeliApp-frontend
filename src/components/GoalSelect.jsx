@@ -21,7 +21,7 @@ const GoalSelect = ({ onChangeGoal }) => {
 
   const handleGetActiveGoals = async () => {
     const response = await fetch(
-      apiUrl + "/api/goals/activeGoals/" + localStorage.getItem("userId"),
+      apiUrl + "/api/goals/activeGoals/",
       {
         method: "GET",
         headers: {

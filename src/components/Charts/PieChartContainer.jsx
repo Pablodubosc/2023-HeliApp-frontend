@@ -42,7 +42,7 @@ const getMealsByUserIdAndDay = async (
     });
     const groupedFoodsArray = Object.values(groupedFoods);
 
-    if (selectedCategory) {
+    if (selectedCategory.name !="") {
       setData(groupedFoodsArray.filter((item) => item.id === selectedCategory._id));
       setLoading(false);
     } else {
@@ -63,7 +63,7 @@ const getExerciseByUserIdAndDay = async (
   setData("");
   setLoading(true);
   const response = await fetch(
-    apiUrl + "/api/exerciseDone/user/" +
+    apiUrl + "/api/exerciseDone/user" +
     "/date/" +
     date,
     {
@@ -76,14 +76,13 @@ const getExerciseByUserIdAndDay = async (
   );
   const data = await response.json();
   const groupedExercises = {};
-  if (data.data && data.data.length > 0) {
-    data.data.forEach((item) => {
+  if (data.exercisesDoneToSend && data.exercisesDoneToSend.length > 0) {
+    data.exercisesDoneToSend.forEach((item) => {
       item.exercises.forEach((exercise) => {
-        const { name, timeDoing} = exercise;
-        if (groupedExercises[name]) {
-          groupedExercises[name].value += timeDoing;
+        if (groupedExercises[exercise.exerciseId.name]) {
+          groupedExercises[exercise.exerciseId.name].value += exercise.timeWasted;
         } else {
-          groupedExercises[name] = { id: name, value: timeDoing, label: name };
+          groupedExercises[exercise.exerciseId.name] = { id: exercise.exerciseId.name, value: exercise.timeWasted, label: exercise.exerciseId.name };
         }
       });
     });
@@ -99,7 +98,7 @@ const getExerciseByUserIdAndDay = async (
 
 const PieChartContainer = () => {
   const [data, setData] = useState();
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState({name:""});
   const [selectedType, setSelectedType] = useState("Foods");
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [loading, setLoading] = useState(false);

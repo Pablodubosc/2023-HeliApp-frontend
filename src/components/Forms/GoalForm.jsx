@@ -28,7 +28,6 @@ const initialGoalState = {
   name: "",
   type: "",
   objetive: "",
-  userId: localStorage.getItem("userId"),
   startDate: new Date(),
   endDate: new Date(),
 };
@@ -51,7 +50,6 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
     name: "",
     type: "",
     objetive: "",
-    userId: localStorage.getItem("userId"),
     startDate: new Date(),
     endDate: new Date(),
     recurrency: "Non-Recurring"
@@ -72,7 +70,6 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
         name: "",
         type: "",
         objetive: "",
-        userId: localStorage.getItem("userId"),
         startDate: new Date(),
         endDate: new Date(),
         recurrency: "Non-Recurring"
@@ -85,7 +82,6 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
       newGoal.name === "" ||
       newGoal.type === "" ||
       newGoal.objetive === "" ||
-      newGoal.userId === "" ||
       newGoal.startDate === "" ||
       newGoal.endDate === "" ||
       newGoal.endDate < newGoal.startDate
@@ -206,11 +202,11 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
             onChange={handleSelectChange}
             label="Goal Type"
           >
-            <MenuItem value="calories">Calories</MenuItem>
-            <MenuItem value="fats">Fats</MenuItem>
-            <MenuItem value="carbs">Carbs</MenuItem>
-            <MenuItem value="proteins">Proteins</MenuItem>
-            <MenuItem value="calories burn">Calories Burn</MenuItem>
+            <MenuItem value="Calories">Calories</MenuItem>
+            <MenuItem value="Fats">Fats</MenuItem>
+            <MenuItem value="Carbs">Carbs</MenuItem>
+            <MenuItem value="Proteins">Proteins</MenuItem>
+            <MenuItem value="Calories Burn">Calories Burn</MenuItem>
           </Select>
         </FormControl>
       </Grid>

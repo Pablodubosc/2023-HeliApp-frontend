@@ -43,8 +43,7 @@ const LineChartContainer = () => {
 
   const getMealsBetweenDays = async (selectedStartDate, selectedEndDate) => {
     const response = await fetch(
-      apiUrl + "/api/meals/user/" +
-      localStorage.getItem("userId") +
+      apiUrl + "/api/meals/user"+
       "/between/" +
       selectedStartDate+"/"+selectedEndDate+"/type/"+selectedType,
       {
@@ -62,8 +61,7 @@ const LineChartContainer = () => {
 
   const getExerciseDoneBetweenDays = async (selectedStartDate, selectedEndDate) => {
     const response = await fetch(
-      apiUrl + "/api/exerciseDone/user/" +
-      localStorage.getItem("userId") +
+      apiUrl + "/api/exerciseDone/user"+
       "/between/" +
       selectedStartDate+"/"+selectedEndDate,
       {
@@ -182,7 +180,7 @@ const LineChartContainer = () => {
             />
           </div>
         ) : data && data.length > 0 ? (
-          <MyResponsiveLine data={data} type={selectedType.toLowerCase()} />
+          <MyResponsiveLine data={data} type={selectedType} />
         ) : (
           <div>No calories to show</div>
         )}

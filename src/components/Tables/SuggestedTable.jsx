@@ -23,8 +23,10 @@ const apiUrl = getApiUrl();
 
 
 function Row(props) {
-  const planTypeWithoutQuotes = props.planType.replace(/"/g, "");
+  //const planTypeWithoutQuotes = props.planType.replace(/"/g, "");
+  console.log(props.planType)
   const { row, onDoneClick } = props;
+  console.log(row)
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -40,9 +42,9 @@ function Row(props) {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row" align="center">
-          {row.name}
+          {row.exerciseDoneSuggestionId.name}
         </TableCell>
-        {planTypeWithoutQuotes !== "calories burn" ? (
+        {props.planType !== "Calories Burn" ? (
         <TableCell align="center">
           {row.done == false && new Date(props.planStart) <= new Date() ? (
               <IconButton
@@ -89,7 +91,7 @@ function Row(props) {
         </TableCell>
         )}
       </TableRow>
-      {planTypeWithoutQuotes !== "calories burn" ? (
+      {props.planType !== "Calories Burn" ? (
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
@@ -176,16 +178,16 @@ function Row(props) {
                         {exercise.name}
                       </TableCell>
                       <TableCell align="center">
-                        {exercise.totalCaloriesBurn}
+                        {exercise.caloriesBurnPerExercise}
                       </TableCell>
-                      <TableCell align="center">{exercise.timeDoing}</TableCell>
+                      <TableCell align="center">{exercise.timeWasted}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.caloriesBurn}</TableCell>
+                    <TableCell align="center">{row.totalCaloriesBurn}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>

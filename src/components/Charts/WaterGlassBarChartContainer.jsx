@@ -12,10 +12,10 @@ const WaterGlassBarChartContainer = ({flag}) => {
   const [data, setData] = useState();
 
   const getWaterGlasses = async () => {
+    setLoading(true)
       const response = await fetch(
           apiUrl +
-          "/api/waterGlass/countByDay/" +
-          localStorage.getItem("userId"),
+          "/api/waterGlass/countByDay/",
           {
               method: "GET",
               headers: {
@@ -25,7 +25,8 @@ const WaterGlassBarChartContainer = ({flag}) => {
           }
       );
       const data = await response.json();
-      setData(data.result);
+      setData(data.data);
+      setLoading(false)
   }
 
   useEffect(() => {
@@ -45,7 +46,7 @@ const WaterGlassBarChartContainer = ({flag}) => {
         <div style={{ position: "relative", minHeight: 320, marginTop: "10%" }}>
           {loading ? (
             <CircularProgress />
-          ) : data && data.length > 0 ? (
+          ) : data && data.length >0  ? (
             <WaterGlassBarChart data={data} />
           ) : (
             <div style={{ fontSize: "18px", width: 320, marginTop: "10%" }}>

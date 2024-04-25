@@ -94,7 +94,7 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
 
   const handleGetGoals = async () => {
     const response = await fetch(
-      apiUrl + "/api/goals/goalsWithProgress/" + localStorage.getItem("userId"),
+      apiUrl + "/api/goals/goalsWithProgress/",
       {
         method: "GET",
         headers: {

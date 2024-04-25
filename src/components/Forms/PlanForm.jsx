@@ -27,10 +27,9 @@ const apiUrl = getApiUrl();
 
 const initialPlanState = {
   name: "",
-  planObjetive: "",
-  planType: "",
   suggestions:[],
-  userId: localStorage.getItem("userId"),
+  planType: "",
+  planObjetive: "",
   startDate: new Date(),
   endDate: new Date(),
 };
@@ -160,11 +159,11 @@ const PlanForm = ({ open, setOpen }) => {
             onChange={handleSelectChange}
             label="Goal Type"
           >
-            <MenuItem value="calories">Calories</MenuItem>
-            <MenuItem value="fats">Fats</MenuItem>
-            <MenuItem value="carbs">Carbs</MenuItem>
-            <MenuItem value="proteins">Proteins</MenuItem>
-            <MenuItem value="calories burn">Calories Burn</MenuItem>
+            <MenuItem value="Calories">Calories</MenuItem>
+            <MenuItem value="Fats">Fats</MenuItem>
+            <MenuItem value="Carbs">Carbs</MenuItem>
+            <MenuItem value="Proteins">Proteins</MenuItem>
+            <MenuItem value="Calories Burn">Calories Burn</MenuItem>
           </Select>
         </FormControl>
       </Grid>
