@@ -150,12 +150,6 @@ export default function MiniDrawer({ user }) {
   const navigateToHomeScreen = () => {
     navigate("/main", { replace: true });
   };
-  const navigateToNutritionMainScreen = () => {
-    localStorage.setItem("userId", localStorage.getItem("nutritionistUserId"));
-    localStorage.removeItem("nutritionistUserId");
-    localStorage.setItem("viewAs", false);
-    navigate("/mainNutritionist", { replace: true });
-  };
 
   const navigateToMyProfileScreen = () => {
     navigate("/myProfile", { replace: true });
@@ -215,30 +209,6 @@ export default function MiniDrawer({ user }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {localStorage.getItem("viewAs") === "true" && (
-            <ListItem disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-                onClick={navigateToNutritionMainScreen}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  <ArrowBackIcon />
-                </ListItemIcon>
-                <ListItemText primary="Return" sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          )}
-
           <ListItem disablePadding sx={{ display: "block" }}>
             <ListItemButton
               sx={{
@@ -354,8 +324,6 @@ export default function MiniDrawer({ user }) {
               <ListItemText primary="Meals Planifier" sx={{ opacity: open ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
-          
-          {localStorage.getItem("viewAs") === "false" && (
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
@@ -379,8 +347,7 @@ export default function MiniDrawer({ user }) {
                   sx={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>
-            </ListItem>)}
-          {localStorage.getItem("viewAs") === "false" && (
+            </ListItem>
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
@@ -401,7 +368,7 @@ export default function MiniDrawer({ user }) {
                 </ListItemIcon>
                 <ListItemText primary="Logout" sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
-            </ListItem>)}
+            </ListItem>
         </List>
       </Drawer>
       <Main open={open}>

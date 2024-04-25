@@ -23,14 +23,13 @@ const PlanList = ({selectedPlan,setSelectedPlan}) => {
       <React.Fragment>
         <PlanForm open={isModalOpen} setOpen={setIsModalOpen} />
       </React.Fragment>
-      {localStorage.getItem("viewAs") === "false" && (
       <IconButton
         onClick={() => {
           setIsModalOpen(true);
         }}
       >
         <AddCircleRoundedIcon />
-      </IconButton>)}
+      </IconButton>
     </div>
   );
 };

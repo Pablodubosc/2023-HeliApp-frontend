@@ -22,8 +22,7 @@ const apiUrl = getApiUrl();
 const initialExerciseDoneState = {
   name: "",
   date: new Date(),
-  exercises: [{ name: "", caloriesBurn: "", time: "", timeDoing: ""}],
-  userId: localStorage.getItem("userId"),
+  exercises: [{ exerciseId: "", timeWasted: ""}],
 };
 
 const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
@@ -42,8 +41,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
       setExerciseDoneData({
         name: "",
         date: new Date(),
-        exercises: [{ name: "", caloriesBurn: "", time: "", timeDoing: ""}],
-        userId: localStorage.getItem("userId"),
+        exercises: [{ exerciseId: "", timeWasted: ""}],
       });
     }
   }, [initialData]);
@@ -70,9 +68,8 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
       exerciseDoneData.date === "" ||
       !exerciseDoneData.exercises.every(
         (exercise) =>
-        exercise.name !== "" &&
-        exercise.time !== "" &&
-        Number(exercise.timeDoing) > 0
+        exercise.exerciseId !== "" &&
+        Number(exercise.timeWasted) > 0
       )
     ) {
       enqueueSnackbar("Please complete all the fields correctly.", {
@@ -80,9 +77,6 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
       });
       return;
     } else {
-      exerciseDoneData.caloriesBurn = exerciseDoneData.exercises
-        .map((exercise) => parseInt(exercise.totalCaloriesBurn))
-        .reduce((acc, caloriesBurn) => acc + caloriesBurn, 0);
 
       exerciseDoneData.date.setHours(1, 0);
 
@@ -131,8 +125,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
     setExerciseDoneData({
       name: "",
       date: new Date(),
-      exercises: [{ name: "", caloriesBurn: "", time: "", timeDoing: ""}],
-      userId: localStorage.getItem("userId"),
+      exercises: [{ exerciseId: "", timeWasted: ""}],
     });
   }
   };
@@ -140,7 +133,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
   const handleAddExerciseInput = () => {
     const updatedExercises = [
       ...exerciseDoneData.exercises,
-      { name: "", caloriesBurn: "", time: "" },
+      { exerciseId: "", timeWasted: ""},
     ];
     setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
   };
@@ -154,19 +147,10 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
   const handleExerciseInputChange = (newValue, index) => {
     const updatedExercises = [...exerciseDoneData.exercises];
     if (newValue) {
-      updatedExercises[index].name = newValue.name ? newValue.name : "";
-      updatedExercises[index].caloriesBurn = newValue.caloriesBurn;
-      updatedExercises[index].time = newValue.time;
-      if (updatedExercises[index].timeDoing) {
-        updatedExercises[index].totalCaloriesBurn = Math.round(
-          updatedExercises[index].timeDoing *
-            (updatedExercises[index].caloriesBurn / updatedExercises[index].time)
-        )
-      }
+      updatedExercises[index].exerciseId = newValue._id
     } else {
-      updatedExercises[index].name = "";
-      updatedExercises[index].caloriesBurn = 0;
-      updatedExercises[index].time = 0;
+      updatedExercises[index].exerciseId = "";
+      updatedExercises[index].timeWasted = "";
     }
     setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
   };
@@ -175,14 +159,11 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
     const inputValue = Number(e.target.value);
     const updatedExercises = [...exerciseDoneData.exercises];
     if (!isNaN(inputValue) && inputValue >= 1) {
-      updatedExercises[index].timeDoing = inputValue;
-      updatedExercises[index].totalCaloriesBurn = Math.round(
-        inputValue * (updatedExercises[index].caloriesBurn / updatedExercises[index].time)
-      );
-      setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
+      updatedExercises[index].timeWasted = inputValue;
     }else {
-      updatedExercises[index].timeDoing = "";
+      updatedExercises[index].timeWasted = "";
     }
+    setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
   };
 
   return (
@@ -263,8 +244,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
                   id={`exercise-autocomplete-${index}`}
                   options={exerciseOptions}
                   value={
-                    exerciseOptions.find((option) => option.name === exercise.name) ||
-                    null
+                    exerciseOptions.find((option) => option.name === exercise.name)
                   }
                   onChange={(e, newValue) =>
                     handleExerciseInputChange(newValue, index)
@@ -295,7 +275,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
                   type="number"
                   variant="outlined"
                   fullWidth
-                  value={exercise.timeDoing}
+                  value={exercise.timeWasted}
                   onChange={(e) => handleQuantityInputChange(e, index)}
                 />
               </Grid>

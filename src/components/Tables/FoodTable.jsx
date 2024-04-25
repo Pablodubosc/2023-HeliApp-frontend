@@ -151,7 +151,6 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
           style={{
             display: "flex",
             justifyContent: "center",
-            marginBottom: "20px",
           }}
         >
           <CategoryAutocomplete

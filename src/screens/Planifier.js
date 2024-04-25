@@ -100,7 +100,6 @@ const Planifier = () => {
       {showConfetti && (
         <Confetti width={window.innerWidth} height={window.innerHeight} />
       )}
-      {localStorage.getItem("viewAs") === "false" && (
         <SpeedDial
           ariaLabel="SpeedDial basic example"
           sx={{ position: "fixed", bottom: "70px", right: "25px" }}
@@ -115,10 +114,6 @@ const Planifier = () => {
             />
           ))}
         </SpeedDial>
-      )}
-      {localStorage.getItem("viewAs") === "true" && (
-        <ViewingMessage patientUserName={localStorage.getItem("patientUserName")} />
-      )}
       <div className="row justify-content-center">
         <div className="col-lg-10">
           <div className="row justify-content-center">

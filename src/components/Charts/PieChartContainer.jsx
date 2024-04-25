@@ -17,8 +17,7 @@ const getMealsByUserIdAndDay = async (
   setData("");
   setLoading(true);
   const response = await fetch(
-    apiUrl + "/api/meals/user/" +
-    localStorage.getItem("userId") +
+    apiUrl + "/api/meals/user" +
     "/date/" +
     date,
     {
@@ -31,21 +30,20 @@ const getMealsByUserIdAndDay = async (
   );
   const data = await response.json();
   const groupedFoods = {};
-  if (data.data && data.data.length > 0) {
-    data.data.forEach((item) => {
+  if (data.mealsToSend && data.mealsToSend.length > 0) {
+    data.mealsToSend.forEach((item) => {
       item.foods.forEach((food) => {
-        const { name, weightConsumed, category } = food;
-        if (groupedFoods[name]) {
-          groupedFoods[name].value += weightConsumed;
+        if (groupedFoods[food.foodId.name]) {
+          groupedFoods[food.foodId.name].value += food.weightConsumed;
         } else {
-          groupedFoods[name] = { id: category, value: weightConsumed, label: name };
+          groupedFoods[food.foodId.name] = { id: food.foodId.category._id, value: food.weightConsumed, label: food.foodId.name };
         }
       });
     });
     const groupedFoodsArray = Object.values(groupedFoods);
 
     if (selectedCategory) {
-      setData(groupedFoodsArray.filter((item) => item.id === selectedCategory));
+      setData(groupedFoodsArray.filter((item) => item.id === selectedCategory._id));
       setLoading(false);
     } else {
       setData(groupedFoodsArray);
@@ -66,7 +64,6 @@ const getExerciseByUserIdAndDay = async (
   setLoading(true);
   const response = await fetch(
     apiUrl + "/api/exerciseDone/user/" +
-    localStorage.getItem("userId") +
     "/date/" +
     date,
     {

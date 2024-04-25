@@ -330,6 +330,11 @@ const SignUp = () => {
                 />
               </Grid>
             </Grid>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" align="center" color="textSecondary">
+                IMPORTANT: Manage food allergies within the app <span role="img" aria-label="settings" style={{ filter: 'brightness(0.4)' }}>(⚙️)</span> for a smoother experience!
+              </Typography>
+            </Box>
             <Button
               type="submit"
               fullWidth

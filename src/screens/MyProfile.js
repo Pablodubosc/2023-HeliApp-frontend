@@ -39,7 +39,7 @@ const MyProfile = () => {
   }, []);
 
   const getFoods = async () => {
-    const response = await fetch(apiUrl + "/api/foods/", {
+    const response = await fetch(apiUrl + "/api/foods/all", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -47,15 +47,16 @@ const MyProfile = () => {
       },
     });
     const data = await response.json();
-    setFoodOptions(data.data);
+    setFoodOptions(data.allFoods);
   };
 
+
   const handleAddFoodAllergyInput = () => {
-    const newFood = { name: '' };
-    setUser((prevData) => ({
-      ...prevData,
-      allergies:  [...prevData.allergies, newFood]
-    }));
+    const updatedAllergies = [
+      ...user.allergies,
+      { allergyId: ""},
+    ];
+    setUser({ ...user, allergies: updatedAllergies });
   };
   
   const handleRemoveFoodAllergyInput = (index) => {
@@ -68,17 +69,13 @@ const MyProfile = () => {
   };
 
   const handleFoodAllergyInputChange = (newValue, index) => {
-    const updatedFoods = [...user.allergies];
-    
-    // Verifica si newValue es null, si es así, establece el nombre en una cadena vacía
-    const updatedName = newValue ? newValue.name : "";
-    updatedFoods[index].name = updatedName;
-  
-    // Actualiza el objeto user manteniendo la inmutabilidad
-    setUser((prevUser) => ({
-      ...prevUser,
-      allergies: updatedFoods,
-    }));
+    const updatedAllergies = [...user.allergies];
+    if (newValue) {
+      updatedAllergies[index].allergyId = newValue._id
+    } else {
+      updatedAllergies[index].allergyId = ""
+    }
+    setUser({ ...user, allergies: updatedAllergies });
   };
 
   const [isMobile, setIsMobile] = useState(false);
@@ -113,7 +110,7 @@ const MyProfile = () => {
 
   const getUserById = async () => {
     const response = await fetch(
-      apiUrl + "/api/auth/users/" + localStorage.getItem("userId"),
+      apiUrl + "/api/auth/users/",
       {
         method: "GET",
         headers: {
@@ -124,7 +121,6 @@ const MyProfile = () => {
     );
 
     const data = await response.json();
-    console.log(data.data)
     setUser(data.data);
   };
 
@@ -172,17 +168,18 @@ const MyProfile = () => {
       (user.allergies.length > 1 &&
       user.allergies.some(
         (allergy) =>
-          allergy.name == ""
+          allergy == ""
       ))
     ) {
       enqueueSnackbar("Some fields are empty.", { variant: "error" });
       return;
     }
 
-    fetch(apiUrl + "/api/auth/users/" + localStorage.getItem("userId"), {
+    fetch(apiUrl + "/api/auth/users/", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify(user),
     }).then(function (response) {
@@ -198,17 +195,7 @@ const MyProfile = () => {
 
   return (
     <div className="container">
-      {isMobile ? (
-        localStorage.getItem("roles") === "nutritionist" ? (
-          <LabelBottomNavigationNutritionist/>
-        ) :(
-          <LabelBottomNavigation/>
-        )
-      ) : localStorage.getItem("roles") === "nutritionist" ? (
-        <DrawerNutritionist user={localStorage.getItem("username")} />   
-      ) : (
-        <Drawer user={localStorage.getItem("username")} />
-      )}
+      {isMobile ? (<LabelBottomNavigation/>): (<Drawer user={localStorage.getItem("username")} />)}
       <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="s" maxheight="s">
           <CssBaseline />
@@ -370,56 +357,52 @@ const MyProfile = () => {
                 </Grid>
               </Grid>
 
-              <div style={{ border: '1px solid black', padding: '10px', borderRadius: '5px', maxWidth: '600px', margin: 'auto', marginTop: '20px' }}>
-  <Typography variant="h6" style={{ color: 'black', marginBottom: '10px', textAlign: 'center' }}>
-    Set Your Allergies
-  </Typography>
-
-  {user.allergies.map((food, index) => (
-    <React.Fragment key={index}>
-      <Grid container spacing={2} alignItems="center" style={{ marginTop: 10 }}>
-        <Grid item xs={10}>
-          <Autocomplete
-          id={`food-autocomplete-${index}`}
-          options={foodOptions}
-          value={foodOptions.find((option) => option.name === food.name) || null}
-          onChange={(e, newValue) => handleFoodAllergyInputChange(newValue, index)}
-          getOptionLabel={(option) => option.name}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Food"
-              variant="outlined"
-              fullWidth
-              size="small"
-            />
-          )}
-          noOptionsText="No foods available."
-          ListboxProps={{
-            style: {
-              maxHeight: 90,
-            },
-          }}
-        />
-        </Grid>
-        <Grid item xs={2}>
-          {index === 0 ? (
-            <IconButton color="primary" onClick={handleAddFoodAllergyInput}>
-              <AddCircleRoundedIcon />
-            </IconButton>
-          ) : (
-            <IconButton
-              color="primary"
-              onClick={() => handleRemoveFoodAllergyInput(index)}
-            >
-              <RemoveCircleRoundedIcon />
-            </IconButton>
-          )}
-        </Grid>
-      </Grid>
-    </React.Fragment>
-  ))}
-</div>
+              <div style={{ border: '1px solid black', padding: '10px', borderRadius: '5px', maxWidth: '600px', margin: 'auto', marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant="h6" style={{ color: 'black', marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                  Set Your Allergies
+                  <IconButton color="primary" onClick={handleAddFoodAllergyInput}>
+                    <AddCircleRoundedIcon />
+                  </IconButton>
+              </Typography>
+              {user.allergies.map((allergyId, index) => (
+                <React.Fragment key={index}>
+                  <Grid container spacing={2} alignItems="center" style={{ marginTop: 10 }}>
+                    <Grid item xs={10}>
+                      <Autocomplete
+                        id={`food-autocomplete-${index}`}
+                        options={foodOptions}
+                        value={foodOptions.find((option) => option._id === allergyId.allergyId) || null}
+                        onChange={(e, newValue) => handleFoodAllergyInputChange(newValue, index)}
+                        getOptionLabel={(option) => option.name}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Food"
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                          />
+                        )}
+                        noOptionsText="No foods available."
+                        ListboxProps={{
+                          style: {
+                            maxHeight: 90,
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={2}>
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleRemoveFoodAllergyInput(index)}
+                      >
+                        <RemoveCircleRoundedIcon />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </React.Fragment>
+              ))}
+            </div>
 
               <Button
                 type="submit"

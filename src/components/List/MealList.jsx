@@ -13,7 +13,7 @@ const MealList = () => {
         variant="h5"
         fontWeight="bold"
         align="center"
-        marginBottom="2%"
+        marginBottom="9%"
       >
         MEALS TABLE
       </Typography>

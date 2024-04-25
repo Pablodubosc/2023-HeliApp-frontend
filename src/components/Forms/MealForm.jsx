@@ -155,7 +155,6 @@ const MealForm = ({ open, setOpen, initialData }) => {
 
   const handleFoodInputChange = (newValue, index) => {
     const updatedFoods = [...mealData.foods];
-    console.log("NEW VALE"+JSON.stringify(newValue))
     if (newValue) {
       updatedFoods[index].foodId = newValue._id
     } else {
@@ -279,7 +278,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
                   id={`food-autocomplete-${index}`}
                   options={foodOptions}
                   value={
-                    foodOptions.find((option) => option.name === food.name) 
+                    foodOptions.find((option) => option.name === food.foodId.name) // chequear esto
                   }
                   onChange={(e, newValue) =>
                     handleFoodInputChange(newValue, index)

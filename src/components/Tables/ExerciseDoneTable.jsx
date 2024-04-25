@@ -76,7 +76,6 @@ function Row(props) {
           {row.name}
         </TableCell>
         <TableCell align="center">{row.date}</TableCell>
-        {localStorage.getItem("viewAs") === "false" && (
         <TableCell align="center">
           <IconButton
             aria-label="edit row"
@@ -93,7 +92,6 @@ function Row(props) {
             <DeleteIcon />
           </IconButton>
         </TableCell>
-        )}
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -117,19 +115,19 @@ function Row(props) {
                   {row.exercises.map((exercise) => (
                     <TableRow key={exercise._id}>
                       <TableCell component="th" scope="row" align="center">
-                        {exercise.name}
+                        {exercise.exerciseId.name}
                       </TableCell>
                       <TableCell align="center">
-                        {exercise.totalCaloriesBurn}
+                        {exercise.caloriesBurnPerExercise}
                       </TableCell>
-                      <TableCell align="center">{exercise.timeDoing}</TableCell>
+                      <TableCell align="center">{exercise.timeWasted}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.caloriesBurn}</TableCell>
+                    <TableCell align="center">{row.totalCaloriesBurn}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -159,7 +157,7 @@ export default function ExerciseDoneTable({modalOpen  })  {
 
   const getExerciseDone = async () => {
     const response = await fetch(
-      apiUrl + "/api/exerciseDone/user/" + localStorage.getItem("userId"),
+      apiUrl + "/api/exerciseDone/user/",
       {
         method: "GET",
         headers: {
@@ -207,10 +205,9 @@ export default function ExerciseDoneTable({modalOpen  })  {
             <TableCell sx={{ fontWeight: "bold" }} align="center">
               Date&nbsp;
             </TableCell>
-            {localStorage.getItem("viewAs") === "false" && (
             <TableCell sx={{ fontWeight: "bold" }} align="center">
               Actions&nbsp;
-            </TableCell>)}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody sx={{ textAlign: "center" }}>

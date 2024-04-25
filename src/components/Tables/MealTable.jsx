@@ -18,8 +18,11 @@ import MealForm from "../Forms/MealForm";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useSnackbar } from "notistack";
 import getApiUrl from "../../helpers/apiConfig";
+import ErrorIcon from '@mui/icons-material/Error';
+import Tooltip from '@mui/material/Tooltip';
 
 const apiUrl = getApiUrl();
+
 
 function Row(props) {
   const { row, onEditClick } = props;
@@ -74,6 +77,9 @@ function Row(props) {
         </TableCell>
         <TableCell component="th" scope="row" align="center">
           {row.name}
+          {row.allergy && (<Tooltip title={"You are allergic to one or more ingredients in this meal"}>
+            <ErrorIcon style={{ marginLeft: '5px', color: 'red' }} />
+            </Tooltip>)} 
         </TableCell>
         <TableCell align="center">{row.date}</TableCell>
         <TableCell align="center">{row.hour}</TableCell>
@@ -187,7 +193,6 @@ export default function MealTable({modalOpen  })  {
       }
     );
     const data = await response.json();
-
     const mealsWithShortenedDates = data.data.map((meal) => {
       return {
         ...meal,
