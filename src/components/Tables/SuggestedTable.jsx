@@ -18,15 +18,15 @@ import getApiUrl from "../../helpers/apiConfig";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import SuggestionForm from  "../Forms/SuggestionForm";
+import ErrorIcon from '@mui/icons-material/Error';
+import Tooltip from '@mui/material/Tooltip';
 
 const apiUrl = getApiUrl();
 
 
 function Row(props) {
-  //const planTypeWithoutQuotes = props.planType.replace(/"/g, "");
-  console.log(props.planType)
+  const planTypeWithoutQuotes = props.planType.replace(/"/g, "");
   const { row, onDoneClick } = props;
-  console.log(row)
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -41,12 +41,19 @@ function Row(props) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
+        {planTypeWithoutQuotes!== "Calories Burn" ? (
         <TableCell component="th" scope="row" align="center">
-          {row.exerciseDoneSuggestionId.name}
-        </TableCell>
-        {props.planType !== "Calories Burn" ? (
+        {row.suggestion.name}
+        {row.allergy && (<Tooltip title={"You are allergic to one or more ingredients in this meal"}>
+                      <ErrorIcon style={{ marginLeft: '5px', color: 'red' }} />
+                      </Tooltip>)} 
+        </TableCell>):
+        (<TableCell component="th" scope="row" align="center">
+        {row.suggestion.name}
+        </TableCell>)}
+        {planTypeWithoutQuotes!== "Calories Burn" ? (
         <TableCell align="center">
-          {row.done == false && new Date(props.planStart) <= new Date() ? (
+          {row.done == false && row.allergy == false && new Date(props.planStart) <= new Date() ? (
               <IconButton
                 aria-label="done row"
                 size="small"
@@ -91,7 +98,7 @@ function Row(props) {
         </TableCell>
         )}
       </TableRow>
-      {props.planType !== "Calories Burn" ? (
+      {planTypeWithoutQuotes !== "Calories Burn" ? (
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
@@ -120,19 +127,19 @@ function Row(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.foods.map((foodRow) => (
+                  {row.suggestion.foods.map((foodRow) => (
                     <TableRow key={foodRow._id}>
                       <TableCell component="th" scope="row" align="center">
-                        {foodRow.name}
+                        {foodRow.foodId.name}
                       </TableCell>
                       <TableCell align="center">
-                        {foodRow.totalCalories}
+                        {foodRow.caloriesPerFood}
                       </TableCell>
-                      <TableCell align="center">{foodRow.totalCarbs}</TableCell>
+                      <TableCell align="center">{foodRow.carbsPerFood}</TableCell>
                       <TableCell align="center">
-                        {foodRow.totalProteins}
+                        {foodRow.proteinsPerFood}
                       </TableCell>
-                      <TableCell align="center">{foodRow.totalFats}</TableCell>
+                      <TableCell align="center">{foodRow.fatsPerFood}</TableCell>
                       <TableCell align="center">
                         {foodRow.weightConsumed}
                       </TableCell>
@@ -142,10 +149,10 @@ function Row(props) {
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.calories}</TableCell>
-                    <TableCell align="center">{row.carbs}</TableCell>
-                    <TableCell align="center">{row.proteins}</TableCell>
-                    <TableCell align="center">{row.fats}</TableCell>
+                    <TableCell align="center">{row.suggestion.totalCalories}</TableCell>
+                    <TableCell align="center">{row.suggestion.totalCarbs}</TableCell>
+                    <TableCell align="center">{row.suggestion.totalProteins}</TableCell>
+                    <TableCell align="center">{row.suggestion.totalFats}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -172,10 +179,10 @@ function Row(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.exercises.map((exercise) => (
+                  {row.suggestion.exercises.map((exercise) => (
                     <TableRow key={exercise._id}>
                       <TableCell component="th" scope="row" align="center">
-                        {exercise.name}
+                        {exercise.exerciseId.name}
                       </TableCell>
                       <TableCell align="center">
                         {exercise.caloriesBurnPerExercise}
@@ -187,7 +194,7 @@ function Row(props) {
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.totalCaloriesBurn}</TableCell>
+                    <TableCell align="center">{row.suggestion.totalCaloriesBurn}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -243,10 +250,9 @@ export default function SuggestedTable({selectedPlan})  {
             <TableCell sx={{ fontWeight: "bold" }} align="center">
               Name
             </TableCell>
-            {localStorage.getItem("viewAs") === "false" && (
             <TableCell sx={{ fontWeight: "bold" }} align="center">
               Actions&nbsp;
-            </TableCell>)}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody sx={{ textAlign: "center" }}>

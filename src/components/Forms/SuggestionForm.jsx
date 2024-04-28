@@ -16,22 +16,17 @@ import { formatISO, parseISO } from 'date-fns';
 const apiUrl = getApiUrl();
 
 
-
-
 const initialExerciseDoneState = {
   name: "",
   date: new Date(),
-  exercises: [{ name: "", caloriesBurn: "", time: "", timeDoing: ""}],
-  userId: localStorage.getItem("userId"),
+  exercises: [{ exerciseId: "", timeWasted: ""}],
 };
 
 const initialMealState = {
   name: "",
   date: new Date(),
   hour: new Date(),
-  calories: 0,
-  foods: [{ name: "", calories: "", weight: "", category: "" }],
-  userId: localStorage.getItem("userId"),
+  foods: [{ foodId: "", weightConsumed: ""}],
 };
 
 const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => {
@@ -92,7 +87,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
 
   const handleAddSuggestion = () => {
     suggestion.done = true;
-    if(selectedPlan.planType === "calories burn"){
+    if(selectedPlan.planType === "Calories Burn"){
 
 
       exerciseDoneData.caloriesBurn = exerciseDoneData.exercises
@@ -122,25 +117,8 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
       });
     }
     else{
-      mealDoneData.calories = mealDoneData.foods
-        .map((food) => parseInt(food.totalCalories))
-        .reduce((acc, calories) => acc + calories, 0);
-
-        mealDoneData.carbs = mealDoneData.foods
-        .map((food) => parseInt(food.totalCarbs))
-        .reduce((acc, carbs) => acc + carbs, 0);
-
-        mealDoneData.proteins = mealDoneData.foods
-        .map((food) => parseInt(food.totalProteins))
-        .reduce((acc, proteins) => acc + proteins, 0);
-
-        mealDoneData.fats = mealDoneData.foods
-        .map((food) => parseInt(food.totalFats))
-        .reduce((acc, fats) => acc + fats, 0);
-
-       
-
       mealDoneData.hour = mealDoneData.hour.slice(11, 16);
+      console.log(mealDoneData)
 
       fetch(apiUrl + "/api/meals", {
         method: "POST",

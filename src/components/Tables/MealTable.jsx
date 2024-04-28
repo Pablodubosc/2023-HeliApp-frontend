@@ -235,10 +235,9 @@ export default function MealTable({modalOpen  })  {
             <TableCell sx={{ fontWeight: "bold" }} align="center">
               Hours&nbsp;
             </TableCell>
-            {localStorage.getItem("viewAs") === "false" && (
             <TableCell sx={{ fontWeight: "bold" }} align="center">
               Actions&nbsp;
-            </TableCell>)}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody sx={{ textAlign: "center" }}>

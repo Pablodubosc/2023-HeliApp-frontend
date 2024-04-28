@@ -80,7 +80,6 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
     const data = await response.json();
     setPlans(data.data);
     setTotalItems(data.data.length);
-    console.log(data.data[0])
   };
 
   const handleChangePage = (event, newPage) => {
