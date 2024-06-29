@@ -13,37 +13,42 @@ const initialCategoryState = {
 const CategoryForm = ({ open, setOpen }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [newCategory, setNewCategory] = useState(initialCategoryState);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Nuevo estado
 
   const handleAddCategory = () => {
-    if (newCategory.name === "") {
-      enqueueSnackbar("Please complete all the fields.", { variant: "error" });
+    if (newCategory.name === "" || isSubmitting) { // Verifica isSubmitting
       return;
-    } else {
-      fetch(apiUrl + "/api/category", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(newCategory),
-      }).then(function (response) {
-        if (response.status === 200) {
-          enqueueSnackbar("The category was created successfully.", {
-            variant: "success",
-          });
-          closeModal();
-        } else {
-          enqueueSnackbar("An error occurred while creating the category.", {
-            variant: "error",
-          });
-        }
-      });
     }
+
+    setIsSubmitting(true); // Bloquea el botón
+
+    fetch(apiUrl + "/api/category", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify(newCategory),
+    }).then(function (response) {
+      setIsSubmitting(false); // Desbloquea el botón después de recibir la respuesta
+
+      if (response.status === 200) {
+        enqueueSnackbar("The category was created successfully.", {
+          variant: "success",
+        });
+        closeModal();
+      } else {
+        enqueueSnackbar("An error occurred while creating the category.", {
+          variant: "error",
+        });
+      }
+    });
   };
 
   const closeModal = () => {
     setOpen(false);
     setNewCategory(initialCategoryState);
+    setIsSubmitting(false); // Asegúrate de restablecer isSubmitting al cerrar modal
   };
 
   return (
@@ -100,6 +105,7 @@ const CategoryForm = ({ open, setOpen }) => {
             variant="contained"
             color="primary"
             onClick={handleAddCategory}
+            disabled={isSubmitting} // Deshabilita el botón si isSubmitting es true
             sx={{
               mt: 3,
               mb: 2,
@@ -109,7 +115,7 @@ const CategoryForm = ({ open, setOpen }) => {
             }}
             fullWidth
           >
-            Add Category
+            {isSubmitting ? "Adding..." : "Add Category"}
           </Button>
         </div>
       </Box>

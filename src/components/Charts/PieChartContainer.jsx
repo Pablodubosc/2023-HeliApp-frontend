@@ -42,7 +42,7 @@ const getMealsByUserIdAndDay = async (
     });
     const groupedFoodsArray = Object.values(groupedFoods);
 
-    if (selectedCategory.name !="") {
+    if (selectedCategory && selectedCategory.name !="") {
       setData(groupedFoodsArray.filter((item) => item.id === selectedCategory._id));
       setLoading(false);
     } else {
@@ -114,7 +114,7 @@ const PieChartContainer = () => {
   }, [date, selectedCategory,selectedType]);
 
   const handleCategoryChange = (selectedCategory) => {
-    setSelectedCategory(selectedCategory);
+    setSelectedCategory(selectedCategory)
   };
 
   const handleTypeChange = (selectedType) => {

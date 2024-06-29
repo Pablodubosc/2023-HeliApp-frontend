@@ -11,7 +11,6 @@ import Confetti from "react-confetti";
 import getApiUrl from "../helpers/apiConfig";
 import { useSnackbar } from "notistack";
 import IntermittentFastingForm from "../components/Forms/IntermittentFastingForm";
-import ViewingMessage from "../components/ViewingMessage";
 
 const apiUrl = getApiUrl();
 

@@ -102,7 +102,6 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
 
   const getFoodByCategory = async () => {
     if (selectedCategory.name !== "") {
-      console.log("ENTRA ACA "+selectedCategory.name)
       const response = await fetch(
         apiUrl + "/api/foods/category/" + selectedCategory.name + "/" ,
         {

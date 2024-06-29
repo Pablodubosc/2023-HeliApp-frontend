@@ -120,7 +120,6 @@ export default function LabelBottomNavigation() {
           marginRight: 0,
         }}
       />
-      {localStorage.getItem("viewAs") === "false" && (
         <BottomNavigationAction
           label="Fitness"
           value="fitness"
@@ -132,8 +131,7 @@ export default function LabelBottomNavigation() {
             marginLeft: 0,
             marginRight: 0,
           }}
-        />)}
-        {localStorage.getItem("viewAs") === "false" && (
+        />
         <BottomNavigationAction
           label="Planifier"
           value="planifier"
@@ -145,8 +143,7 @@ export default function LabelBottomNavigation() {
             marginLeft: 0,
             marginRight: 0,
           }}
-        />)}
-      {localStorage.getItem("viewAs") === "false" && (
+        />
         <BottomNavigationAction
           label="Profile"
           value="profile"
@@ -158,8 +155,7 @@ export default function LabelBottomNavigation() {
             marginLeft: 0,
             marginRight: 0,
           }}
-        />)}
-      {localStorage.getItem("viewAs") === "false" && (
+        />
         <BottomNavigationAction
           label="Logout"
           value="logout"
@@ -171,7 +167,7 @@ export default function LabelBottomNavigation() {
             marginLeft: 0,
             marginRight: 0,
           }}
-        />)}
+        />
     </BottomNavigation>
   );
 }

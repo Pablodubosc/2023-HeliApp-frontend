@@ -58,7 +58,7 @@ function TablePaginationActions(props) {
 export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) {
   const [plans, setPlans] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = useState(0);
   const [noResults, setNoResults] = useState(false);
 
   useEffect(() => {
@@ -66,8 +66,11 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
   }, [modalOpen]);
 
   useEffect(() => {
-    getPlans();
-  }, []);
+    // Select the first plan when plans are loaded
+    if (plans.length > 0) {
+      setSelectedPlan(plans[0]);
+    }
+  }, [plans]);
 
   const getPlans = async () => {
     const response = await fetch(apiUrl + "/api/plans/", {
@@ -105,27 +108,27 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
           <TableHead sx={{ fontWeight: "bold" }}>
             <TableRow sx={{ fontWeight: "bold" }}>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Plan name</TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Objetive</TableCell>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Objective</TableCell>
               <TableCell sx={{ fontWeight: "bold" }} align="center">From&nbsp;</TableCell>
               <TableCell sx={{ fontWeight: "bold" }} align="center">To&nbsp;</TableCell>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Tracking</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {plans.length == 0 ? (
+            {plans.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} align="center">
-                  You dont have any plans.{" "}
+                <TableCell colSpan={5} align="center">
+                  <div style={{ textAlign: 'center' }}>You don't have any plans.</div>
                 </TableCell>
               </TableRow>
             ) : (
-              (5 > 0 ? plans.slice(page * 5, page * 5 + 5) : plans).map((row) => (
+              plans.slice(page * 5, page * 5 + 5).map((row) => (
                 <TableRow key={row._id} selected={selectedPlan === row}>
                   <TableCell component="th" scope="row" style={{ width: 200, height:70 }} align="center">
                     {row.name}
                   </TableCell>
                   <TableCell style={{ width: 100 }} align="center">
-                    {row.planObjetive} {row.planType}
+                    {row.planObjective} {row.planType}
                   </TableCell>
                   <TableCell style={{ width: 220 }} align="center">
                     {row.startDate ? row.startDate.substring(0, 10) : ""}

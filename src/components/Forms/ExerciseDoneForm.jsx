@@ -28,6 +28,7 @@ const initialExerciseDoneState = {
 const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
   const [exerciseDoneData, setExerciseDoneData] = useState(initialExerciseDoneState);
   const [exerciseOptions, setExerciseOptions] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío de la solicitud
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -63,71 +64,81 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
   };
 
   const handleAddExercise = () => {
+    // Verifica si ya se está enviando una solicitud
+    if (isSubmitting) {
+      return;
+    }
+
+    // Realiza validaciones antes de enviar
     if (
       exerciseDoneData.name === "" ||
       exerciseDoneData.date === "" ||
       !exerciseDoneData.exercises.every(
         (exercise) =>
-        exercise.exerciseId !== "" &&
-        Number(exercise.timeWasted) > 0
+          exercise.exerciseId !== "" &&
+          Number(exercise.timeWasted) > 0
       )
     ) {
       enqueueSnackbar("Please complete all the fields correctly.", {
         variant: "error",
       });
       return;
-    } else {
+    }
 
-      exerciseDoneData.date.setHours(1, 0);
+    setIsSubmitting(true); // Marca como "submitting" al iniciar la solicitud
 
-      const url = initialData
-        ? apiUrl + `/api/exerciseDone/${initialData._id}`
-        : apiUrl + "/api/exerciseDone";
-      const method = initialData ? "PUT" : "POST";
+    // Prepara los datos para enviar
+    exerciseDoneData.date.setHours(1, 0);
 
-      fetch(url, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(exerciseDoneData),
-      })
-        .then(function (response) {
-          if (response.status === 200) {
-            enqueueSnackbar(
-              initialData
-                ? "The exercise was updated successfully."
-                : "The exercise was created successfully.",
-              {
-                variant: "success",
-              }
-            );
-            closeModal();
-          } else {
-            enqueueSnackbar("An error occurred while saving the exercise.", {
-              variant: "error",
-            });
-          }
-        })
-        .catch(function (error) {
+    const url = initialData
+      ? apiUrl + `/api/exerciseDone/${initialData._id}`
+      : apiUrl + "/api/exerciseDone";
+    const method = initialData ? "PUT" : "POST";
+
+    fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify(exerciseDoneData),
+    })
+      .then(function (response) {
+        if (response.status === 200) {
+          enqueueSnackbar(
+            initialData
+              ? "The exercise was updated successfully."
+              : "The exercise was created successfully.",
+            {
+              variant: "success",
+            }
+          );
+          closeModal();
+        } else {
           enqueueSnackbar("An error occurred while saving the exercise.", {
             variant: "error",
           });
+        }
+      })
+      .catch(function (error) {
+        enqueueSnackbar("An error occurred while saving the exercise.", {
+          variant: "error",
         });
-    }
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Marca como "no submitting" al finalizar
+      });
   };
 
   const closeModal = () => {
     setOpen(false);
-    if(!initialData)
-    {
-    setExerciseDoneData({
-      name: "",
-      date: new Date(),
-      exercises: [{ exerciseId: "", timeWasted: ""}],
-    });
-  }
+    if(!initialData) {
+      setExerciseDoneData({
+        name: "",
+        date: new Date(),
+        exercises: [{ exerciseId: "", timeWasted: ""}],
+      });
+    }
   };
 
   const handleAddExerciseInput = () => {
@@ -218,7 +229,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
             <FormControl fullWidth>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
-                  label="Date (MM/DD/AAAA)"
+                  label="Date (MM/DD/YYYY)"
                   variant="outlined"
                   fullWidth
                   margin="normal"
@@ -244,7 +255,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
                   id={`exercise-autocomplete-${index}`}
                   options={exerciseOptions}
                   value={
-                    exerciseOptions.find((option) => option.name === exercise.name)
+                    exerciseOptions.find((option) => option.name === exercise.exerciseId.name)
                   }
                   onChange={(e, newValue) =>
                     handleExerciseInputChange(newValue, index)
@@ -311,6 +322,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
               variant="contained"
               color="primary"
               onClick={handleAddExercise}
+              disabled={isSubmitting} // Deshabilita el botón si se está enviando
               sx={{
                 mt: 3,
                 mb: 2,

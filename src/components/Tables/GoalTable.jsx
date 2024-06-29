@@ -227,9 +227,9 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
           <TableBody>
             {totalItems === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} align="center">
-                  No results found.
-                </TableCell>
+                  <TableCell colSpan={5} align="center">
+                    <div style={{ textAlign: 'center' }}>No results found.</div>
+                  </TableCell>
               </TableRow>
             ) : (
               (5 > 0 ? goals.slice(page * 5, page * 5 + 5) : goals).map(

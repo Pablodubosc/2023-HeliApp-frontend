@@ -8,10 +8,11 @@ import ResetPassword from "./screens/ResetPassword";
 import Statistics from "./screens/Statistics";
 import MyProfile from './screens/MyProfile'
 import "./styles/Home.css";
-import { SnackbarProvider } from "notistack";
+import { SnackbarProvider, closeSnackbar } from "notistack";
 import Meals from "./screens/Meals";
 import { ThemeProvider, createTheme } from "@mui/material";
 import Fitness from "./screens/Fitness";
+import ProtectedRoute from "./ProtectedRoute";
 
 
 const customTheme = createTheme({
@@ -24,17 +25,27 @@ export default function App() {
   return (
     <ThemeProvider theme={customTheme}>
     <div className="Home-header" style={{ backgroundColor: "#CECFC7" }}>
-      <SnackbarProvider>
+      <SnackbarProvider
+          action={(snackbarId) => (
+            <button
+              onClick={() => {
+                closeSnackbar(snackbarId);
+              }}
+            >
+              Dismiss
+            </button>
+          )}
+        >
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="signUp" element={<SignUp />} />
-          <Route path="main" element={<Main />} />
-          <Route path="meals" element={<Meals />} />
-          <Route path="fitness" element={<Fitness />} />
-          <Route path="resetPassword" element={<ResetPassword />} />
-          <Route path="statistics" element={<Statistics />} />
-          <Route path="planifier" element={<Planifier />} />
-          <Route path="myProfile" element={<MyProfile />} />
+          <Route path="main" element={ <ProtectedRoute> <Main /> </ProtectedRoute>} />
+          <Route path="meals" element={<ProtectedRoute> <Meals /> </ProtectedRoute>} />
+          <Route path="fitness" element={<ProtectedRoute> <Fitness /> </ProtectedRoute>} />
+          <Route path="resetPassword" element={<ProtectedRoute> <ResetPassword /> </ProtectedRoute>} />
+          <Route path="statistics" element={<ProtectedRoute> <Statistics /> </ProtectedRoute>} />
+          <Route path="planifier" element={<ProtectedRoute> <Planifier /> </ProtectedRoute>} />
+          <Route path="myProfile" element={<ProtectedRoute> <MyProfile /> </ProtectedRoute>} />
         </Routes>
       </SnackbarProvider>
     </div>

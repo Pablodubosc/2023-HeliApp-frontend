@@ -153,6 +153,8 @@ const MyProfile = () => {
     setUser({ ...user, sex: event.target.value });
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleUpdateUser = () => {
     if (
       user.firstName === "" ||
@@ -163,15 +165,13 @@ const MyProfile = () => {
       user.age === "" ||
       user.height === "" ||
       user.weight === "" ||
-      (user.allergies.length > 1 &&
-      user.allergies.some(
-        (allergy) =>
-          allergy == ""
-      ))
+      user.allergies.some((allergy) => allergy.allergyId === "")
     ) {
       enqueueSnackbar("Some fields are empty.", { variant: "error" });
       return;
     }
+
+    setIsSubmitting(true); // Activar el estado de envío
 
     fetch(apiUrl + "/api/auth/users/", {
       method: "PUT",
@@ -180,15 +180,25 @@ const MyProfile = () => {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify(user),
-    }).then(function (response) {
-      if (response.status === 200) {
-        enqueueSnackbar("User updated successfully.", { variant: "success" });
-        getUserById();
-        localStorage.setItem("username", user.firstName + " " + user.lastName);
-      } else {
-        enqueueSnackbar("Something went wrong.", { variant: "error" });
-      }
-    });
+    })
+      .then(function (response) {
+        if (response.status === 200) {
+          enqueueSnackbar("User updated successfully.", { variant: "success" });
+          getUserById();
+          localStorage.setItem(
+            "username",
+            user.firstName + " " + user.lastName
+          );
+        } else {
+          enqueueSnackbar("Something went wrong.", { variant: "error" });
+        }
+      })
+      .catch((error) => {
+        enqueueSnackbar("Error updating user.", { variant: "error" });
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Desactivar el estado de envío
+      });
   };
 
   return (
@@ -414,9 +424,10 @@ const MyProfile = () => {
                   "&:hover": { backgroundColor: "#373D20" },
                   fontWeight: "bold",
                 }}
+                disabled={isSubmitting} // Deshabilitar el botón cuando se esté enviando
                 onClick={handleUpdateUser}
               >
-                Update
+                {isSubmitting ? "Updating..." : "Update"}
               </Button>
             </Box>
           </Box>

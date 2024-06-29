@@ -24,12 +24,13 @@ const initialMealState = {
   name: "",
   date: new Date(),
   hour: new Date(),
-  foods: [{ foodId: "", weightConsumed: ""}],
+  foods: [{ foodId: "", weightConsumed: "" }],
 };
 
 const MealForm = ({ open, setOpen, initialData }) => {
   const [mealData, setMealData] = useState(initialMealState);
   const [foodOptions, setFoodOptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -42,50 +43,53 @@ const MealForm = ({ open, setOpen, initialData }) => {
         date: initialDate,
       });
     } else {
-      setMealData({
-        name: "",
-        date: new Date(),
-        hour: new Date(),
-        foods: [{ foodId: "", weightConsumed: ""}],
-      });
+      setMealData(initialMealState);
     }
   }, [initialData]);
 
   useEffect(() => {
-    getFoods();
+    if (open) {
+      getFoods();
+    }
   }, [open]);
 
   const getFoods = async () => {
-    const response = await fetch(apiUrl + "/api/foods/", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const data = await response.json();
-    setFoodOptions(data.data);
+    try {
+      const response = await fetch(apiUrl + "/api/foods/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      const data = await response.json();
+      setFoodOptions(data.data);
+    } catch (error) {
+      console.error("Error fetching foods:", error);
+    }
   };
 
-  const handleAddMeal = () => {
-    if (
-      mealData.name === "" ||
-      mealData.date === "" ||
-      mealData.hour === "" ||
-      !mealData.foods.every(
-        (food) =>
-          food.foodId !== "" &&
-          Number(food.weightConsumed) > 0
-      )
-    ) {
-      enqueueSnackbar("Please complete all the fields correctly.", {
-        variant: "error",
-      });
-      return;
-    } else {
+  const handleAddMeal = async () => {
+    try {
+      setIsLoading(true); // Start loading
+
+      if (
+        mealData.name === "" ||
+        mealData.date === "" ||
+        mealData.hour === "" ||
+        !mealData.foods.every(
+          (food) =>
+            food.foodId !== "" &&
+            Number(food.weightConsumed) > 0
+        )
+      ) {
+        enqueueSnackbar("Please complete all the fields correctly.", {
+          variant: "error",
+        });
+        return;
+      }
 
       mealData.hour = mealData.hour.toTimeString().slice(0, 5);
-
       mealData.date.setHours(1, 0);
 
       const url = initialData
@@ -93,56 +97,51 @@ const MealForm = ({ open, setOpen, initialData }) => {
         : apiUrl + "/api/meals";
       const method = initialData ? "PUT" : "POST";
 
-      fetch(url, {
+      const response = await fetch(url, {
         method: method,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
         body: JSON.stringify(mealData),
-      })
-        .then(function (response) {
-          if (response.status === 200) {
-            enqueueSnackbar(
-              initialData
-                ? "The meal was updated successfully."
-                : "The meal was created successfully.",
-              {
-                variant: "success",
-              }
-            );
-            closeModal();
-          } else {
-            enqueueSnackbar("An error occurred while saving the meal.", {
-              variant: "error",
-            });
+      });
+
+      if (response.status === 200) {
+        enqueueSnackbar(
+          initialData
+            ? "The meal was updated successfully."
+            : "The meal was created successfully.",
+          {
+            variant: "success",
           }
-        })
-        .catch(function (error) {
-          enqueueSnackbar("An error occurred while saving the meal.", {
-            variant: "error",
-          });
+        );
+        closeModal();
+      } else {
+        enqueueSnackbar("An error occurred while saving the meal.", {
+          variant: "error",
         });
+      }
+    } catch (error) {
+      console.error("Error saving meal:", error);
+      enqueueSnackbar("An error occurred while saving the meal.", {
+        variant: "error",
+      });
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
   const closeModal = () => {
     setOpen(false);
-    if(!initialData)
-    {
-      setMealData({
-        name: "",
-        date: new Date(),
-        hour: new Date(),
-        foods: [{ foodId: "", weightConsumed: ""}],
-      });
-  }
+    if (!initialData) {
+      setMealData(initialMealState);
+    }
   };
 
   const handleAddFoodInput = () => {
     const updatedFoods = [
       ...mealData.foods,
-      { foodId: "", weightConsumed: ""},
+      { foodId: "", weightConsumed: "" },
     ];
     setMealData({ ...mealData, foods: updatedFoods });
   };
@@ -156,10 +155,10 @@ const MealForm = ({ open, setOpen, initialData }) => {
   const handleFoodInputChange = (newValue, index) => {
     const updatedFoods = [...mealData.foods];
     if (newValue) {
-      updatedFoods[index].foodId = newValue._id
+      updatedFoods[index].foodId = newValue._id;
     } else {
-      updatedFoods[index].foodId = ""
-      updatedFoods[index].weightConsumed = ""
+      updatedFoods[index].foodId = "";
+      updatedFoods[index].weightConsumed = "";
     }
     setMealData({ ...mealData, foods: updatedFoods });
   };
@@ -169,7 +168,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
     const updatedFoods = [...mealData.foods];
     if (!isNaN(inputValue) && inputValue >= 1) {
       updatedFoods[index].weightConsumed = inputValue;
-    }else {
+    } else {
       updatedFoods[index].weightConsumed = "";
     }
     setMealData({ ...mealData, foods: updatedFoods });
@@ -227,7 +226,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
             <FormControl fullWidth>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
-                  label="Date (MM/DD/AAAA)"
+                  label="Date (MM/DD/YYYY)"
                   variant="outlined"
                   fullWidth
                   margin="normal"
@@ -277,9 +276,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
                 <Autocomplete
                   id={`food-autocomplete-${index}`}
                   options={foodOptions}
-                  value={
-                    foodOptions.find((option) => option.name === food.foodId.name) // chequear esto
-                  }
+                  value={foodOptions.find((option) => option.name === food.foodId.name)}
                   onChange={(e, newValue) =>
                     handleFoodInputChange(newValue, index)
                   }
@@ -345,6 +342,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
               variant="contained"
               color="primary"
               onClick={handleAddMeal}
+              disabled={isLoading} // Disable button when loading
               sx={{
                 mt: 3,
                 mb: 2,
