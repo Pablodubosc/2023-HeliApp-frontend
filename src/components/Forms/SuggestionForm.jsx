@@ -50,30 +50,32 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
 
   useEffect(() => {
     if (suggestion) {
+      if (suggestion.suggestion.hasOwnProperty("exercises")){
       setExerciseDoneData({
         ...initialExerciseDoneState,
-        name: suggestion.name,
+        name: suggestion.suggestion.name,
         date: selectedPlan.startDate,
-        exercises : suggestion.exercises
+        exercises : suggestion.suggestion.exercises
       });
-
+     }
+     else {
       setMealDoneData({
-        ...initialExerciseDoneState,
-        name: suggestion.name,
+        ...initialMealState,
+        name: suggestion.suggestion.name,
         date: selectedPlan.startDate,
         hour: selectedPlan.startDate,
-        foods: suggestion.foods
+        foods: suggestion.suggestion.foods
       });
     } 
+  }
   }, [suggestion]);
 
 
   const handleUpdateSuggestion = () => {
-    const selectedPlanModify = selectedPlan.suggestions.find(sugerencia => sugerencia._id === suggestion._id);
+    const index = selectedPlan.suggestions.findIndex(sugerencia => sugerencia._id === suggestion._id);
 
-    if (selectedPlanModify) {
-       selectedPlanModify.done = true; }
-  
+    if (index) {
+       selectedPlan.suggestions[index].done = true; }
       // Envía la sugerencia actualizada al servidor
       fetch(apiUrl + "/api/plans", {
         method: "PUT", // Utiliza el método correcto según tu API
@@ -88,11 +90,11 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
   const handleAddSuggestion = () => {
     suggestion.done = true;
     if(selectedPlan.planType === "Calories Burn"){
+      console.log(exerciseDoneData)
 
-
-      exerciseDoneData.caloriesBurn = exerciseDoneData.exercises
+      /*exerciseDoneData.caloriesBurn = exerciseDoneData.exercises
         .map((exercise) => parseInt(exercise.totalCaloriesBurn))
-        .reduce((acc, caloriesBurn) => acc + caloriesBurn, 0);
+        .reduce((acc, caloriesBurn) => acc + caloriesBurn, 0);*/
 
       fetch(apiUrl + "/api/exerciseDone", {
         method: "POST",
@@ -118,7 +120,6 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
     }
     else{
       mealDoneData.hour = mealDoneData.hour.slice(11, 16);
-      console.log(mealDoneData)
 
       fetch(apiUrl + "/api/meals", {
         method: "POST",
