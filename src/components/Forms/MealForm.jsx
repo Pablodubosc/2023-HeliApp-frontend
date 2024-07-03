@@ -18,6 +18,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import CloseIcon from "@mui/icons-material/Close";
 import getApiUrl from "../../helpers/apiConfig";
 import { Autocomplete } from "@mui/material";
+import CancelIntermittentFastingDialog from "../Forms/CancelIntermittentFastingDialog";
 const apiUrl = getApiUrl();
 
 const initialMealState = {

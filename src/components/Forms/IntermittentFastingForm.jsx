@@ -15,55 +15,101 @@ const IntermittentFastingForm = ({
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [startDateTime, setStartDateTime] = useState(
-    new Date(new Date().getTime() + 1 * 60000)
+    new Date(new Date().getTime() + 0 * 60000)
   );
   const [endDateTime, setEndDateTime] = useState(
-    new Date(new Date().getTime() + 60 * 60000)
+    new Date(new Date().getTime() + 61 * 60000)
   );
-  const [activeIntermittentFastings, setActiveIntermittentFastings] =
-    useState();
+  const [activeIntermittentFastings, setActiveIntermittentFastings] = useState();
+  const [nextIntermittentFastings, setNextIntermittentFastings] = useState();
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el estado de envío
 
   useEffect(() => {
     handleGetActiveIntermittentFasting();
-  }, [activeIntermittentFastings, openIntermittentFastingModal]);
+  }, [openIntermittentFastingModal]);
 
   const handleGetActiveIntermittentFasting = async () => {
-    const response = await fetch(
-      apiUrl +
-        "/api/intermittentFasting/active/" +
-        localStorage.getItem("userId"),
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
+    // Función para obtener el ayuno intermitente activo
+    try {
+      const response = await fetch(
+        apiUrl +
+          "/api/intermittentFasting/active",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.filteredData) {
+        setActiveIntermittentFastings(data.filteredData);
       }
-    );
-    const data = await response.json();
-    if (data.filteredData.length > 0) {
-      setActiveIntermittentFastings(data.filteredData);
+      else{
+        await handleGetNextIntermittentFasting();
+      }
+    } catch (error) {
+      console.error("Error fetching active intermittent fasting:", error);
+    }
+  };
+
+  
+  const handleGetNextIntermittentFasting = async () => {
+    // Función para obtener el ayuno intermitente activo
+    try {
+      const response = await fetch(
+        apiUrl +
+          "/api/intermittentFasting/next",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.filteredData.length > 0) {
+        setNextIntermittentFastings(data.filteredData);
+      }
+    } catch (error) {
+      console.error("Error fetching next intermittent fasting:", error);
     }
   };
 
   const cancelIntermittentFasting = async () => {
-    fetch(
-      apiUrl +
-        "/api/intermittentFasting/active/" +
-        activeIntermittentFastings[0]._id,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      }
-    ).then(function (response) {
+    const id = activeIntermittentFastings  ? activeIntermittentFastings._id : nextIntermittentFastings[0]._id
+    const cancel = activeIntermittentFastings  ? "active" : "next"
+    // Función para cancelar el ayuno intermitente activo
+    try {
+      const response = await fetch(
+        apiUrl +
+          "/api/intermittentFasting/active/" + id,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
       if (response.status === 200) {
-        enqueueSnackbar("The intermittent fasting was cancel successfully.", {
-          variant: "success",
-        });
-        setActiveIntermittentFastings("");
+        enqueueSnackbar(
+          "The intermittent fasting was cancel successfully.",
+          {
+            variant: "success",
+          }
+        );
+        if (cancel == "active")
+        {
+          setActiveIntermittentFastings("");
+          await handleGetNextIntermittentFasting();
+        }
+        else{
+          setNextIntermittentFastings("");
+        }
+        
       } else if (response.status === 500) {
         enqueueSnackbar(
           "An error occurred while canceling the intermittent fasting.",
@@ -72,22 +118,31 @@ const IntermittentFastingForm = ({
           }
         );
       }
-    });
+    } catch (error) {
+      console.error("Error cancelling intermittent fasting:", error);
+    }
   };
 
   const handleStartIntermittentFasting = () => {
+    setIsSubmitting(true); // Indicamos que se está enviando la solicitud
+
+    // Lógica para validar y enviar la solicitud de inicio de ayuno intermitente
     const timeDifferenceMillis = endDateTime - startDateTime;
-    
     const timeDifferenceHours = timeDifferenceMillis / (1000 * 60 * 60);
-  
+
     if (startDateTime > endDateTime) {
-      enqueueSnackbar("End date and time must be greater than start date and time.", {
-        variant: "error",
-      });
+      enqueueSnackbar(
+        "End date and time must be greater than start date and time.",
+        {
+          variant: "error",
+        }
+      );
+      setIsSubmitting(false); // Habilitamos el botón nuevamente
     } else if (timeDifferenceHours < 1) {
       enqueueSnackbar("The fasting period must be at least 1 hour.", {
         variant: "error",
       });
+      setIsSubmitting(false); // Habilitamos el botón nuevamente
     } else {
       fetch(apiUrl + "/api/intermittentFasting", {
         method: "POST",
@@ -100,28 +155,40 @@ const IntermittentFastingForm = ({
           startDateTime: startDateTime,
           endDateTime: endDateTime,
           email: localStorage.getItem("userMail"),
-          userName: localStorage.getItem("username")
+          userName: localStorage.getItem("username"),
         }),
-      }).then(function (response) {
-        if (response.status === 200) {
-          enqueueSnackbar("The intermittent fasting was created successfully.", {
-            variant: "success",
-          });
-          closeModal();
-        } else if (response.status === 501) {
-          enqueueSnackbar(
-            "Another intermittent fasting is scheduled for the same time.",
-            {
-              variant: "error",
-            }
-          );
-        }
-      });
+      })
+        .then(function (response) {
+          if (response.status === 200) {
+            enqueueSnackbar(
+              "The intermittent fasting was created successfully.",
+              {
+                variant: "success",
+              }
+            );
+            setNextIntermittentFastings("");
+            setActiveIntermittentFastings("");
+            closeModal();
+          } else if (response.status === 501) {
+            enqueueSnackbar(
+              "Another intermittent fasting is scheduled for the same time.",
+              {
+                variant: "error",
+              }
+            );
+          }
+        })
+        .catch(function (error) {
+          console.error("Error starting intermittent fasting:", error);
+        })
+        .finally(function () {
+          setIsSubmitting(false); // Habilitamos el botón nuevamente después de la respuesta
+        });
     }
   };
-  
 
   function formatDate(date) {
+    // Función para formatear la fecha
     if (typeof date === "string") {
       const fecha = date.substring(0, 10).split("-");
       const hora = date.substring(11, 19).split(":");
@@ -176,11 +243,43 @@ const IntermittentFastingForm = ({
             </span>
             <br />
             <span>
-              Start: {formatDate(activeIntermittentFastings[0].startDateTime)}
+              Start:{" "}
+              {formatDate(activeIntermittentFastings.startDateTime)}
             </span>
             <br />
             <span>
-              End: {formatDate(activeIntermittentFastings[0].endDateTime)}
+              End: {formatDate(activeIntermittentFastings.endDateTime)}
+            </span>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                mt: 3,
+                mb: 2,
+                backgroundColor: "#373D20",
+                "&:hover": { backgroundColor: "#373D20" },
+                fontWeight: "bold",
+              }}
+              fullWidth
+              onClick={cancelIntermittentFasting}
+            >
+              Cancel
+            </Button>
+          </Grid>
+        )}
+        {nextIntermittentFastings && (
+          <Grid sx={{ textAlign: "center" }}>
+            <span style={{ marginBottom: "5%", fontWeight: "bold" }}>
+              Next Intermittent Fasting:{" "}
+            </span>
+            <br />
+            <span>
+              Start:{" "}
+              {formatDate(nextIntermittentFastings[0].startDateTime)}
+            </span>
+            <br />
+            <span>
+              End: {formatDate(nextIntermittentFastings[0].endDateTime)}
             </span>
             <Button
               variant="contained"
@@ -201,7 +300,12 @@ const IntermittentFastingForm = ({
         )}
 
         <span
-          style={{ marginTop: "5%", marginBottom: "5%", fontWeight: "bold", textAlign: 'center' }}
+          style={{
+            marginTop: "5%",
+            marginBottom: "5%",
+            fontWeight: "bold",
+            textAlign: "center",
+          }}
         >
           Configure your Intermittent Fasting:{" "}
         </span>
@@ -236,9 +340,10 @@ const IntermittentFastingForm = ({
               fontWeight: "bold",
             }}
             fullWidth
+            disabled={isSubmitting} // Deshabilitar el botón si se está enviando la solicitud
             onClick={handleStartIntermittentFasting}
           >
-            Start Intermittent Fasting
+            {isSubmitting ? "Submitting..." : "Start Intermittent Fasting"}
           </Button>
         </Grid>
       </Box>
