@@ -16,7 +16,7 @@ const FoodList = () => {
       <Typography variant="h5" fontWeight="bold" align='center' marginBottom='1%'>FOODS TABLE</Typography>
       <Box >
               <Typography variant="body2" align="center" color="textSecondary">
-                IMPORTANT: Manage your allergies in the section <span role="img" aria-label="settings" style={{ filter: 'brightness(0.4)' }}>(⚙️)</span> for a smoother experience!
+                IMPORTANT: Manage your allergies in your profile section <span role="img" aria-label="settings" style={{ filter: 'brightness(0.4)' }}>(⚙️)</span>
               </Typography>
             </Box>
       <div

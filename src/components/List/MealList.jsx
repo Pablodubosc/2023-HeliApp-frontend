@@ -8,7 +8,7 @@ const MealList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div style={{ textAlign: "center", marginBottom: "250px", color: "black" }}>
+    <div style={{ textAlign: "center", color: "black" }}>
       <Typography
         variant="h5"
         fontWeight="bold"

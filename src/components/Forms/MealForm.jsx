@@ -18,7 +18,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import CloseIcon from "@mui/icons-material/Close";
 import getApiUrl from "../../helpers/apiConfig";
 import { Autocomplete } from "@mui/material";
-import CancelIntermittentFastingDialog from "../Forms/CancelIntermittentFastingDialog";
+import CancelIntermittentFastingForm from "../Forms/CancelIntermittentFastingForm";
 const apiUrl = getApiUrl();
 
 const initialMealState = {
@@ -32,6 +32,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
   const [mealData, setMealData] = useState(initialMealState);
   const [foodOptions, setFoodOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -70,6 +71,29 @@ const MealForm = ({ open, setOpen, initialData }) => {
     }
   };
 
+  const handleGetActiveIntermittentFasting = async () => {
+    // Función para obtener el ayuno intermitente activo
+    try {
+      const response = await fetch(
+        apiUrl +
+          "/api/intermittentFasting/active",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.filteredData) {
+        return data.filteredData;
+      }
+    } catch (error) {
+      console.error("Error fetching active intermittent fasting:", error);
+    }
+  };
+
   const handleAddMeal = async () => {
     try {
       setIsLoading(true); // Start loading
@@ -89,15 +113,34 @@ const MealForm = ({ open, setOpen, initialData }) => {
         });
         return;
       }
-
       mealData.hour = mealData.hour.toTimeString().slice(0, 5);
-      mealData.date.setHours(1, 0);
+      mealData.date.setHours(mealData.hour.split(":")[0]-3, mealData.hour.split(":")[1]);
 
-      const url = initialData
+
+      const activeIF = await handleGetActiveIntermittentFasting()
+      if (activeIF && new Date(mealData.date).toISOString() >= activeIF.startDateTime && new Date(mealData.date).toISOString() <= new Date(activeIF.endDateTime).toISOString())
+        {
+          setOpenCancelDialog(true)
+        }     
+      else
+      {
+        await confirmMeal();
+      } 
+  }
+  catch (error) {
+    console.error("Error saving meal:", error);
+    enqueueSnackbar("An error occurred while saving the meal.", {
+      variant: "error",
+    });
+  } finally {
+    setIsLoading(false); // Stop loading
+  }}
+
+  const confirmMeal = async () => {
+        const url = initialData
         ? apiUrl + `/api/meals/${initialData._id}`
         : apiUrl + "/api/meals";
       const method = initialData ? "PUT" : "POST";
-
       const response = await fetch(url, {
         method: method,
         headers: {
@@ -122,15 +165,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
           variant: "error",
         });
       }
-    } catch (error) {
-      console.error("Error saving meal:", error);
-      enqueueSnackbar("An error occurred while saving the meal.", {
-        variant: "error",
-      });
-    } finally {
-      setIsLoading(false); // Stop loading
-    }
-  };
+    } 
 
   const closeModal = () => {
     setOpen(false);
@@ -357,6 +392,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
             </Button>
           </Grid>
         </Grid>
+        <CancelIntermittentFastingForm open={openCancelDialog} setOpen={setOpenCancelDialog} onConfirm={confirmMeal} />
       </Box>
     </Modal>
   );

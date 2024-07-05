@@ -15,10 +15,10 @@ const IntermittentFastingForm = ({
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [startDateTime, setStartDateTime] = useState(
-    new Date(new Date().getTime() + 0 * 60000)
+    new Date()
   );
   const [endDateTime, setEndDateTime] = useState(
-    new Date(new Date().getTime() + 61 * 60000)
+    new Date(Date.now() + 3600000)
   );
   const [activeIntermittentFastings, setActiveIntermittentFastings] = useState();
   const [nextIntermittentFastings, setNextIntermittentFastings] = useState();
@@ -26,6 +26,8 @@ const IntermittentFastingForm = ({
 
   useEffect(() => {
     handleGetActiveIntermittentFasting();
+    setStartDateTime(new Date());
+    setEndDateTime(new Date(Date.now() + 3600000));
   }, [openIntermittentFastingModal]);
 
   const handleGetActiveIntermittentFasting = async () => {
@@ -144,6 +146,10 @@ const IntermittentFastingForm = ({
       });
       setIsSubmitting(false); // Habilitamos el botón nuevamente
     } else {
+      startDateTime.setHours(startDateTime.getHours() - 3);
+      startDateTime.setSeconds(0);
+      endDateTime.setHours(endDateTime.getHours() - 3);
+      endDateTime.setSeconds(0);
       fetch(apiUrl + "/api/intermittentFasting", {
         method: "POST",
         headers: {
@@ -188,15 +194,9 @@ const IntermittentFastingForm = ({
   };
 
   function formatDate(date) {
-    // Función para formatear la fecha
-    if (typeof date === "string") {
-      const fecha = date.substring(0, 10).split("-");
-      const hora = date.substring(11, 19).split(":");
-      return `${fecha[2]}/${fecha[1]}/${fecha[0]} ${hora[0] - 3}:${hora[1]}:${
-        hora[2]
-      }`;
-    }
-    return date.toLocaleDateString();
+    const fecha = date.substring(0, 10).split("-");
+    const hora = date.substring(11, 19).split(":");
+    return `${fecha[2]}/${fecha[1]}/${fecha[0]} ${hora[0]}:${hora[1]}:${hora[2]}`;
   }
 
   return (
@@ -267,7 +267,7 @@ const IntermittentFastingForm = ({
             </Button>
           </Grid>
         )}
-        {nextIntermittentFastings && (
+        {!activeIntermittentFastings && nextIntermittentFastings && (
           <Grid sx={{ textAlign: "center" }}>
             <span style={{ marginBottom: "5%", fontWeight: "bold" }}>
               Next Intermittent Fasting:{" "}
