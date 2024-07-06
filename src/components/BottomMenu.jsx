@@ -4,38 +4,34 @@ import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import LogoutIcon from "@mui/icons-material/Logout";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import HomeIcon from "@mui/icons-material/Home";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
+import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
+import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import { useNavigate, useLocation } from "react-router-dom";
-import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+
 export default function LabelBottomNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [value, setValue] = React.useState("home");
-
-  React.useEffect(() => {
+  const [value, setValue] = React.useState(() => {
+    // Inicializar el valor basado en la ruta actual
     switch (location.pathname) {
       case "/main":
-        setValue("home");
-        break;
+        return "home";
       case "/meals":
-        setValue("meals");
-        break;
+        return "meals";
       case "/statistics":
-        setValue("stats");
-        break;
+        return "stats";
       case "/fitness":
-        setValue("fitness");
-        break;
+        return "fitness";
       case "/myProfile":
-        setValue("profile");
-        break;
+        return "profile";
+      case "/planifier":
+        return "planifier";
       default:
-        setValue("home");
-        break;
+        return "home";
     }
-  }, [location.pathname]);
+  });
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -95,7 +91,7 @@ export default function LabelBottomNavigation() {
           marginRight: 0,
         }}
       />
-     
+
       <BottomNavigationAction
         label="Stats"
         value="stats"
@@ -108,8 +104,8 @@ export default function LabelBottomNavigation() {
           marginRight: 0,
         }}
       />
-       <BottomNavigationAction
-        label="My Meals"
+      <BottomNavigationAction
+        label="Meals"
         value="meals"
         icon={<RestaurantIcon />}
         sx={{
@@ -120,54 +116,54 @@ export default function LabelBottomNavigation() {
           marginRight: 0,
         }}
       />
-        <BottomNavigationAction
-          label="Fitness"
-          value="fitness"
-          icon={<FitnessCenterIcon />}
-          sx={{
-            minWidth: 0,
-            paddingLeft: 0,
-            paddingRight: 0,
-            marginLeft: 0,
-            marginRight: 0,
-          }}
-        />
-        <BottomNavigationAction
-          label="Planifier"
-          value="planifier"
-          icon={<ContentPasteSearchIcon />}
-          sx={{
-            minWidth: 0,
-            paddingLeft: 0,
-            paddingRight: 0,
-            marginLeft: 0,
-            marginRight: 0,
-          }}
-        />
-        <BottomNavigationAction
-          label="Profile"
-          value="profile"
-          icon={<SettingsIcon />}
-          sx={{
-            minWidth: 0,
-            paddingLeft: 0,
-            paddingRight: 0,
-            marginLeft: 0,
-            marginRight: 0,
-          }}
-        />
-        <BottomNavigationAction
-          label="Logout"
-          value="logout"
-          icon={<LogoutIcon />}
-          sx={{
-            minWidth: 0,
-            paddingLeft: 0,
-            paddingRight: 0,
-            marginLeft: 0,
-            marginRight: 0,
-          }}
-        />
+      <BottomNavigationAction
+        label="Fitness"
+        value="fitness"
+        icon={<FitnessCenterIcon />}
+        sx={{
+          minWidth: 0,
+          paddingLeft: 0,
+          paddingRight: 0,
+          marginLeft: 0,
+          marginRight: 0,
+        }}
+      />
+      <BottomNavigationAction
+        label="Planifier"
+        value="planifier"
+        icon={<ContentPasteSearchIcon />}
+        sx={{
+          minWidth: 0,
+          paddingLeft: 0,
+          paddingRight: 0,
+          marginLeft: 0,
+          marginRight: 0,
+        }}
+      />
+      <BottomNavigationAction
+        label="Profile"
+        value="profile"
+        icon={<SettingsIcon />}
+        sx={{
+          minWidth: 0,
+          paddingLeft: 0,
+          paddingRight: 0,
+          marginLeft: 0,
+          marginRight: 0,
+        }}
+      />
+      <BottomNavigationAction
+        label="Logout"
+        value="logout"
+        icon={<LogoutIcon />}
+        sx={{
+          minWidth: 0,
+          paddingLeft: 0,
+          paddingRight: 0,
+          marginLeft: 0,
+          marginRight: 0,
+        }}
+      />
     </BottomNavigation>
   );
 }

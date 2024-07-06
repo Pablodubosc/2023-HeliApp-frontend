@@ -65,7 +65,7 @@ function Row(props) {
 
   return (
     <React.Fragment>
-      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
+      <TableRow sx={{ "& > *": { borderBottom: "unset", height : '72px' } }}>
         <TableCell width={5} align="center" sx={{ textAlign: "center" }}>
           <IconButton
             aria-label="expand row"
@@ -109,6 +109,7 @@ function Row(props) {
                   <TableRow>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Name
+
                     </TableCell>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Calories
@@ -224,8 +225,10 @@ export default function MealTable({modalOpen  })  {
     >
       <Table aria-label="collapsible table">
         <TableHead>
-          <TableRow>
-            <TableCell />
+          <TableRow sx={{ height : '80px' }}>
+          <TableCell sx={{ fontWeight: "bold" }} align="center">
+              Details
+            </TableCell>
             <TableCell sx={{ fontWeight: "bold" }} align="center">
               Name
             </TableCell>

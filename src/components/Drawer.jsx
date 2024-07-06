@@ -274,7 +274,7 @@ export default function MiniDrawer({ user }) {
               >
                 <RestaurantIcon />
               </ListItemIcon>
-              <ListItemText primary="My Meals" sx={{ opacity: open ? 1 : 0 }} />
+              <ListItemText primary="Meals" sx={{ opacity: open ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
           

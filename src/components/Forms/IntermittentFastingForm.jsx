@@ -25,9 +25,11 @@ const IntermittentFastingForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el estado de envío
 
   useEffect(() => {
-    handleGetActiveIntermittentFasting();
+    setActiveIntermittentFastings("")
+    setNextIntermittentFastings("")
     setStartDateTime(new Date());
     setEndDateTime(new Date(Date.now() + 3600000));
+    handleGetActiveIntermittentFasting();
   }, [openIntermittentFastingModal]);
 
   const handleGetActiveIntermittentFasting = async () => {

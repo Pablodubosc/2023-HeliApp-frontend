@@ -137,7 +137,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
   }}
 
   const confirmMeal = async () => {
-        const url = initialData
+      const url = initialData
         ? apiUrl + `/api/meals/${initialData._id}`
         : apiUrl + "/api/meals";
       const method = initialData ? "PUT" : "POST";
@@ -168,6 +168,7 @@ const MealForm = ({ open, setOpen, initialData }) => {
     } 
 
   const closeModal = () => {
+    setOpenCancelDialog(false)
     setOpen(false);
     if (!initialData) {
       setMealData(initialMealState);
