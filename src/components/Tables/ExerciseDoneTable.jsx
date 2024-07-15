@@ -153,7 +153,7 @@ export default function ExerciseDoneTable({modalOpen  })  {
 
   useEffect(() => {
     getExerciseDone();
-  }, [modalOpen,isModalOpen]);
+  }, [modalOpen,isModalOpen,page]);
 
   const getExerciseDone = async () => {
     const response = await fetch(
@@ -187,7 +187,13 @@ export default function ExerciseDoneTable({modalOpen  })  {
   };
 
   const handleDelete = (deletedExerciseDone) => {
-    setExerciseDone(exerciseDone.filter((exercise) => exercise._id !== deletedExerciseDone._id));
+    const updatedExerciseDone = exerciseDone.filter((exercise) => exercise._id !== deletedExerciseDone._id)
+    setExerciseDone(updatedExerciseDone);
+    setTotalExerciseDone(updatedExerciseDone.length); // Update totalMeals
+    // Adjust page if necessary
+    if (page > 0 && updatedExerciseDone.length <= rowsPerPage * page) {
+      setPage(page - 1);
+    }
   };
 
   return (
@@ -239,13 +245,13 @@ export default function ExerciseDoneTable({modalOpen  })  {
 
       <div>
         <IconButton
-          onClick={(e) => handlePageChange(page - 1)}
+          onClick={() => handlePageChange(page - 1)}
           disabled={page === 0}
         >
           <ArrowBackIosIcon />
         </IconButton>
         <IconButton
-          onClick={(e) => handlePageChange(page + 1)}
+          onClick={() => handlePageChange(page + 1)}
           disabled={endIndex >= totalExerciseDone}
         >
           <ArrowForwardIosIcon />

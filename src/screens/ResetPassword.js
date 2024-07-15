@@ -1,8 +1,8 @@
 import { Button, Grid, TextField } from "@mui/material";
 import React from "react";
 import { useSnackbar } from "notistack";
-import getApiUrl from '../helpers/apiConfig';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import getApiUrl from "../helpers/apiConfig";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 const apiUrl = getApiUrl();
 
 const ResetPassword = () => {
@@ -17,18 +17,16 @@ const ResetPassword = () => {
 
   const handleResetPassword = async () => {
     if (password === repeatPassword) {
-      const response = await fetch(
-        apiUrl + "/api/auth/users/updatePassword/" + userId,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            password: password,
-          }),
-        }
-      );
+      const response = await fetch(apiUrl + "/api/auth/users/updatePassword/", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          password: password,
+          _id: userId,
+        }),
+      });
 
       if (response.status === 200) {
         enqueueSnackbar("The password was changed successfully.", {
@@ -46,9 +44,9 @@ const ResetPassword = () => {
   };
 
   const validateToken = async () => {
-    if(token === ''){
+    if (token === "") {
       enqueueSnackbar("You need to enter the token.", { variant: "error" });
-    }else{
+    } else {
       const response = await fetch(
         apiUrl + "/api/notifications/validateToken/" + token,
         {
@@ -59,7 +57,7 @@ const ResetPassword = () => {
         }
       );
       const data = await response.json();
-      console.log(JSON.stringify(data.data))
+
       if (data.data != null) {
         enqueueSnackbar("The token was validated.", { variant: "success" });
         setUserId(data.data._id);
@@ -126,18 +124,18 @@ const ResetPassword = () => {
             fullWidth
             name="password"
             label="Password"
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             id="password"
             autoComplete="current-password"
             InputLabelProps={{
               style: { color: "black" },
             }}
             InputProps={{
-              style: { color: 'black' },
+              style: { color: "black" },
               endAdornment: (
                 <VisibilityIcon
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 />
               ),
             }}
@@ -155,18 +153,18 @@ const ResetPassword = () => {
             fullWidth
             name="password"
             label="Repeat Password"
-            type={showRepeatedPassword ? 'text' : 'password'}
+            type={showRepeatedPassword ? "text" : "password"}
             id="password"
             autoComplete="current-password"
             InputLabelProps={{
               style: { color: "black" },
             }}
             InputProps={{
-              style: { color: 'black' },
+              style: { color: "black" },
               endAdornment: (
                 <VisibilityIcon
                   onClick={() => setShowRepeatedPassword(!showRepeatedPassword)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 />
               ),
             }}

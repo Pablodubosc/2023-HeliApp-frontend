@@ -104,8 +104,8 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
       : apiUrl + "/api/goals";
     const method = initialData ? "PUT" : "POST";
 
-    newGoal.startDate.setHours(0, 0);
-    newGoal.endDate.setHours(23, 59);
+    newGoal.startDate.setHours(-3, 0, 0);
+    newGoal.endDate.setHours(20, 59, 59);
 
     fetch(url, {
       method: method,

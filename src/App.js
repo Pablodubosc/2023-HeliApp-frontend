@@ -42,7 +42,7 @@ export default function App() {
           <Route path="main" element={ <ProtectedRoute> <Main /> </ProtectedRoute>} />
           <Route path="meals" element={<ProtectedRoute> <Meals /> </ProtectedRoute>} />
           <Route path="fitness" element={<ProtectedRoute> <Fitness /> </ProtectedRoute>} />
-          <Route path="resetPassword" element={<ProtectedRoute> <ResetPassword /> </ProtectedRoute>} />
+          <Route path="resetPassword" element={ <ResetPassword />} />
           <Route path="statistics" element={<ProtectedRoute> <Statistics /> </ProtectedRoute>} />
           <Route path="planifier" element={<ProtectedRoute> <Planifier /> </ProtectedRoute>} />
           <Route path="myProfile" element={<ProtectedRoute> <MyProfile /> </ProtectedRoute>} />

@@ -11,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import { TableHead } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
 import getApiUrl from "../../helpers/apiConfig";
 
 const apiUrl = getApiUrl();
@@ -60,29 +61,34 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
   const [totalItems, setTotalItems] = useState(0);
   const [page, setPage] = useState(0);
   const [noResults, setNoResults] = useState(false);
+  const [loading, setLoading] = useState(false); // Estado para controlar la carga
 
   useEffect(() => {
     getPlans();
   }, [modalOpen]);
 
-  useEffect(() => {
-    // Select the first plan when plans are loaded
-    if (plans.length > 0) {
-      setSelectedPlan(plans[0]);
-    }
-  }, [plans]);
-
   const getPlans = async () => {
-    const response = await fetch(apiUrl + "/api/plans/", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const data = await response.json();
-    setPlans(data.data);
-    setTotalItems(data.data.length);
+    if(plans)
+    {
+      setLoading(true); // Inicia el estado de carga
+    }
+    try {
+      const response = await fetch(apiUrl + "/api/plans/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      const data = await response.json();
+      setPlans(data.data);
+      setTotalItems(data.data.length);
+    } catch (error) {
+      console.error("Error fetching plans:", error);
+      // Puedes manejar el error aquí según tu lógica de la aplicación
+    } finally {
+      setLoading(false); // Finaliza el estado de carga
+    }
   };
 
   const handleChangePage = (event, newPage) => {
@@ -115,7 +121,13 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
             </TableRow>
           </TableHead>
           <TableBody>
-            {plans.length === 0 ? (
+            {loading ? ( // Muestra CircularProgress si loading es true
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <CircularProgress style={{ margin: "20px" }} />
+                </TableCell>
+              </TableRow>
+            ) : plans.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} align="center">
                   <div style={{ textAlign: 'center' }}>You don't have any plans.</div>
@@ -124,7 +136,7 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
             ) : (
               plans.slice(page * 5, page * 5 + 5).map((row) => (
                 <TableRow key={row._id} selected={selectedPlan === row}>
-                  <TableCell component="th" scope="row" style={{ width: 200, height:70 }} align="center">
+                  <TableCell component="th" scope="row" style={{ width: 200, height: 70 }} align="center">
                     {row.name}
                   </TableCell>
                   <TableCell style={{ width: 100 }} align="center">
@@ -148,9 +160,11 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
             )}
           </TableBody>
         </Table>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <TablePaginationActions count={totalItems} page={page} onPageChange={handleChangePage} />
-        </Box>
+        {!loading && plans.length > 0 && (
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <TablePaginationActions count={totalItems} page={page} onPageChange={handleChangePage} />
+          </Box>
+        )}
       </TableContainer>
     </div>
   );

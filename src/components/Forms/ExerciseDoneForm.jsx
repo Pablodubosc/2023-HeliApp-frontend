@@ -7,6 +7,7 @@ import {
   IconButton,
   Grid,
   FormControl,
+  CircularProgress,
 } from "@mui/material";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
@@ -17,53 +18,76 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import CloseIcon from "@mui/icons-material/Close";
 import getApiUrl from "../../helpers/apiConfig";
 import { Autocomplete } from "@mui/material";
+
 const apiUrl = getApiUrl();
 
 const initialExerciseDoneState = {
   name: "",
   date: new Date(),
-  exercises: [{ exerciseId: "", timeWasted: ""}],
+  exercises: [{ exerciseId: "", timeWasted: "" }],
 };
 
 const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
   const [exerciseDoneData, setExerciseDoneData] = useState(initialExerciseDoneState);
   const [exerciseOptions, setExerciseOptions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío de la solicitud
+  const [exercisesLoaded, setExercisesLoaded] = useState(false);
+  const [loadingExercises, setLoadingExercises] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    if (initialData) {
-      const initialDate = new Date(initialData.date + "T10:00:00Z");
-      setExerciseDoneData({
-        ...initialData,
-        date: initialDate,
-      });
-    } else {
-      setExerciseDoneData({
-        name: "",
-        date: new Date(),
-        exercises: [{ exerciseId: "", timeWasted: ""}],
-      });
+    if (open && !exercisesLoaded) {
+      getExercise();
     }
-  }, [initialData]);
+  }, [open, exercisesLoaded]);
 
   useEffect(() => {
-    getExercise();
-  }, [open]);
+    if (initialData) {
+      initializeForm(initialData);
+    } else {
+      initializeForm(initialExerciseDoneState);
+    }
+  }, [initialData, exercisesLoaded]);
 
-  const getExercise = async () => {
-    const response = await fetch(apiUrl + "/api/exercise" , {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
+  const initializeForm = (data) => {
+    const initialDate = new Date(data.date + "T10:00:00Z");
+    const initialExercises = data.exercises.map((exercise) => ({
+      exerciseId: exercise.exerciseId._id,
+      timeWasted: exercise.timeWasted,
+    }));
+    setExerciseDoneData({
+      ...data,
+      date: initialDate,
+      exercises: initialExercises,
     });
-    const data = await response.json();
-    setExerciseOptions(data.data);
   };
 
-  const handleAddExercise = () => {
+  const getExercise = async () => {
+    setLoadingExercises(true);
+    try {
+      const response = await fetch(apiUrl + "/api/exercise", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setExerciseOptions(data.data);
+        setExercisesLoaded(true);
+      } else {
+        throw new Error("Failed to fetch exercises options");
+      }
+    } catch (error) {
+      console.error("Error fetching exercises options:", error);
+      enqueueSnackbar("Failed to load exercises options.", { variant: "error" });
+    } finally {
+      setLoadingExercises(false);
+    }
+  };
+
+  const handleAddExercise = async () => {
     // Verifica si ya se está enviando una solicitud
     if (isSubmitting) {
       return;
@@ -95,56 +119,50 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
       : apiUrl + "/api/exerciseDone";
     const method = initialData ? "PUT" : "POST";
 
-    fetch(url, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      body: JSON.stringify(exerciseDoneData),
-    })
-      .then(function (response) {
-        if (response.status === 200) {
-          enqueueSnackbar(
-            initialData
-              ? "The exercise was updated successfully."
-              : "The exercise was created successfully.",
-            {
-              variant: "success",
-            }
-          );
-          closeModal();
-        } else {
-          enqueueSnackbar("An error occurred while saving the exercise.", {
-            variant: "error",
-          });
-        }
-      })
-      .catch(function (error) {
-        enqueueSnackbar("An error occurred while saving the exercise.", {
-          variant: "error",
-        });
-      })
-      .finally(() => {
-        setIsSubmitting(false); // Marca como "no submitting" al finalizar
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify(exerciseDoneData),
       });
+
+      if (response.status === 200) {
+        enqueueSnackbar(
+          initialData
+            ? "The exercise was updated successfully."
+            : "The exercise was created successfully.",
+          {
+            variant: "success",
+          }
+        );
+        closeModal();
+      } else {
+        throw new Error("Failed to save exercise.");
+      }
+    } catch (error) {
+      console.error("Error saving exercise:", error);
+      enqueueSnackbar("An error occurred while saving the exercise.", {
+        variant: "error",
+      });
+    } finally {
+      setIsSubmitting(false); // Marca como "no submitting" al finalizar
+    }
   };
 
   const closeModal = () => {
     setOpen(false);
-    if(!initialData) {
-      setExerciseDoneData({
-        name: "",
-        date: new Date(),
-        exercises: [{ exerciseId: "", timeWasted: ""}],
-      });
+    if (!initialData) {
+      setExerciseDoneData(initialExerciseDoneState);
     }
   };
 
   const handleAddExerciseInput = () => {
     const updatedExercises = [
       ...exerciseDoneData.exercises,
-      { exerciseId: "", timeWasted: ""},
+      { exerciseId: "", timeWasted: "" },
     ];
     setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
   };
@@ -158,7 +176,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
   const handleExerciseInputChange = (newValue, index) => {
     const updatedExercises = [...exerciseDoneData.exercises];
     if (newValue) {
-      updatedExercises[index].exerciseId = newValue._id
+      updatedExercises[index].exerciseId = newValue._id;
     } else {
       updatedExercises[index].exerciseId = "";
       updatedExercises[index].timeWasted = "";
@@ -171,7 +189,7 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
     const updatedExercises = [...exerciseDoneData.exercises];
     if (!isNaN(inputValue) && inputValue >= 1) {
       updatedExercises[index].timeWasted = inputValue;
-    }else {
+    } else {
       updatedExercises[index].timeWasted = "";
     }
     setExerciseDoneData({ ...exerciseDoneData, exercises: updatedExercises });
@@ -254,8 +272,11 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
                 <Autocomplete
                   id={`exercise-autocomplete-${index}`}
                   options={exerciseOptions}
+                  loading={loadingExercises}
                   value={
-                    exerciseOptions.find((option) => option.name === exercise.exerciseId.name)
+                    exercise.exerciseId
+                      ? exerciseOptions.find((option) => option._id === exercise.exerciseId)
+                      : null
                   }
                   onChange={(e, newValue) =>
                     handleExerciseInputChange(newValue, index)
@@ -267,6 +288,17 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
                       label="Exercise"
                       variant="outlined"
                       fullWidth
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {loadingExercises ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      }}
                     />
                   )}
                   noOptionsText="No exercises available."

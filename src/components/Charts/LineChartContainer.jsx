@@ -31,7 +31,7 @@ const LineChartContainer = () => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [selectedType, setSelectedType] = useState("Calories");
   const [range, setRange] = useState({
-    from: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 0, 0, 0, 0),
+    from: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), -3, 0, 0, 0),
     to: addDays(new Date().setHours(0, 0), 7)
   });
 

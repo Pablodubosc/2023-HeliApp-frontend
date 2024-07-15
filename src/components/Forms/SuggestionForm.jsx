@@ -90,11 +90,6 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
   const handleAddSuggestion = () => {
     suggestion.done = true;
     if(selectedPlan.planType === "Calories Burn"){
-      console.log(exerciseDoneData)
-
-      /*exerciseDoneData.caloriesBurn = exerciseDoneData.exercises
-        .map((exercise) => parseInt(exercise.totalCaloriesBurn))
-        .reduce((acc, caloriesBurn) => acc + caloriesBurn, 0);*/
 
       fetch(apiUrl + "/api/exerciseDone", {
         method: "POST",
@@ -191,7 +186,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
                   fullWidth
                   margin="normal"
                   minDate={parseISO(selectedPlan.startDate)}
-                  maxDate={parseISO(selectedPlan.endDate)}
+                  maxDate={new Date() < new Date(selectedPlan.endDate) ? new Date() : parseISO(selectedPlan.endDate)}
                   InputLabelProps={{
                     shrink: true,
                   }}

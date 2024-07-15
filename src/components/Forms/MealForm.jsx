@@ -7,6 +7,8 @@ import {
   IconButton,
   Grid,
   FormControl,
+  CircularProgress,
+  Typography,
 } from "@mui/material";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
@@ -18,7 +20,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import CloseIcon from "@mui/icons-material/Close";
 import getApiUrl from "../../helpers/apiConfig";
 import { Autocomplete } from "@mui/material";
-import CancelIntermittentFastingForm from "../Forms/CancelIntermittentFastingForm";
+import CancelIntermittentFastingForm from "./CancelIntermittentFastingForm";
 const apiUrl = getApiUrl();
 
 const initialMealState = {
@@ -32,22 +34,17 @@ const MealForm = ({ open, setOpen, initialData }) => {
   const [mealData, setMealData] = useState(initialMealState);
   const [foodOptions, setFoodOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+  const [foodsLoaded, setFoodsLoaded] = useState(false);
+  const [loadingFoods, setLoadingFoods] = useState(false);
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
+
   useEffect(() => {
-    if (initialData) {
-      const initialTime = new Date(`2023-01-01T${initialData.hour}`);
-      const initialDate = new Date(initialData.date + "T10:00:00Z");
-      setMealData({
-        ...initialData,
-        hour: initialTime,
-        date: initialDate,
-      });
-    } else {
-      setMealData(initialMealState);
+    if (!foodsLoaded) {
+      getFoods();
     }
-  }, [initialData]);
+  }, [foodsLoaded]);
 
   useEffect(() => {
     if (open) {
@@ -55,7 +52,33 @@ const MealForm = ({ open, setOpen, initialData }) => {
     }
   }, [open]);
 
+  useEffect(() => {
+    if (initialData && foodsLoaded) {
+      initializeForm(initialData);
+    } else if (foodsLoaded) {
+      initializeForm(initialMealState);
+    }
+  }, [initialData, foodsLoaded]);
+  
+
+  const initializeForm = (data) => {
+    const initialTime = new Date(`2023-01-01T${data.hour}`);
+    const initialDate = new Date(data.date + "T10:00:00Z");
+    const initialFoods = data.foods.map((food) => ({
+      foodId: food.foodId._id,
+      weightConsumed: food.weightConsumed,
+    }));
+    setMealData({
+      ...data,
+      hour: initialTime,
+      date: initialDate,
+      foods: initialFoods,
+    });
+  };
+
   const getFoods = async () => {
+    setLoadingFoods(true);
+    setIsLoading(true);
     try {
       const response = await fetch(apiUrl + "/api/foods/", {
         method: "GET",
@@ -64,10 +87,19 @@ const MealForm = ({ open, setOpen, initialData }) => {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-      const data = await response.json();
-      setFoodOptions(data.data);
+      if (response.ok) {
+        const data = await response.json();
+        setFoodOptions(data.data);
+        setFoodsLoaded(true);
+      } else {
+        throw new Error("Failed to fetch food options");
+      }
     } catch (error) {
-      console.error("Error fetching foods:", error);
+      console.error("Error fetching food options:", error);
+      enqueueSnackbar("Failed to load food options.", { variant: "error" });
+    } finally {
+      setIsLoading(false);
+      setLoadingFoods(false);
     }
   };
 
@@ -167,13 +199,16 @@ const MealForm = ({ open, setOpen, initialData }) => {
       }
     } 
 
-  const closeModal = () => {
-    setOpenCancelDialog(false)
-    setOpen(false);
-    if (!initialData) {
-      setMealData(initialMealState);
-    }
-  };
+    const closeModal = () => {
+      setOpenCancelDialog(false);
+      setOpen(false);
+      if (!initialData) {
+        setMealData(initialMealState);
+      } else {
+        // Reset initial foods to prevent showing previous data
+        initializeForm(initialMealState);
+      }
+    };
 
   const handleAddFoodInput = () => {
     const updatedFoods = [
@@ -313,7 +348,12 @@ const MealForm = ({ open, setOpen, initialData }) => {
                 <Autocomplete
                   id={`food-autocomplete-${index}`}
                   options={foodOptions}
-                  value={foodOptions.find((option) => option.name === food.foodId.name)}
+                  loading={loadingFoods}
+                  value={
+                    food.foodId
+                      ? foodOptions.find((option) => option._id === food.foodId)
+                      : null
+                  }
                   onChange={(e, newValue) =>
                     handleFoodInputChange(newValue, index)
                   }
@@ -324,6 +364,17 @@ const MealForm = ({ open, setOpen, initialData }) => {
                       label="Food"
                       variant="outlined"
                       fullWidth
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {loadingFoods ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      }}
                     />
                   )}
                   noOptionsText="No foods available."
