@@ -25,6 +25,7 @@ const ResetPassword = () => {
         body: JSON.stringify({
           password: password,
           _id: userId,
+          secretToken: token,
         }),
       });
 

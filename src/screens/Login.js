@@ -26,10 +26,6 @@ import "../styles/Login.css";
 const apiUrl = getApiUrl();
 const url = getUrl();
 
-function getUID() {
-  return Date.now().toString(36);
-}
-
 const Login = () => {
   const [user, setUser] = React.useState({
     email: "",
@@ -83,23 +79,24 @@ const Login = () => {
           });
           return;
         }
+        //SOLO DEBERIA TRAER EL MAIL
         const userId = data.data._id;
         const userName = data.data.firstName + " " + data.data.lastName;
-
+        setIsLoading(true);
         const response1 = await fetch(apiUrl + "/api/notifications/sendEmail", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          //ACA SOLO MANDO EL MAIL
           body: JSON.stringify({
             email: recoveryEmail,
-            token: getUID(),
             userName: userName,
             userId: userId,
             url: url,
           }),
         });
-
+        setIsLoading(false);
         if (response1.status === 200) {
           enqueueSnackbar(
             "An email with the link to recover your password has been sent.",
@@ -377,6 +374,7 @@ const Login = () => {
               width: "100%",
             }}
             onClick={handleRecoverClick}
+            disabled={isLoading}
           >
             Reset Password
           </Button>
