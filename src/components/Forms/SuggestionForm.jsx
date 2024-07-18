@@ -34,7 +34,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
 
   const [exerciseDoneData, setExerciseDoneData] = useState(initialExerciseDoneState);
   const [mealDoneData, setMealDoneData] = useState(initialMealState);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const handleChangeDate = (e, index) => {
     setMealDoneData((prevData) => ({
       ...prevData,
@@ -89,6 +89,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
 
   const handleAddSuggestion = () => {
     suggestion.done = true;
+    setIsSubmitting(true);
     if(selectedPlan.planType === "Calories Burn"){
 
       fetch(apiUrl + "/api/exerciseDone", {
@@ -104,12 +105,14 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
             variant: "success",
           });
           handleUpdateSuggestion();
+          setIsSubmitting(false);
           closeModal();
 
         } else {
           enqueueSnackbar("An error occurred while creating the exercise.", {
             variant: "error",
           });
+          setIsSubmitting(false);
         }
       });
     }
@@ -129,15 +132,18 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
             variant: "success",
           });
           handleUpdateSuggestion();
+          setIsSubmitting(false);
           closeModal();
         } else {
           enqueueSnackbar("An error occurred while creating the meal.", {
             variant: "error",
           });
+          setIsSubmitting(false);
         }
       });
     }
     closeModal();
+    setIsSubmitting(false);
   };
 
   const closeModal = () => {
@@ -202,6 +208,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
             variant="contained"
             color="primary"
             onClick={handleAddSuggestion}
+            disabled={isSubmitting}
             sx={{
               mt: 3,
               mb: 2,

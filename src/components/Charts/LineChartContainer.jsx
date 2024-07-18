@@ -42,6 +42,7 @@ const LineChartContainer = () => {
   };
 
   const getMealsBetweenDays = async (selectedStartDate, selectedEndDate) => {
+    setLoading(true);
     const response = await fetch(
       apiUrl + "/api/meals/user"+
       "/between/" +
@@ -56,10 +57,12 @@ const LineChartContainer = () => {
     );
     const data = await response.json();
     setData(data.fechasIntermedias);
+    setLoading(false);
   };
 
 
   const getExerciseDoneBetweenDays = async (selectedStartDate, selectedEndDate) => {
+    setLoading(true);
     const response = await fetch(
       apiUrl + "/api/exerciseDone/user"+
       "/between/" +
@@ -74,6 +77,7 @@ const LineChartContainer = () => {
     );
     const data = await response.json();
     setData(data.fechasIntermedias);
+    setLoading(false);
   };
 
   useEffect(() => {
