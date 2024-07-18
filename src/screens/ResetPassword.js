@@ -14,8 +14,9 @@ const ResetPassword = () => {
   const [repeatPassword, setRepeatPassword] = React.useState("");
   const [isValid, setIsValid] = React.useState(false);
   const [userId, setUserId] = React.useState("");
-
+  const [isLoading, setIsLoading] = React.useState(false);
   const handleResetPassword = async () => {
+    setIsLoading(true);
     if (password === repeatPassword) {
       const response = await fetch(apiUrl + "/api/auth/users/updatePassword/", {
         method: "PUT",
@@ -34,6 +35,7 @@ const ResetPassword = () => {
           variant: "success",
         });
         setIsValid(false);
+        setIsLoading(false);
         setToken("");
         setPassword("");
         setRepeatPassword("");
@@ -189,6 +191,7 @@ const ResetPassword = () => {
               fontWeight: "bold",
             }}
             onClick={() => handleResetPassword()}
+            disabled={isLoading}
           >
             Reset Password
           </Button>

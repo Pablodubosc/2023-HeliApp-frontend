@@ -53,6 +53,7 @@ const Login = () => {
   const images = [carousel1, carousel2, carousel3, carousel4];
 
   const handleRecoverClick = async () => {
+    setIsLoading(true);
     if (recoveryEmail === "") {
       enqueueSnackbar(
         "Please enter your email address to reset your password.",
@@ -82,7 +83,6 @@ const Login = () => {
         //SOLO DEBERIA TRAER EL MAIL
         const userId = data.data._id;
         const userName = data.data.firstName + " " + data.data.lastName;
-        setIsLoading(true);
         const response1 = await fetch(apiUrl + "/api/notifications/sendEmail", {
           method: "POST",
           headers: {
@@ -103,6 +103,7 @@ const Login = () => {
             { variant: "success" }
           );
           setRecoveryEmail("");
+          setIsLoading(false);
           closeModal();
         } else {
           enqueueSnackbar("There was an issue with sending the email.", {
