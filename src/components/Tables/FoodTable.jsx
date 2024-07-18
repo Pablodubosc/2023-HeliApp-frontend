@@ -13,7 +13,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CategoryAutocomplete from "../CategoryAutocomplete";
 import getApiUrl from "../../helpers/apiConfig";
-
+import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
 const apiUrl = getApiUrl();
 
 function TablePaginationActions(props) {
@@ -66,6 +66,7 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
   const [selectedCategory, setSelectedCategory] = useState(initialSelectedCategoryState);
   const [page, setPage] = React.useState(0);
   const [noResults, setNoResults] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     selectedCategory && filterOpen == true ? getFoodByCategory() : getFoods();
@@ -83,6 +84,7 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
   }, []);
 
   const getFoods = async () => {
+    setLoading(true)
     const response = await fetch(apiUrl + "/api/foods/", {
       method: "GET",
       headers: {
@@ -93,14 +95,17 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
     const data = await response.json();
     if (data.data.length === 0) {
       setNoResults(true);
+      setLoading(false)
     } else {
       setNoResults(false);
+      setLoading(false)
       setFoods(data.data);
       setTotalItems(data.data.length);
     }
   };
 
   const getFoodByCategory = async () => {
+    setLoading(true)
     if (selectedCategory.name !== "") {
       const response = await fetch(
         apiUrl + "/api/foods/category/" + selectedCategory.name + "/" ,
@@ -115,10 +120,12 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
       const data = await response.json();
       if (data.data.length === 0) {
         setNoResults(true);
+        setLoading(false)
       } else {
         setNoResults(false);
         setFoods(data.data);
         setTotalItems(data.data.length);
+        setLoading(false)
       }
     } else {
       setNoResults(false)
@@ -186,7 +193,13 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {noResults ? (
+          {loading ? ( // Muestra CircularProgress si loading es true
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <CircularProgress style={{ margin: "20px" }} />
+                </TableCell>
+              </TableRow>
+            ) : noResults ? (
               <TableRow>
                 <TableCell colSpan={3} align="center">
                   No results found.{" "}

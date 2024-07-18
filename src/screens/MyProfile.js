@@ -31,7 +31,7 @@ const defaultTheme = createTheme();
 const MyProfile = () => {
   const theme = useTheme();
   const [foodOptions, setFoodOptions] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     getFoods();
   }, []);
@@ -99,7 +99,7 @@ const MyProfile = () => {
     sex: "",
     height: "",
     weight: "",
-    allergies: [{ name: ""}],
+    allergies: [],
   });
 
   React.useEffect(() => {
@@ -107,6 +107,7 @@ const MyProfile = () => {
   }, []);
 
   const getUserById = async () => {
+    setLoading(true)
     const response = await fetch(
       apiUrl + "/api/auth/users/",
       {
@@ -120,6 +121,7 @@ const MyProfile = () => {
 
     const data = await response.json();
     setUser(data.data);
+    setLoading(false)
   };
 
   const handleWeightInputChange = (e) => {
@@ -154,7 +156,7 @@ const MyProfile = () => {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  
   const handleUpdateUser = () => {
     if (
       user.firstName === "" ||

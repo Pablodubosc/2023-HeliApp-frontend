@@ -18,7 +18,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useSnackbar } from "notistack";
 import getApiUrl from "../../helpers/apiConfig";
 import ExerciseDoneForm from "../Forms/ExerciseDoneForm";
-
+import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
 const apiUrl = getApiUrl();
 
 function Row(props) {
@@ -147,7 +147,7 @@ export default function ExerciseDoneTable({modalOpen  })  {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editExerciseDone, setEditExerciseDone] = useState(null);
   const [totalExerciseDone, setTotalExerciseDone] = useState(0);
-
+  const [loading, setLoading] = useState(false);
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
 
@@ -156,6 +156,7 @@ export default function ExerciseDoneTable({modalOpen  })  {
   }, [modalOpen,isModalOpen,page]);
 
   const getExerciseDone = async () => {
+    setLoading(true)
     const response = await fetch(
       apiUrl + "/api/exerciseDone/user/",
       {
@@ -175,6 +176,7 @@ export default function ExerciseDoneTable({modalOpen  })  {
     });
     setExerciseDone(exerciseDoneWithShortenedDates);
     setTotalExerciseDone(exerciseDoneWithShortenedDates.length);
+    setLoading(false)
   };
 
   const handleEditClick = (exercise) => {
@@ -217,7 +219,13 @@ export default function ExerciseDoneTable({modalOpen  })  {
           </TableRow>
         </TableHead>
         <TableBody sx={{ textAlign: "center" }}>
-          {exerciseDone.length > 0 ? (
+        {loading ? ( // Muestra CircularProgress si loading es true
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <CircularProgress style={{ margin: "20px" }} />
+                </TableCell>
+              </TableRow>
+            ) :exerciseDone.length > 0 ? (
             exerciseDone
               .slice(startIndex, endIndex)
               .map((row) => (

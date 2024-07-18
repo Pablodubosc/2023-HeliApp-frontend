@@ -27,7 +27,7 @@ const apiUrl = getApiUrl();
 
 const LineChartContainer = () => {
   const [data, setData] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [selectedType, setSelectedType] = useState("Calories");
   const [range, setRange] = useState({
@@ -183,10 +183,8 @@ const LineChartContainer = () => {
               }}
             />
           </div>
-        ) : data && data.length > 0 ? (
+        ) : data && data.length && (
           <MyResponsiveLine data={data} type={selectedType} />
-        ) : (
-          <div>No calories to show</div>
         )}
       </div>
     </Grid>

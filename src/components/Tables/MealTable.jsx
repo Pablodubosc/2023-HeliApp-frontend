@@ -20,6 +20,7 @@ import { useSnackbar } from "notistack";
 import getApiUrl from "../../helpers/apiConfig";
 import ErrorIcon from '@mui/icons-material/Error';
 import Tooltip from '@mui/material/Tooltip';
+import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
 
 const apiUrl = getApiUrl();
 
@@ -174,7 +175,7 @@ export default function MealTable({modalOpen  })  {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editMeal, setEditMeal] = useState(null);
   const [totalMeals, setTotalMeals] = useState(0);
-
+  const [loading, setLoading] = useState(false);
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
 
@@ -183,6 +184,7 @@ export default function MealTable({modalOpen  })  {
   }, [modalOpen, isModalOpen, page]);
 
   const getMeals = async () => {
+    setLoading(true)
     const response = await fetch(
       apiUrl + "/api/meals/user/",
       {
@@ -203,6 +205,7 @@ export default function MealTable({modalOpen  })  {
 
     setMeals(mealsWithShortenedDates);
     setTotalMeals(mealsWithShortenedDates.length);
+    setLoading(false)
   };
 
   const handleEditClick = (meal) => {
@@ -250,7 +253,13 @@ export default function MealTable({modalOpen  })  {
           </TableRow>
         </TableHead>
         <TableBody sx={{ textAlign: "center" }}>
-          {meals.length > 0 ? (
+        {loading ? ( // Muestra CircularProgress si loading es true
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <CircularProgress style={{ margin: "20px" }} />
+                </TableCell>
+              </TableRow>
+            ) :meals.length > 0 ? (
             meals
               .slice(startIndex, endIndex)
               .map((row) => (

@@ -12,7 +12,7 @@ import { TableHead } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import getApiUrl from "../../helpers/apiConfig";
-
+import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
 const apiUrl = getApiUrl();
 
 function TablePaginationActions(props) {
@@ -60,7 +60,7 @@ export default function ExerciseTable({ modalOpen  }) {
   const [totalItems, setTotalItems] = useState(0);
   const [page, setPage] = React.useState(0);
   const [noResults, setNoResults] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
       getExercise();
   }, [ modalOpen]);
@@ -70,6 +70,7 @@ export default function ExerciseTable({ modalOpen  }) {
   }, []);
 
   const getExercise = async () => {
+    setLoading(true)
     const response = await fetch(apiUrl + "/api/exercise" , {
       method: "GET",
       headers: {
@@ -80,6 +81,7 @@ export default function ExerciseTable({ modalOpen  }) {
     const data = await response.json();
     setExercises(data.data);
     setTotalItems(data.data.length);
+    setLoading(false)
   };
 
 
@@ -117,7 +119,13 @@ export default function ExerciseTable({ modalOpen  }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {noResults ? (
+          {loading ? ( // Muestra CircularProgress si loading es true
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <CircularProgress style={{ margin: "20px" }} />
+                </TableCell>
+              </TableRow>
+            ) : noResults ? (
               <TableRow>
                 <TableCell colSpan={3} align="center">
                   No results found.{" "}
