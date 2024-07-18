@@ -61,6 +61,7 @@ const Login = () => {
           variant: "error",
         }
       );
+      setIsLoading(false);
       return;
     } else {
       try {
@@ -270,7 +271,7 @@ const Login = () => {
               onClick={() => handleLogin()}
               disabled={isLoading}
             >
-              {isLoading ? "Signing In..." : "Sign In"}
+              {isLoading ? "Loading..." : "Sign In"}
             </Button>
             <Grid container justifyContent="center">
               <Grid container>
@@ -377,7 +378,7 @@ const Login = () => {
             onClick={handleRecoverClick}
             disabled={isLoading}
           >
-            Reset Password
+            {isLoading ? "Loading..." : "Reset Password"}
           </Button>
         </Box>
       </Modal>

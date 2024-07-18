@@ -85,6 +85,7 @@ const SignUp = () => {
       user.weight === "" 
     ) {
       enqueueSnackbar("Some fields are empty.", { variant: "error" });
+      setIsLoading(false);
       return;
     }
     fetch(apiUrl + "/api/auth/register", {
@@ -352,7 +353,7 @@ const SignUp = () => {
               onClick={handleRegister}
               disabled={isLoading}
             >
-              Sign Up
+              {isLoading ? "Loading..." : "Sign Up"}
             </Button>
             <Grid container justifyContent="center">
               <Grid item>

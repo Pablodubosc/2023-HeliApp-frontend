@@ -47,7 +47,9 @@ const ResetPassword = () => {
   };
 
   const validateToken = async () => {
+    setIsLoading(true);
     if (token === "") {
+      setIsLoading(false);
       enqueueSnackbar("You need to enter the token.", { variant: "error" });
     } else {
       const response = await fetch(
@@ -64,8 +66,10 @@ const ResetPassword = () => {
       if (data.data != null) {
         enqueueSnackbar("The token was validated.", { variant: "success" });
         setUserId(data.data._id);
+        setIsLoading(false);
         setIsValid(true);
       } else {
+        setIsLoading(false);
         enqueueSnackbar("The token is incorrect.", { variant: "error" });
       }
     }
@@ -113,8 +117,9 @@ const ResetPassword = () => {
               fontWeight: "bold",
             }}
             onClick={() => validateToken()}
+            disabled={isLoading}
           >
-            Validate
+            {isLoading ? "Loading..." : "Validate"}
           </Button>
         </Grid>
       )}
@@ -193,7 +198,7 @@ const ResetPassword = () => {
             onClick={() => handleResetPassword()}
             disabled={isLoading}
           >
-            Reset Password
+            {isLoading ? "Loading..." : "Reset Password"}
           </Button>
         </Grid>
       )}
