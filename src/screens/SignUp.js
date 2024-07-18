@@ -39,6 +39,7 @@ const SignUp = () => {
     weight: "",
     allergies:[{ name: ""}],
   });
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleSexChange = (event) => {
     setUser({ ...user, sex: event.target.value });
@@ -72,6 +73,7 @@ const SignUp = () => {
   };
 
   const handleRegister = () => {
+    setIsLoading(true);
     if (
       user.firstName === "" ||
       user.lastName === "" ||
@@ -98,6 +100,7 @@ const SignUp = () => {
       } else {
         enqueueSnackbar("Something went wrong.", { variant: "error" });
       }
+      setIsLoading(false);
     });
   };
 
@@ -347,6 +350,7 @@ const SignUp = () => {
                 fontWeight: "bold",
               }}
               onClick={handleRegister}
+              disabled={isLoading}
             >
               Sign Up
             </Button>

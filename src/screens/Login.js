@@ -103,13 +103,13 @@ const Login = () => {
             { variant: "success" }
           );
           setRecoveryEmail("");
-          setIsLoading(false);
           closeModal();
         } else {
           enqueueSnackbar("There was an issue with sending the email.", {
             variant: "error",
           });
         }
+        setIsLoading(false);
       } catch (error) {
         enqueueSnackbar("There was an issue with sending the email.", {
           variant: "error",

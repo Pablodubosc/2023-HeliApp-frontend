@@ -35,7 +35,6 @@ const ResetPassword = () => {
           variant: "success",
         });
         setIsValid(false);
-        setIsLoading(false);
         setToken("");
         setPassword("");
         setRepeatPassword("");
@@ -44,6 +43,7 @@ const ResetPassword = () => {
     } else {
       enqueueSnackbar("The passwords do not match.", { variant: "error" });
     }
+    setIsLoading(false);
   };
 
   const validateToken = async () => {
