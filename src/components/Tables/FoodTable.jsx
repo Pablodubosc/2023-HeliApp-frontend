@@ -150,6 +150,8 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
         margin: "auto",
         minHeight: "400px",
         overflowY: "auto",
+        position: "relative", // Asegúrate de que el contenedor tenga posición relativa
+        paddingBottom: "15px", // Ajusta esto según el alto de tus flechas de paginación
       }}
     >
       {filterOpen && (
@@ -167,10 +169,10 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
       )}
       <TableContainer
         component={Paper}
-        sx={{ overflowX: "auto", minHeight: "450px" }}
+        sx={{ overflowX: "auto", minHeight: "487px" }}
       >
         <Table aria-label="custom pagination table">
-          <TableHead sx={{ fontWeight: "bold" }}>
+          <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200"  }}>
             <TableRow sx={{ fontWeight: "bold" }}>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
                 Name (gr/ml)
@@ -212,24 +214,66 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
                     <TableCell
                       component="th"
                       scope="row"
-                      style={{ width: 160 }}
+                      style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }}
                       align="center"
                     >
                       {row.name + " " + row.weight + "(gr/ml)"}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.calories}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.carbs === "0" ? "-" : row.carbs}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.proteins === "0" ? "-" : row.proteins}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.fats === "0" ? "-" : row.fats}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.category.name}
                     </TableCell>
                   </TableRow>
@@ -238,7 +282,19 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
             )}
           </TableBody>
         </Table>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: "0",
+            left: "0",
+            right: "0",
+            padding: "10px", // Reducir padding para reducir el espacio
+            backgroundColor: "white", // O el color que desees
+            borderTop: "1px solid #ddd",
+          }}
+        >
           <TablePaginationActions
             count={totalItems}
             page={page}

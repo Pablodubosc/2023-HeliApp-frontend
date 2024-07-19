@@ -21,14 +21,14 @@ import getApiUrl from "../../helpers/apiConfig";
 import ErrorIcon from '@mui/icons-material/Error';
 import Tooltip from '@mui/material/Tooltip';
 import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
-
+import { useTheme } from "@mui/material/styles";
 const apiUrl = getApiUrl();
 
 
 function Row(props) {
   const { row, onEditClick } = props;
   const [open, setOpen] = React.useState(false);
-
+  
   const { enqueueSnackbar } = useSnackbar();
 
   const handleDeleteClick = (meal) => {
@@ -76,15 +76,19 @@ function Row(props) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row" align="center">
+        <TableCell component="th" scope="row" align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "6px", }}>
           {row.name}
           {row.allergy && (<Tooltip title={"You are allergic to one or more ingredients in this meal"}>
             <ErrorIcon style={{ marginLeft: '5px', color: 'red' }} />
             </Tooltip>)} 
         </TableCell>
-        <TableCell align="center">{row.date}</TableCell>
-        <TableCell align="center">{row.hour}</TableCell>
-        <TableCell align="center">
+        <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "6px", }}>{row.date}</TableCell>
+        <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "6px", }}>{row.hour}</TableCell>
+        <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "6px", }}>
           <IconButton
             aria-label="edit row"
             size="small"
@@ -106,7 +110,7 @@ function Row(props) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Table size="small" aria-label="purchases">
-                <TableHead>
+                <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200"}}>
                   <TableRow>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Name
@@ -132,30 +136,41 @@ function Row(props) {
                 <TableBody>
                   {row.foods.map((foodRow) => (
                     <TableRow key={foodRow._id}>
-                      <TableCell component="th" scope="row" align="center">
+                      <TableCell component="th" scope="row" align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>
                         {foodRow.foodId.name}
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>
                         {foodRow.caloriesPerFood}
                       </TableCell>
-                      <TableCell align="center">{foodRow.carbsPerFood}</TableCell>
-                      <TableCell align="center">
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>{foodRow.carbsPerFood}</TableCell>
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>
                         {foodRow.proteinsPerFood}
                       </TableCell>
-                      <TableCell align="center">{foodRow.fatsPerFood}</TableCell>
-                      <TableCell align="center">
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>{foodRow.fatsPerFood}</TableCell>
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>
                         {foodRow.weightConsumed}
                       </TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.totalCalories}</TableCell>
-                    <TableCell align="center">{row.totalCarbs}</TableCell>
-                    <TableCell align="center">{row.totalProteins}</TableCell>
-                    <TableCell align="center">{row.totalFats}</TableCell>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>{row.totalCalories}</TableCell>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>{row.totalCarbs}</TableCell>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>{row.totalProteins}</TableCell>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>{row.totalFats}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -178,7 +193,7 @@ export default function MealTable({modalOpen  })  {
   const [loading, setLoading] = useState(false);
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-
+  const theme = useTheme();
   useEffect(() => {
     getMeals();
   }, [modalOpen, isModalOpen, page]);
@@ -216,6 +231,7 @@ export default function MealTable({modalOpen  })  {
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
+  
 
   const handleDelete = (deletedMeal) => {
     const updatedMeals = meals.filter((meal) => meal._id !== deletedMeal._id);
@@ -230,11 +246,11 @@ export default function MealTable({modalOpen  })  {
   return (
     <TableContainer
       component={Paper}
-      sx={{ overflowX: "auto", minHeight: "450px" }}
+      sx={{ overflowX: "auto", minHeight: "500px", position :"relative" }}
     >
       <Table aria-label="collapsible table">
-        <TableHead>
-          <TableRow sx={{ height : '80px' }}>
+        <TableHead sx={{ height : '80px', bgcolor: "grey.200"  }}>
+          <TableRow sx={{ fontWeight: "bold" }}>
           <TableCell sx={{ fontWeight: "bold" }} align="center">
               Details
             </TableCell>
@@ -284,21 +300,35 @@ export default function MealTable({modalOpen  })  {
           )}
         </TableBody>
       </Table>
-
-      <div>
+      
+      <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: "0",
+            left: "0",
+            right: "0",
+            padding: "8px", // Reducir padding para reducir el espacio
+            backgroundColor: "white", // O el color que desees
+            borderTop: "1px solid #ddd",
+          }}
+        >
         <IconButton
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 0}
+          sx={{ color: theme.palette.primary.main }} // Utilizar theme aquí
         >
           <ArrowBackIosIcon />
         </IconButton>
         <IconButton
           onClick={() => handlePageChange(page + 1)}
           disabled={endIndex >= totalMeals}
+          sx={{ color: theme.palette.primary.main }} // Utilizar theme aquí
         >
           <ArrowForwardIosIcon />
         </IconButton>
-      </div>
+        </Box>
 
       <MealForm
         open={isModalOpen}

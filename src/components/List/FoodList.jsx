@@ -13,7 +13,7 @@ const FoodList = () => {
 
   return (
     <div style={{ textAlign: "center", color: "black" }}>
-      <Typography variant="h5" fontWeight="bold" align='center' marginBottom='1%'>FOODS TABLE</Typography>
+      <Typography variant="h5" fontWeight="bold" align='center' marginBottom='0.5%'>FOODS TABLE</Typography>
       <Box >
               <Typography variant="body2" align="center" color="textSecondary">
                 IMPORTANT: Manage your allergies in your profile section <span role="img" aria-label="settings" style={{ filter: 'brightness(0.4)' }}>(⚙️)</span>

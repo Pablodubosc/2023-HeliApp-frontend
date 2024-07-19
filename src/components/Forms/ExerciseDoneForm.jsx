@@ -45,7 +45,11 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
     if (initialData) {
       initializeForm(initialData);
     } else {
-      initializeForm(initialExerciseDoneState);
+      initializeForm({
+        name: "",
+        date: new Date(),
+        exercises: [{ exerciseId: "", timeWasted: "" }],
+      });
     }
   }, [initialData, exercisesLoaded]);
 
@@ -155,7 +159,11 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
   const closeModal = () => {
     setOpen(false);
     if (!initialData) {
-      setExerciseDoneData(initialExerciseDoneState);
+      setExerciseDoneData({
+        name: "",
+        date: new Date(),
+        exercises: [{ exerciseId: "", timeWasted: "" }],
+      });
     }
   };
 

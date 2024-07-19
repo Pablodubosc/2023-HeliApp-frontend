@@ -56,7 +56,12 @@ const MealForm = ({ open, setOpen, initialData }) => {
     if (initialData && foodsLoaded) {
       initializeForm(initialData);
     } else if (foodsLoaded) {
-      initializeForm(initialMealState);
+      setMealData({
+        name: "",
+        date: new Date(),
+        hour: new Date(),
+        foods: [{ foodId: "", weightConsumed: "" }],
+      });
     }
   }, [initialData, foodsLoaded]);
   
@@ -202,12 +207,12 @@ const MealForm = ({ open, setOpen, initialData }) => {
     const closeModal = () => {
       setOpenCancelDialog(false);
       setOpen(false);
-      if (!initialData) {
-        setMealData(initialMealState);
-      } else {
-        // Reset initial foods to prevent showing previous data
-        initializeForm(initialMealState);
-      }
+      setMealData({
+        name: "",
+        date: new Date(),
+        hour: new Date(),
+        foods: [{ foodId: "", weightConsumed: "" }],
+      });
     };
 
   const handleAddFoodInput = () => {
