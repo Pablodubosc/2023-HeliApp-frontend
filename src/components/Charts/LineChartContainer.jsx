@@ -56,6 +56,10 @@ const LineChartContainer = () => {
       }
     );
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     setData(data.fechasIntermedias);
     setLoading(false);
   };
@@ -76,6 +80,10 @@ const LineChartContainer = () => {
       }
     );
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     setData(data.fechasIntermedias);
     setLoading(false);
   };

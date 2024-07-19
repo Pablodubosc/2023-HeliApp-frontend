@@ -29,6 +29,10 @@ const getMealsByUserIdAndDay = async (
     }
   );
   const data = await response.json();
+  if (response.status == 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  }
   const groupedFoods = {};
   if (data.mealsToSend && data.mealsToSend.length > 0) {
     data.mealsToSend.forEach((item) => {
@@ -75,6 +79,10 @@ const getExerciseByUserIdAndDay = async (
     }
   );
   const data = await response.json();
+  if (response.status == 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  }
   const groupedExercises = {};
   if (data.exercisesDoneToSend && data.exercisesDoneToSend.length > 0) {
     data.exercisesDoneToSend.forEach((item) => {

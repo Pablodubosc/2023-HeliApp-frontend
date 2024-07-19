@@ -25,6 +25,10 @@ const WaterGlassBarChartContainer = ({flag}) => {
           }
       );
       const data = await response.json();
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       setData(data.data);
       setLoading(false)
   }

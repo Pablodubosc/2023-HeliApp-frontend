@@ -76,6 +76,10 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (response.ok) {
         const data = await response.json();
         setExerciseOptions(data.data);
@@ -132,7 +136,10 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
         },
         body: JSON.stringify(exerciseDoneData),
       });
-
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (response.status === 200) {
         enqueueSnackbar(
           initialData

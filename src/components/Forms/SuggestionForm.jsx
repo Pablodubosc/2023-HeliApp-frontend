@@ -100,6 +100,10 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
         },
         body: JSON.stringify(exerciseDoneData),
       }).then(function (response) {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The exercise was created successfully.", {
             variant: "success",
@@ -127,6 +131,10 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
         },
         body: JSON.stringify(mealDoneData),
       }).then(function (response) {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The meal was created successfully.", {
             variant: "success",

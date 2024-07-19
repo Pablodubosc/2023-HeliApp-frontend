@@ -45,6 +45,10 @@ const MyProfile = () => {
       },
     });
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     setFoodOptions(data.allFoods);
   };
 
@@ -120,6 +124,10 @@ const MyProfile = () => {
     );
 
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     setUser(data.data);
     setLoading(false)
   };
@@ -184,6 +192,10 @@ const MyProfile = () => {
       body: JSON.stringify(user),
     })
       .then(function (response) {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("User updated successfully.", { variant: "success" });
           getUserById();

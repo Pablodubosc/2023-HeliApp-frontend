@@ -45,6 +45,10 @@ const Meals = () => {
         userId: localStorage.getItem("userId"),
       }),
     }).then(function (response) {
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (response.status === 200) {
         enqueueSnackbar("The water glass was add successfully.", {
           variant: "success",

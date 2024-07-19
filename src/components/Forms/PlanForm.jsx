@@ -73,6 +73,10 @@ const PlanForm = ({ open, setOpen }) => {
       body: JSON.stringify(newPlan),
     })
       .then((response) => {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The plan was created successfully.", {
             variant: "success",

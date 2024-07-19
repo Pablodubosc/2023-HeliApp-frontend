@@ -44,7 +44,10 @@ const ExerciseForm = ({ open, setOpen }) => {
     })
       .then(function (response) {
         setIsSubmitting(false); // Desbloquea el botón después de recibir la respuesta
-
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The exercise was created successfully.", {
             variant: "success",

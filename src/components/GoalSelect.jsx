@@ -31,6 +31,10 @@ const GoalSelect = ({ onChangeGoal }) => {
       }
     );
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     if (data.filteredData.length > 0) {
       if (selectedGoal === "") {
         setSelectedGoal(data.filteredData[0].name);

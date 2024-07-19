@@ -116,6 +116,10 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
       body: JSON.stringify(newGoal),
     })
       .then((response) => {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar(
             initialData

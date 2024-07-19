@@ -81,6 +81,10 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
         },
       });
       const data = await response.json();
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       setPlans(data.data);
       setTotalItems(data.data.length);
     } catch (error) {

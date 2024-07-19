@@ -50,7 +50,10 @@ const IntermittentFastingForm = ({
         },
       });
       const data = await response.json();
-
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (data.filteredData) {
         setActiveIntermittentFastings(data.filteredData);
       } else {
@@ -73,6 +76,10 @@ const IntermittentFastingForm = ({
         },
       });
       const data = await response.json();
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (data.filteredData.length > 0) {
         setNextIntermittentFastings(data.filteredData);
       }
@@ -97,6 +104,10 @@ const IntermittentFastingForm = ({
           },
         }
       );
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (response.status === 200) {
         enqueueSnackbar(
           "The intermittent fasting was cancelled successfully.",
@@ -161,6 +172,10 @@ const IntermittentFastingForm = ({
         }),
       })
         .then(function (response) {
+          if (response.status == 401) {
+            localStorage.removeItem("token");
+            window.location.href = "/";
+          }
           if (response.status === 200) {
             enqueueSnackbar(
               "The intermittent fasting was created successfully.",

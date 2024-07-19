@@ -40,6 +40,10 @@ function Row(props) {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       }).then(function (response) {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The meal was deleted successfully.", {
             variant: "success",
@@ -211,6 +215,11 @@ export default function MealTable({modalOpen  })  {
       }
     );
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
+
     const mealsWithShortenedDates = data.data.map((meal) => {
       return {
         ...meal,
@@ -309,7 +318,7 @@ export default function MealTable({modalOpen  })  {
             bottom: "0",
             left: "0",
             right: "0",
-            padding: "8px", // Reducir padding para reducir el espacio
+            padding: "9px", // Reducir padding para reducir el espacio
             backgroundColor: "white", // O el color que desees
             borderTop: "1px solid #ddd",
           }}
@@ -317,14 +326,12 @@ export default function MealTable({modalOpen  })  {
         <IconButton
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 0}
-          sx={{ color: theme.palette.primary.main }} // Utilizar theme aquí
         >
           <ArrowBackIosIcon />
         </IconButton>
         <IconButton
           onClick={() => handlePageChange(page + 1)}
           disabled={endIndex >= totalMeals}
-          sx={{ color: theme.palette.primary.main }} // Utilizar theme aquí
         >
           <ArrowForwardIosIcon />
         </IconButton>

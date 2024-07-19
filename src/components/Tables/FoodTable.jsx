@@ -93,6 +93,10 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
       },
     });
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     if (data.data.length === 0) {
       setNoResults(true);
       setLoading(false)
@@ -118,6 +122,10 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
         }
       );
       const data = await response.json();
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (data.data.length === 0) {
         setNoResults(true);
         setLoading(false)

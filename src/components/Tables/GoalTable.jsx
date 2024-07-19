@@ -105,6 +105,10 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
     );
 
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     if (selectedFilter !== "" && filterOpen) {
       const filteredGoals = data.goalsWithProgress.filter(
         (item) => item.state === selectedFilter
@@ -125,7 +129,10 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
-
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     if (response.status === 200) {
       setSelectedGoal(null);
       setIsModalOpen(false);
@@ -172,6 +179,10 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
       },
       body: JSON.stringify(goal),
     }).then(function (response) {
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (response.status === 200) {
         enqueueSnackbar("Recurrency Canceled", {
           variant: "success",

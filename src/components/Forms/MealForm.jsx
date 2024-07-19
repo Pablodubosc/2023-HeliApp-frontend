@@ -92,6 +92,10 @@ const MealForm = ({ open, setOpen, initialData }) => {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (response.ok) {
         const data = await response.json();
         setFoodOptions(data.data);
@@ -123,6 +127,10 @@ const MealForm = ({ open, setOpen, initialData }) => {
         }
       );
       const data = await response.json();
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (data.filteredData) {
         return data.filteredData;
       }
@@ -186,7 +194,10 @@ const MealForm = ({ open, setOpen, initialData }) => {
         },
         body: JSON.stringify(mealData),
       });
-
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (response.status === 200) {
         enqueueSnackbar(
           initialData

@@ -36,6 +36,10 @@ function Row(props) {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       }).then(function (response) {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The exercise was deleted successfully.", {
             variant: "success",
@@ -62,7 +66,7 @@ function Row(props) {
 
   return (
     <React.Fragment>
-      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
+      <TableRow sx={{ "& > *": { borderBottom: "unset", height : '72px' } }}>
         <TableCell width={5} align="center" sx={{ textAlign: "center" }}>
           <IconButton
             aria-label="expand row"
@@ -72,11 +76,14 @@ function Row(props) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row" align="center">
+        <TableCell component="th" scope="row" align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>
           {row.name}
         </TableCell>
-        <TableCell align="center">{row.date}</TableCell>
-        <TableCell align="center">
+        <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>{row.date}</TableCell> 
+        <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "8px", }}>
           <IconButton
             aria-label="edit row"
             size="small"
@@ -98,7 +105,7 @@ function Row(props) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Table size="small" aria-label="purchases">
-                <TableHead>
+                <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200"}}>
                   <TableRow>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Name
@@ -114,20 +121,25 @@ function Row(props) {
                 <TableBody>
                   {row.exercises.map((exercise) => (
                     <TableRow key={exercise._id}>
-                      <TableCell component="th" scope="row" align="center">
+                      <TableCell component="th" scope="row" align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "6px", }}>
                         {exercise.exerciseId.name}
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "6px", }}>
                         {exercise.caloriesBurnPerExercise}
                       </TableCell>
-                      <TableCell align="center">{exercise.timeWasted}</TableCell>
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "6px", }}>{exercise.timeWasted}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}style={{ width: 160,border: "1px solid #ddd",
+                        padding: "6px", }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.totalCaloriesBurn}</TableCell>
+                    <TableCell align="center"style={{ width: 160,border: "1px solid #ddd",
+                        padding: "6px", }}>{row.totalCaloriesBurn}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -168,6 +180,10 @@ export default function ExerciseDoneTable({modalOpen  })  {
       }
     );
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     const exerciseDoneWithShortenedDates = data.data.map((exercise) => {
       return {
         ...exercise,
@@ -201,10 +217,10 @@ export default function ExerciseDoneTable({modalOpen  })  {
   return (
     <TableContainer
       component={Paper}
-      sx={{ overflowX: "auto", minHeight: "450px" }}
+      sx={{ overflowX: "auto", minHeight: "500px", position :"relative" }}
     >
       <Table aria-label="collapsible table">
-        <TableHead>
+        <TableHead sx={{ height : '80px', bgcolor: "grey.200"  }}>
           <TableRow>
             <TableCell />
             <TableCell sx={{ fontWeight: "bold" }} align="center">
@@ -251,7 +267,19 @@ export default function ExerciseDoneTable({modalOpen  })  {
         </TableBody>
       </Table>
 
-      <div>
+      <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: "0",
+            left: "0",
+            right: "0",
+            padding: "9px", // Reducir padding para reducir el espacio
+            backgroundColor: "white", // O el color que desees
+            borderTop: "1px solid #ddd",
+          }}
+        >
         <IconButton
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 0}
@@ -264,7 +292,7 @@ export default function ExerciseDoneTable({modalOpen  })  {
         >
           <ArrowForwardIosIcon />
         </IconButton>
-      </div>
+        </Box>
 
       <ExerciseDoneForm
         open={isModalOpen}
