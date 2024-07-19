@@ -199,6 +199,9 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
         <div>
           <TextField
             label="Name"
+            inputProps={{
+              maxLength: 17, // Establecer el máximo de caracteres permitidos
+            }}
             variant="outlined"
             fullWidth
             margin="normal"
@@ -233,11 +236,10 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
 
             <Grid item xs={4}>
               <TextField
-                InputProps={{
-                  inputProps: { min: 1 },
+                inputProps={{
+                  maxLength: 6, // Establecer el máximo de caracteres permitidos
                 }}
                 label="Goal"
-                type="number"
                 variant="outlined"
                 fullWidth
                 value={newGoal.objetive}

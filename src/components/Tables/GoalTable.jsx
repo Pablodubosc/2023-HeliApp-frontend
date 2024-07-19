@@ -22,7 +22,7 @@ import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
-
+import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
 const apiUrl = getApiUrl();
 
 function TablePaginationActions(props) {
@@ -72,7 +72,7 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const handleFilterChange = (event) => {
@@ -93,6 +93,7 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
   ]);
 
   const handleGetGoals = async () => {
+    setLoading(true)
     const response = await fetch(
       apiUrl + "/api/goals/goalsWithProgress/",
       {
@@ -119,6 +120,7 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
       setGoals(data.goalsWithProgress);
       setTotalItems(data.goalsWithProgress.length);
     }
+    setLoading(false)
   };
 
   const handleDeleteGoal = async (goal) => {
@@ -193,7 +195,17 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        textAlign: "center",
+        maxWidth: "100%",
+        margin: "auto",
+        minHeight: "400px",
+        overflowY: "auto",
+        position: "relative", // Asegúrate de que el contenedor tenga posición relativa
+        paddingBottom: "15px", // Ajusta esto según el alto de tus flechas de paginación
+      }}
+    >
       {filterOpen && (
         <div style={{ marginBottom: "20px" }}>
           <FormControl
@@ -216,30 +228,36 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
       )}
       <TableContainer component={Paper} sx={{ minWidth: 200, minHeight: 420 }}>
         <Table aria-label="custom pagination table">
-          <TableHead sx={{ fontWeight: "bold" }}>
+          <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200"  }}>
             <TableRow sx={{ fontWeight: "bold" }}>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 120, padding: "6px" }}>
                 Name
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 120, padding: "6px" }}>
                 Type
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 120, padding: "6px" }}>
                 State
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 120, padding: "6px" }}>
                 Recurrency
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 10, padding: "6px" }}>
                 Info
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {totalItems === 0 ? (
+          {loading ? ( // Muestra CircularProgress si loading es true
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <CircularProgress style={{ margin: "20px" }} />
+                </TableCell>
+              </TableRow>
+            ) : totalItems === 0 ? (
               <TableRow>
                   <TableCell colSpan={5} align="center">
-                    <div style={{ textAlign: 'center' }}>No results found.</div>
+                    <div style={{ textAlign: 'center' }}>No Goals to show.</div>
                   </TableCell>
               </TableRow>
             ) : (
@@ -249,21 +267,56 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
                     <TableCell
                       component="th"
                       scope="row"
-                      style={{ width: 130 }}
+                      style={{
+                        width: 120,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }}
                       align="center"
                     >
                       {row.name}
                     </TableCell>
-                    <TableCell style={{ width: 130 }} align="center">
+                    <TableCell style={{
+                        width: 120,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {`${row.type}`}
                     </TableCell>
-                    <TableCell style={{ width: 130 }} align="center">
+                    <TableCell style={{
+                        width: 120,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {`${row.state}`}
                     </TableCell>
-                    <TableCell style={{ width: 130 }} align="center">
+                    <TableCell style={{
+                        width: 120,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {`${row.recurrency}`}
                     </TableCell>
-                    <TableCell style={{ width: 50 }} align="center">
+                    <TableCell style={{
+                        width: 10,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       <IconButton
                         onClick={() => {
                           setSelectedGoal(row);
@@ -278,7 +331,19 @@ export default function GoalTable({ filterOpen, isCreateModalOpen }) {
             )}
           </TableBody>
         </Table>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: "0",
+            left: "0",
+            right: "0",
+            padding: "10px", // Reducir padding para reducir el espacio
+            backgroundColor: "grey.200", // O el color que desees
+            borderTop: "1px solid #ddd",
+          }}
+        >
           <TablePaginationActions
             count={totalItems}
             page={page}

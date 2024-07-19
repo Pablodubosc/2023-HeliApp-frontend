@@ -94,6 +94,9 @@ const CategoryForm = ({ open, setOpen }) => {
             fullWidth
             margin="normal"
             value={newCategory.name}
+            inputProps={{
+              maxLength: 17, // Establecer el máximo de caracteres permitidos
+            }}
             onChange={(e) =>
               setNewCategory({ ...newCategory, name: e.target.value })
             }

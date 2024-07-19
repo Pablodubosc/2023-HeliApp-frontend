@@ -156,6 +156,9 @@ const FoodForm = ({ open, setOpen }) => {
             variant="outlined"
             fullWidth
             margin="normal"
+            inputProps={{
+              maxLength: 17, // Establecer el máximo de caracteres permitidos
+            }}
             value={newFood.name}
             onChange={(e) => setNewFood({ ...newFood, name: e.target.value })}
             onKeyPress={(event) => {
@@ -166,11 +169,10 @@ const FoodForm = ({ open, setOpen }) => {
           />
 
           <TextField
-            InputProps={{
-              inputProps: { min: 1 },
+            inputProps={{
+              maxLength: 6, // Establecer el máximo de caracteres permitidos
             }}
             label={`Weight (gr/ml)`}
-            type="number"
             variant="outlined"
             fullWidth
             value={newFood.weight}
@@ -206,11 +208,10 @@ const FoodForm = ({ open, setOpen }) => {
               <TextField
                 InputProps={{
                   inputProps: {
-                    step: 1,
+                    maxLength: 4,
                   },
                 }}
                 label={`Calories`}
-                type="number"
                 variant="outlined"
                 fullWidth
                 value={newFood.calories}

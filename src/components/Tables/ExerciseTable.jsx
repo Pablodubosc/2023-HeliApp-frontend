@@ -83,9 +83,15 @@ export default function ExerciseTable({ modalOpen  }) {
       localStorage.removeItem("token");
       window.location.href = "/";
     }
-    setExercises(data.data);
-    setTotalItems(data.data.length);
-    setLoading(false)
+    if (data.data.length === 0) {
+      setNoResults(true);
+      setLoading(false)
+    } else {
+      setNoResults(false);
+      setLoading(false)
+      setExercises(data.data);
+      setTotalItems(data.data.length);
+    }
   };
 
 
@@ -113,13 +119,13 @@ export default function ExerciseTable({ modalOpen  }) {
         <Table aria-label="custom pagination table">
           <TableHead sx={{ height : '80px', bgcolor: "grey.200"  }}>
             <TableRow sx={{ fontWeight: "bold" }}>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 160, padding: "6px" }}>
                 Name 
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 160, padding: "6px" }}>
                 Calories Burn
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 160, padding: "6px" }}>
                 Time (minutes)
               </TableCell>
             </TableRow>
@@ -133,7 +139,7 @@ export default function ExerciseTable({ modalOpen  }) {
               </TableRow>
             ) : noResults ? (
               <TableRow>
-                <TableCell colSpan={3} align="center">
+                <TableCell colSpan={6} align="center">
                   No results found.{" "}
                 </TableCell>
               </TableRow>
@@ -191,7 +197,7 @@ export default function ExerciseTable({ modalOpen  }) {
             left: "0",
             right: "0",
             padding: "10px", // Reducir padding para reducir el espacio
-            backgroundColor: "white", // O el color que desees
+            backgroundColor: "grey.200", // O el color que desees
             borderTop: "1px solid #ddd",
           }}
         >

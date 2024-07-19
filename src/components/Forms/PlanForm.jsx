@@ -156,6 +156,9 @@ const PlanForm = ({ open, setOpen }) => {
         <div>
           <TextField
             label="Name"
+            inputProps={{
+              maxLength: 17, // Establecer el máximo de caracteres permitidos
+            }}
             variant="outlined"
             fullWidth
             margin="normal"
@@ -191,11 +194,10 @@ const PlanForm = ({ open, setOpen }) => {
 
             <Grid item xs={4}>
               <TextField
-                InputProps={{
-                  inputProps: { min: 1 },
+                inputProps={{
+                  maxLength: 6, // Establecer el máximo de caracteres permitidos
                 }}
                 label="Goal"
-                type="number"
                 variant="outlined"
                 fullWidth
                 value={newPlan.planObjetive}

@@ -20,8 +20,10 @@ const ExerciseDoneList = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-start",
+          justifyContent: "center", // Alinea los elementos al centro horizontalmente
           maxWidth: "100%",
+          minWidth: "100%",
+          marginBottom: "10px", // Agregamos margen inferior para separar del resto del contenido
         }}
       >
         <ExerciseDoneTable modalOpen={isModalOpen}/>

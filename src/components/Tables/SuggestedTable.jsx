@@ -42,17 +42,20 @@ function Row(props) {
           </IconButton>
         </TableCell>
         {planTypeWithoutQuotes!== "Calories Burn" ? (
-        <TableCell component="th" scope="row" align="center">
+        <TableCell component="th" scope="row" align="center" style={{ width: 160,border: "1px solid #ddd",
+          padding: "18px", }}>
         {row.suggestion.name}
         {row.allergy && (<Tooltip title={"You are allergic to one or more ingredients in this meal"}>
                       <ErrorIcon style={{ marginLeft: '5px', color: 'red' }} />
                       </Tooltip>)} 
         </TableCell>):
-        (<TableCell component="th" scope="row" align="center">
+        (<TableCell component="th" scope="row" align="center" style={{ width: 160,border: "1px solid #ddd",
+          padding: "18px", }}>
         {row.suggestion.name}
         </TableCell>)}
         {planTypeWithoutQuotes!== "Calories Burn" ? (
-        <TableCell align="center">
+        <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+          padding: "18px", }}>
           {row.done == false && row.allergy == false && new Date(props.planStart) <= new Date() ? (
               <IconButton
                 aria-label="done row"
@@ -75,7 +78,8 @@ function Row(props) {
             )}
         </TableCell>
         ):(
-          <TableCell align="center">
+          <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+            padding: "18px", }}>
           {row.done == false && new Date(props.planStart) <= new Date() ? (
             <IconButton
               aria-label="done row"
@@ -104,7 +108,7 @@ function Row(props) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Table size="small" aria-label="purchases">
-                <TableHead>
+                <TableHead  sx={{ fontWeight: "bold", bgcolor: "grey.200"}}>
                   <TableRow>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Name
@@ -129,30 +133,41 @@ function Row(props) {
                 <TableBody>
                   {row.suggestion.foods.map((foodRow) => (
                     <TableRow key={foodRow._id}>
-                      <TableCell component="th" scope="row" align="center">
+                      <TableCell component="th" scope="row" align="center" style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>
                         {foodRow.foodId.name}
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>
                         {foodRow.caloriesPerFood}
                       </TableCell>
-                      <TableCell align="center">{foodRow.carbsPerFood}</TableCell>
-                      <TableCell align="center">
+                      <TableCell align="center"style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>{foodRow.carbsPerFood}</TableCell>
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>
                         {foodRow.proteinsPerFood}
                       </TableCell>
-                      <TableCell align="center">{foodRow.fatsPerFood}</TableCell>
-                      <TableCell align="center">
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>{foodRow.fatsPerFood}</TableCell>
+                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>
                         {foodRow.weightConsumed}
                       </TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }} style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.suggestion.totalCalories}</TableCell>
-                    <TableCell align="center">{row.suggestion.totalCarbs}</TableCell>
-                    <TableCell align="center">{row.suggestion.totalProteins}</TableCell>
-                    <TableCell align="center">{row.suggestion.totalFats}</TableCell>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>{row.suggestion.totalCalories}</TableCell>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>{row.suggestion.totalCarbs}</TableCell>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>{row.suggestion.totalProteins}</TableCell>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>{row.suggestion.totalFats}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -165,7 +180,7 @@ function Row(props) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Table size="small" aria-label="purchases">
-                <TableHead>
+                <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200"}}>
                   <TableRow>
                     <TableCell align="center" sx={{ fontWeight: "bold" }}>
                       Name
@@ -180,21 +195,26 @@ function Row(props) {
                 </TableHead>
                 <TableBody>
                   {row.suggestion.exercises.map((exercise) => (
-                    <TableRow key={exercise._id}>
+                    <TableRow key={exercise._id}style={{ width: 160,border: "1px solid #ddd",
+                      padding: "5px", }}>
                       <TableCell component="th" scope="row" align="center">
                         {exercise.exerciseId.name}
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell align="center"style={{ width: 160,border: "1px solid #ddd",
+                        padding: "5px", }}>
                         {exercise.caloriesBurnPerExercise}
                       </TableCell>
-                      <TableCell align="center">{exercise.timeWasted}</TableCell>
+                      <TableCell align="center"style={{ width: 160,border: "1px solid #ddd",
+                        padding: "5px", }}>{exercise.timeWasted}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "5px", }}>
                       Total
                     </TableCell>
-                    <TableCell align="center">{row.suggestion.totalCaloriesBurn}</TableCell>
+                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
+                        padding: "5px", }}>{row.suggestion.totalCaloriesBurn}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -239,18 +259,20 @@ export default function SuggestedTable({selectedPlan})  {
 
 
   return (
+    <Paper>
     <TableContainer
-      component={Paper}
-      sx={{ overflowX: "auto", minHeight: "450px" }}
+      sx={{ overflowX: "auto", minHeight: "405px", minWidth: "100%"}}
     >
       <Table aria-label="collapsible table">
-        <TableHead>
+        <TableHead sx={{ height : '50px', bgcolor: "grey.200"  }}>
           <TableRow>
-            <TableCell />
-            <TableCell sx={{ fontWeight: "bold" }} align="center">
+          <TableCell sx={{ fontWeight: "bold", width: 160, padding: "6px" }}align="center">
+              Details
+            </TableCell>
+            <TableCell sx={{ fontWeight: "bold", width: 160, padding: "6px" }} align="center">
               Name
             </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="center">
+            <TableCell sx={{ fontWeight: "bold", width: 160, padding: "6px" }} align="center">
               Actions&nbsp;
             </TableCell>
           </TableRow>
@@ -282,21 +304,27 @@ export default function SuggestedTable({selectedPlan})  {
         </TableBody>
       </Table>
       <SuggestionForm open={isDoneSuggestionlModalOpen} setOpen={setIsDoneSuggestionlModalOpen} suggestion={suggestion} selectedPlan={selectedPlan}/>
-      <div>
-        <IconButton
-          onClick={(e) => handlePageChange(page - 1)}
-          disabled={page === 0}
-        >
+    </TableContainer>
+    <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          padding: "11.5px", // Reducir padding para reducir el espacio
+            backgroundColor: "grey.200", // O el color que desees
+            borderTop: "1px solid #ddd",
+            width: "100%"
+        }}
+      >
+        <IconButton onClick={() => handlePageChange(page - 1)} disabled={page === 0}>
           <ArrowBackIosIcon />
         </IconButton>
         <IconButton
-          onClick={(e) => handlePageChange(page + 1)}
+          onClick={() => handlePageChange(page + 1)}
           disabled={endIndex >= selectedPlan.suggestions.length}
         >
           <ArrowForwardIosIcon />
         </IconButton>
-      </div>
-    </TableContainer>
-    
+      </Box>
+    </Paper>
   );
 }

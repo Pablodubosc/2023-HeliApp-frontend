@@ -180,24 +180,24 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
         sx={{ overflowX: "auto", minHeight: "487px" }}
       >
         <Table aria-label="custom pagination table">
-          <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200"  }}>
+          <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200", height : '80px',  }}>
             <TableRow sx={{ fontWeight: "bold" }}>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Name (gr/ml)
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Calories
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100 , padding: "1px"}}>
                 Carbs
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Proteins
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Fats
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Category
               </TableCell>
             </TableRow>
@@ -211,7 +211,7 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
               </TableRow>
             ) : noResults ? (
               <TableRow>
-                <TableCell colSpan={3} align="center">
+                <TableCell colSpan={6} align="center">
                   No results found.{" "}
                 </TableCell>
               </TableRow>
@@ -299,7 +299,7 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
             left: "0",
             right: "0",
             padding: "10px", // Reducir padding para reducir el espacio
-            backgroundColor: "white", // O el color que desees
+            backgroundColor: "grey.200", // O el color que desees
             borderTop: "1px solid #ddd",
           }}
         >

@@ -111,11 +111,13 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
         margin: "auto",
         minHeight: "400px",
         overflowY: "auto",
+        position: "relative", // Asegúrate de que el contenedor tenga posición relativa
+        paddingBottom: "15px", // Ajusta esto según el alto de tus flechas de paginación
       }}
     >
       <TableContainer component={Paper} sx={{ overflowX: "auto", minHeight: "450px" }}>
         <Table aria-label="custom pagination table">
-          <TableHead sx={{ fontWeight: "bold" }}>
+          <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200"  }}>
             <TableRow sx={{ fontWeight: "bold" }}>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Plan name</TableCell>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Objective</TableCell>
@@ -143,16 +145,44 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
                   <TableCell component="th" scope="row" style={{ width: 200, height: 70 }} align="center">
                     {row.name}
                   </TableCell>
-                  <TableCell style={{ width: 100 }} align="center">
+                  <TableCell style={{
+                        width: 100,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                     {row.planObjective} {row.planType}
                   </TableCell>
-                  <TableCell style={{ width: 220 }} align="center">
+                  <TableCell style={{
+                        width: 120,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                     {row.startDate ? row.startDate.substring(0, 10) : ""}
                   </TableCell>
-                  <TableCell style={{ width: 220 }} align="center">
+                  <TableCell style={{
+                        width: 124,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                     {row.endDate ? row.endDate.substring(0, 10) : ""}
                   </TableCell>
-                  <TableCell style={{ width: 50 }} align="center">
+                  <TableCell style={{
+                        width: 10,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                     <input
                       type="checkbox"
                       checked={selectedPlan === row}
@@ -164,11 +194,25 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
             )}
           </TableBody>
         </Table>
-        {!loading && plans.length > 0 && (
-          <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <TablePaginationActions count={totalItems} page={page} onPageChange={handleChangePage} />
-          </Box>
-        )}
+          <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: "0",
+            left: "0",
+            right: "0",
+            padding: "10px", // Reducir padding para reducir el espacio
+            backgroundColor: "grey.200", // O el color que desees
+            borderTop: "1px solid #ddd",
+          }}
+        >
+          <TablePaginationActions
+            count={totalItems}
+            page={page}
+            onPageChange={handleChangePage}
+          />
+        </Box>
       </TableContainer>
     </div>
   );

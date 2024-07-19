@@ -250,6 +250,9 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
             <TextField
               label="Name"
               variant="outlined"
+              inputProps={{
+                maxLength: 17, // Establecer el máximo de caracteres permitidos
+              }}
               fullWidth
               margin="normal"
               value={exerciseDoneData.name}
@@ -326,11 +329,10 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
               </Grid>
               <Grid item xs={4}>
                 <TextField
-                  InputProps={{
-                    inputProps: { min: 1 },
+                  inputProps={{
+                    maxLength: 4, // Establecer el máximo de caracteres permitidos
                   }}
                   label={`Time (minutes)`}
-                  type="number"
                   variant="outlined"
                   fullWidth
                   value={exercise.timeWasted}

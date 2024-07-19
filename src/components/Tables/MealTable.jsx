@@ -140,41 +140,41 @@ function Row(props) {
                 <TableBody>
                   {row.foods.map((foodRow) => (
                     <TableRow key={foodRow._id}>
-                      <TableCell component="th" scope="row" align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>
+                      <TableCell component="th" scope="row" align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>
                         {foodRow.foodId.name}
                       </TableCell>
-                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>
+                      <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>
                         {foodRow.caloriesPerFood}
                       </TableCell>
-                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>{foodRow.carbsPerFood}</TableCell>
-                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>
+                      <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>{foodRow.carbsPerFood}</TableCell>
+                      <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>
                         {foodRow.proteinsPerFood}
                       </TableCell>
-                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>{foodRow.fatsPerFood}</TableCell>
-                      <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>
+                      <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>{foodRow.fatsPerFood}</TableCell>
+                      <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>
                         {foodRow.weightConsumed}
                       </TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>
+                    <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>
                       Total
                     </TableCell>
-                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>{row.totalCalories}</TableCell>
-                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>{row.totalCarbs}</TableCell>
-                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>{row.totalProteins}</TableCell>
-                    <TableCell align="center" style={{ width: 160,border: "1px solid #ddd",
-                        padding: "8px", }}>{row.totalFats}</TableCell>
+                    <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>{row.totalCalories}</TableCell>
+                    <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>{row.totalCarbs}</TableCell>
+                    <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>{row.totalProteins}</TableCell>
+                    <TableCell align="center" style={{ width: 95,border: "1px solid #ddd",
+                        padding: "6px", }}>{row.totalFats}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -253,26 +253,26 @@ export default function MealTable({modalOpen  })  {
   };
 
   return (
+    <Paper sx={{ maxWidth: "100%"}}>
     <TableContainer
-      component={Paper}
-      sx={{ overflowX: "auto", minHeight: "500px", position :"relative" }}
+      sx={{ overflowX: "auto", minHeight: "441px", position :"relative", maxWidth: "100%", }}
     >
       <Table aria-label="collapsible table">
         <TableHead sx={{ height : '80px', bgcolor: "grey.200"  }}>
           <TableRow sx={{ fontWeight: "bold" }}>
-          <TableCell sx={{ fontWeight: "bold" }} align="center">
+          <TableCell sx={{ fontWeight: "bold", width: 160, padding: "6px" }} align="center">
               Details
             </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="center">
+            <TableCell sx={{ fontWeight: "bold", width: 160, padding: "6px" }} align="center">
               Name
             </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="center">
+            <TableCell sx={{ fontWeight: "bold", width: 160, padding: "6px" }} align="center">
               Date&nbsp;
             </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="center">
+            <TableCell sx={{ fontWeight: "bold", width: 160, padding: "6px" }} align="center">
               Hours&nbsp;
             </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="center">
+            <TableCell sx={{ fontWeight: "bold", width: 160, padding: "6px" }} align="center">
               Actions&nbsp;
             </TableCell>
           </TableRow>
@@ -302,46 +302,38 @@ export default function MealTable({modalOpen  })  {
               ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} align="center">
+              <TableCell colSpan={6} align="center">
                 No meals to show
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-      
-      <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            position: "absolute",
-            bottom: "0",
-            left: "0",
-            right: "0",
-            padding: "9px", // Reducir padding para reducir el espacio
-            backgroundColor: "white", // O el color que desees
-            borderTop: "1px solid #ddd",
-          }}
-        >
-        <IconButton
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 0}
-        >
-          <ArrowBackIosIcon />
-        </IconButton>
-        <IconButton
-          onClick={() => handlePageChange(page + 1)}
-          disabled={endIndex >= totalMeals}
-        >
-          <ArrowForwardIosIcon />
-        </IconButton>
-        </Box>
-
-      <MealForm
+      </TableContainer>
+     <Box
+     sx={{
+       display: "flex",
+       justifyContent: "center",
+       padding: "11px", // Reducir padding para reducir el espacio
+         backgroundColor: "grey.200", // O el color que desees
+         borderTop: "1px solid #ddd",
+     }}
+   >
+     <IconButton onClick={() => handlePageChange(page - 1)} disabled={page === 0}>
+       <ArrowBackIosIcon />
+     </IconButton>
+     <IconButton
+       onClick={() => handlePageChange(page + 1)}
+       disabled={endIndex >= totalMeals}
+     >
+       <ArrowForwardIosIcon />
+     </IconButton>
+   </Box>
+   <MealForm
         open={isModalOpen}
         setOpen={setIsModalOpen}
         initialData={editMeal}
       />
-    </TableContainer>
+ </Paper>
   );
 }

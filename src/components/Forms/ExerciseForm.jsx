@@ -128,6 +128,9 @@ const ExerciseForm = ({ open, setOpen }) => {
         <div>
           <TextField
             label="Name"
+            inputProps={{
+              maxLength: 17, // Establecer el máximo de caracteres permitidos
+            }}
             variant="outlined"
             fullWidth
             margin="normal"
@@ -138,13 +141,10 @@ const ExerciseForm = ({ open, setOpen }) => {
           />
           <Grid sx={{ marginBottom: 1 }}>
             <TextField
-              InputProps={{
-                inputProps: {
-                  step: 1,
-                },
+              inputProps={{
+                maxLength: 4, // Establecer el máximo de caracteres permitidos
               }}
               label={`Calories Burn`}
-              type="number"
               variant="outlined"
               fullWidth
               value={newExercise.caloriesBurn}
@@ -154,13 +154,10 @@ const ExerciseForm = ({ open, setOpen }) => {
 
           <Grid>
             <TextField
-              InputProps={{
-                inputProps: {
-                  step: 1,
-                },
+              inputProps={{
+                maxLength: 4, // Establecer el máximo de caracteres permitidos
               }}
               label={`Time (minutes)`}
-              type="number"
               variant="outlined"
               fullWidth
               value={newExercise.time}
