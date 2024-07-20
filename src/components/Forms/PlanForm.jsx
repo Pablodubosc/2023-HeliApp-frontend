@@ -27,10 +27,9 @@ const apiUrl = getApiUrl();
 
 const initialPlanState = {
   name: "",
-  planObjetive: "",
+  suggestions: [],
   planType: "",
-  suggestions:[],
-  userId: localStorage.getItem("userId"),
+  planObjetive: "",
   startDate: new Date(),
   endDate: new Date(),
 };
@@ -39,6 +38,7 @@ const PlanForm = ({ open, setOpen }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPlan, setNewPlan] = useState(initialPlanState);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío de la solicitud
 
   const handleSelectChange = (e) => {
     setNewPlan({ ...newPlan, planType: e.target.value });
@@ -46,9 +46,10 @@ const PlanForm = ({ open, setOpen }) => {
 
   const handleAddPlan = () => {
     if (
+      isSubmitting || // Evita múltiples envíos mientras se está enviando
       newPlan.name === "" ||
       newPlan.planObjetive === "" ||
-      Number(newPlan.planObjetive) < 1   ||    
+      Number(newPlan.planObjetive) < 1 ||
       newPlan.endDate === "" ||
       newPlan.endDate < newPlan.startDate
     ) {
@@ -56,35 +57,53 @@ const PlanForm = ({ open, setOpen }) => {
         variant: "error",
       });
       return;
-    } else {
-      newPlan.startDate.setHours(0, 0);
-      newPlan.endDate.setHours(23, 59);
-      fetch(apiUrl + "/api/plans/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(newPlan),
-      }).then(function (response) {
+    }
+
+    setIsSubmitting(true); // Marca como "submitting" al iniciar la solicitud
+
+    newPlan.startDate.setHours(0, 0);
+    newPlan.endDate.setHours(23, 59);
+
+    fetch(apiUrl + "/api/plans/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify(newPlan),
+    })
+      .then((response) => {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The plan was created successfully.", {
             variant: "success",
           });
           closeModal();
-        }
-        else if (response.status === 400) {
-          enqueueSnackbar("The system could not generate the suggestions for that plan.", {
-            variant: "error",
-          });
+        } else if (response.status === 400) {
+          enqueueSnackbar(
+            "The system could not generate the suggestions for that plan.",
+            {
+              variant: "error",
+            }
+          );
           closeModal();
         } else {
           enqueueSnackbar("An error occurred while creating the plan.", {
             variant: "error",
           });
         }
+      })
+      .catch((error) => {
+        enqueueSnackbar("An error occurred while creating the plan.", {
+          variant: "error",
+        });
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Marca como "no submitting" al finalizar
       });
-    }
   };
 
   const closeModal = () => {
@@ -92,7 +111,7 @@ const PlanForm = ({ open, setOpen }) => {
     setNewPlan(initialPlanState);
   };
 
-  const handleCaloriesInputChange = (e, index) => {
+  const handleCaloriesInputChange = (e) => {
     const inputValue = Number(e.target.value);
     if (!isNaN(inputValue) && inputValue >= 1) {
       setNewPlan({ ...newPlan, planObjetive: inputValue });
@@ -100,7 +119,6 @@ const PlanForm = ({ open, setOpen }) => {
       setNewPlan({ ...newPlan, planObjetive: "" });
     }
   };
-
 
   return (
     <Modal
@@ -138,11 +156,16 @@ const PlanForm = ({ open, setOpen }) => {
         <div>
           <TextField
             label="Name"
+            inputProps={{
+              maxLength: 17, // Establecer el máximo de caracteres permitidos
+            }}
             variant="outlined"
             fullWidth
             margin="normal"
             value={newPlan.name}
-            onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })}
+            onChange={(e) =>
+              setNewPlan({ ...newPlan, name: e.target.value })
+            }
             onKeyPress={(event) => {
               if (event.key === "Enter") {
                 handleAddPlan();
@@ -150,42 +173,41 @@ const PlanForm = ({ open, setOpen }) => {
             }}
           />
           <Grid container spacing={2}>
-      <Grid item xs={8}>
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel id="goal-type-label">Goal Type</InputLabel>
-          <Select
-            labelId="goal-type-label"
-            id="goal-type-select"
-            value={newPlan.planType}
-            onChange={handleSelectChange}
-            label="Goal Type"
-          >
-            <MenuItem value="calories">Calories</MenuItem>
-            <MenuItem value="fats">Fats</MenuItem>
-            <MenuItem value="carbs">Carbs</MenuItem>
-            <MenuItem value="proteins">Proteins</MenuItem>
-            <MenuItem value="calories burn">Calories Burn</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
+            <Grid item xs={8}>
+              <FormControl variant="outlined" fullWidth>
+                <InputLabel id="goal-type-label">Goal Type</InputLabel>
+                <Select
+                  labelId="goal-type-label"
+                  id="goal-type-select"
+                  value={newPlan.planType}
+                  onChange={handleSelectChange}
+                  label="Goal Type"
+                >
+                  <MenuItem value="Calories">Calories</MenuItem>
+                  <MenuItem value="Fats">Fats</MenuItem>
+                  <MenuItem value="Carbs">Carbs</MenuItem>
+                  <MenuItem value="Proteins">Proteins</MenuItem>
+                  <MenuItem value="Calories Burn">Calories Burn</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
 
-      <Grid item xs={4}>
-        <TextField
-          InputProps={{
-            inputProps: { min: 1 },
-          }}
-          label="Goal"
-          type="number"
-          variant="outlined"
-          fullWidth
-          value={newPlan.planObjetive}
-          onChange={handleCaloriesInputChange}
-          style={{ marginBottom: '7px' }}
-        />
-      </Grid>
-    </Grid>
+            <Grid item xs={4}>
+              <TextField
+                inputProps={{
+                  maxLength: 6, // Establecer el máximo de caracteres permitidos
+                }}
+                label="Goal"
+                variant="outlined"
+                fullWidth
+                value={newPlan.planObjetive}
+                onChange={handleCaloriesInputChange}
+                style={{ marginBottom: "7px" }}
+              />
+            </Grid>
+          </Grid>
 
-        <Grid item xs={12} style={{ marginBottom: "7px" }}>
+          <Grid item xs={12} style={{ marginBottom: "7px" }}>
             <FormControl fullWidth>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
@@ -222,7 +244,7 @@ const PlanForm = ({ open, setOpen }) => {
                   margin="normal"
                   disabled={!newPlan.startDate}
                   minDate={newPlan.startDate}
-                  minDateMessage="La fecha de fin debe ser posterior a la fecha de inicio"
+                  minDateMessage="End date must be after start date"
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -244,6 +266,7 @@ const PlanForm = ({ open, setOpen }) => {
             variant="contained"
             color="primary"
             onClick={handleAddPlan}
+            disabled={isSubmitting} // Deshabilita el botón si se está enviando
             sx={{
               mt: 3,
               mb: 2,
@@ -256,6 +279,7 @@ const PlanForm = ({ open, setOpen }) => {
             Add Plan
           </Button>
         </div>
+        {/* Aquí se incluiría el componente CategoryForm */}
         <CategoryForm open={isModalOpen} setOpen={setIsModalOpen} />
       </Box>
     </Modal>

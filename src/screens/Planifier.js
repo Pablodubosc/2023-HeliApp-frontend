@@ -9,7 +9,6 @@ import Confetti from "react-confetti";
 import getApiUrl from "../helpers/apiConfig";
 import { useSnackbar } from "notistack";
 import IntermittentFastingForm from "../components/Forms/IntermittentFastingForm";
-import ViewingMessage from "../components/ViewingMessage";
 import SuggestedList from "../components/List/SuggestedList";
 import PlanList from "../components/List/PlanList";
 
@@ -53,6 +52,10 @@ const Planifier = () => {
         userId: localStorage.getItem("userId"),
       }),
     }).then(function (response) {
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (response.status === 200) {
         enqueueSnackbar("The water glass was add successfully.", {
           variant: "success",
@@ -100,7 +103,6 @@ const Planifier = () => {
       {showConfetti && (
         <Confetti width={window.innerWidth} height={window.innerHeight} />
       )}
-      {localStorage.getItem("viewAs") === "false" && (
         <SpeedDial
           ariaLabel="SpeedDial basic example"
           sx={{ position: "fixed", bottom: "70px", right: "25px" }}
@@ -115,10 +117,6 @@ const Planifier = () => {
             />
           ))}
         </SpeedDial>
-      )}
-      {localStorage.getItem("viewAs") === "true" && (
-        <ViewingMessage patientUserName={localStorage.getItem("patientUserName")} />
-      )}
       <div className="row justify-content-center">
         <div className="col-lg-10">
           <div className="row justify-content-center">

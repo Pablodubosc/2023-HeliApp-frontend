@@ -15,7 +15,7 @@ const initialFoodState = {
   name: "",
   calories: "",
   weight: "",
-  category: "",
+  category: { name: "" },
   carbs: "",
   proteins: "",
   fats: ""
@@ -26,29 +26,43 @@ const FoodForm = ({ open, setOpen }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newFood, setNewFood] = useState(initialFoodState);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Nuevo estado
 
   const handleAddFood = () => {
     if (
       newFood.name === "" ||
       newFood.calories === "" ||
       newFood.weight === "" ||
-      newFood.category === "" ||
+      newFood.category.name === "" ||
       Number(newFood.calories) < 1 ||
-      Number(newFood.weight) < 1
+      Number(newFood.weight) < 1 ||
+      isSubmitting // Evita múltiples envíos mientras se está procesando
     ) {
       enqueueSnackbar("Please complete all the fields correctly.", {
         variant: "error",
       });
       return;
-    } else {
-      fetch(apiUrl + "/api/foods", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(newFood),
-      }).then(function (response) {
+    }
+
+    setIsSubmitting(true); // Bloquea el botón
+
+    // Asigna solo el _id de la categoría para la solicitud POST
+    const foodToSend = { ...newFood, category: newFood.category._id };
+
+    fetch(apiUrl + "/api/foods", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify(foodToSend),
+    })
+      .then(function (response) {
+        setIsSubmitting(false); // Desbloquea el botón después de recibir la respuesta
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The food was created successfully.", {
             variant: "success",
@@ -59,13 +73,20 @@ const FoodForm = ({ open, setOpen }) => {
             variant: "error",
           });
         }
+      })
+      .catch(function (error) {
+        setIsSubmitting(false); // Asegura que se desbloquee en caso de error de red u otro
+        console.error("Error:", error);
+        enqueueSnackbar("An error occurred while processing your request.", {
+          variant: "error",
+        });
       });
-    }
   };
 
   const closeModal = () => {
     setOpen(false);
     setNewFood(initialFoodState);
+    setIsSubmitting(false); // Asegúrate de restablecer isSubmitting al cerrar modal
   };
 
   const handleCaloriesInputChange = (e, index) => {
@@ -91,7 +112,9 @@ const FoodForm = ({ open, setOpen }) => {
   };
 
   const shouldBlink = () => {
-    return newFood.carbs === '' && newFood.proteins === '' && newFood.fats === '' ? 'blinkingIcon' : '';
+    return newFood.carbs === "" && newFood.proteins === "" && newFood.fats === ""
+      ? "blinkingIcon"
+      : "";
   };
 
   return (
@@ -133,6 +156,9 @@ const FoodForm = ({ open, setOpen }) => {
             variant="outlined"
             fullWidth
             margin="normal"
+            inputProps={{
+              maxLength: 17, // Establecer el máximo de caracteres permitidos
+            }}
             value={newFood.name}
             onChange={(e) => setNewFood({ ...newFood, name: e.target.value })}
             onKeyPress={(event) => {
@@ -143,11 +169,10 @@ const FoodForm = ({ open, setOpen }) => {
           />
 
           <TextField
-            InputProps={{
-              inputProps: { min: 1 },
+            inputProps={{
+              maxLength: 6, // Establecer el máximo de caracteres permitidos
             }}
             label={`Weight (gr/ml)`}
-            type="number"
             variant="outlined"
             fullWidth
             value={newFood.weight}
@@ -178,16 +203,15 @@ const FoodForm = ({ open, setOpen }) => {
               </IconButton>
             </Grid>
           </Grid>
-          <Grid container spacing={1} alignItems="center" sx={{ mt: 0.05 }} >
+          <Grid container spacing={1} alignItems="center" sx={{ mt: 0.05 }}>
             <Grid item xs={10}>
               <TextField
                 InputProps={{
                   inputProps: {
-                    step: 1,
+                    maxLength: 4,
                   },
                 }}
                 label={`Calories`}
-                type="number"
                 variant="outlined"
                 fullWidth
                 value={newFood.calories}
@@ -199,26 +223,6 @@ const FoodForm = ({ open, setOpen }) => {
                 }}
               />
             </Grid>
-            <style>
-              {`
-          @keyframes blinkEffect {
-            0%, 100% {
-              opacity: 1;
-              transform: scale(1); /* original size */
-              filter: none; /* no shadow */
-            }
-            50% {
-              opacity: 0.5; /* semi-transparent */
-              transform: scale(1.1); /* slightly larger */
-              filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.25)); /* subtle shadow */
-            }
-          }
-          
-          .blinkingIcon {
-            animation: blinkEffect 1s infinite;
-          }
-        `}
-            </style>
             <Grid item xs={2}>
               <IconButton
                 color="primary"
@@ -236,6 +240,7 @@ const FoodForm = ({ open, setOpen }) => {
             variant="contained"
             color="primary"
             onClick={handleAddFood}
+            disabled={isSubmitting} // Deshabilita el botón si isSubmitting es true
             sx={{
               mt: 3,
               mb: 2,
@@ -245,7 +250,7 @@ const FoodForm = ({ open, setOpen }) => {
             }}
             fullWidth
           >
-            Add Food
+            {isSubmitting ? "Adding..." : "Add Food"}
           </Button>
         </div>
         <InfoModal

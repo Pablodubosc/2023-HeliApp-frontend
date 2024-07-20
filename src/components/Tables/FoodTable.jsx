@@ -13,7 +13,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import CategoryAutocomplete from "../CategoryAutocomplete";
 import getApiUrl from "../../helpers/apiConfig";
-
+import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
 const apiUrl = getApiUrl();
 
 function TablePaginationActions(props) {
@@ -56,30 +56,36 @@ function TablePaginationActions(props) {
   );
 }
 
+const initialSelectedCategoryState = {
+  name: "",
+}
+
 export default function FoodTable({ filterOpen, modalOpen  }) {
   const [foods, setFoods] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(initialSelectedCategoryState);
   const [page, setPage] = React.useState(0);
   const [noResults, setNoResults] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    selectedCategory ? getFoodByCategory() : getFoods();
+    selectedCategory && filterOpen == true ? getFoodByCategory() : getFoods();
   }, [selectedCategory]);
 
   useEffect(() => {
     if (filterOpen === false) {
-      setSelectedCategory("");
+      setSelectedCategory(initialSelectedCategoryState);
       getFoods();
     }
   }, [filterOpen, modalOpen]);
 
-  useEffect(() => {
+    useEffect(() => {
     getFoods();
   }, []);
 
   const getFoods = async () => {
-    const response = await fetch(apiUrl + "/api/foods/" + localStorage.getItem("userId") , {
+    setLoading(true)
+    const response = await fetch(apiUrl + "/api/foods/", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -87,14 +93,26 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
       },
     });
     const data = await response.json();
-    setFoods(data.data);
-    setTotalItems(data.data.length);
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
+    if (data.data.length === 0) {
+      setNoResults(true);
+      setLoading(false)
+    } else {
+      setNoResults(false);
+      setLoading(false)
+      setFoods(data.data);
+      setTotalItems(data.data.length);
+    }
   };
 
   const getFoodByCategory = async () => {
-    if (selectedCategory !== "") {
+    setLoading(true)
+    if (selectedCategory.name !== "") {
       const response = await fetch(
-        apiUrl + "/api/foods/category/" + selectedCategory + "/" +  localStorage.getItem("userId"),
+        apiUrl + "/api/foods/category/" + selectedCategory.name + "/" ,
         {
           method: "GET",
           headers: {
@@ -104,14 +122,21 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
         }
       );
       const data = await response.json();
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (data.data.length === 0) {
         setNoResults(true);
+        setLoading(false)
       } else {
         setNoResults(false);
         setFoods(data.data);
         setTotalItems(data.data.length);
+        setLoading(false)
       }
     } else {
+      setNoResults(false)
       getFoods();
     }
   };
@@ -133,6 +158,8 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
         margin: "auto",
         minHeight: "400px",
         overflowY: "auto",
+        position: "relative", // Asegúrate de que el contenedor tenga posición relativa
+        paddingBottom: "15px", // Ajusta esto según el alto de tus flechas de paginación
       }}
     >
       {filterOpen && (
@@ -140,7 +167,6 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
           style={{
             display: "flex",
             justifyContent: "center",
-            marginBottom: "20px",
           }}
         >
           <CategoryAutocomplete
@@ -151,35 +177,41 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
       )}
       <TableContainer
         component={Paper}
-        sx={{ overflowX: "auto", minHeight: "450px" }}
+        sx={{ overflowX: "auto", minHeight: "487px" }}
       >
         <Table aria-label="custom pagination table">
-          <TableHead sx={{ fontWeight: "bold" }}>
+          <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200", height : '80px',  }}>
             <TableRow sx={{ fontWeight: "bold" }}>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Name (gr/ml)
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Calories
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100 , padding: "1px"}}>
                 Carbs
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Proteins
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Fats
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 100, padding: "1px" }}>
                 Category
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {noResults ? (
+          {loading ? ( // Muestra CircularProgress si loading es true
               <TableRow>
-                <TableCell colSpan={3} align="center">
+                <TableCell colSpan={6} align="center">
+                  <CircularProgress style={{ margin: "20px" }} />
+                </TableCell>
+              </TableRow>
+            ) : noResults ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
                   No results found.{" "}
                 </TableCell>
               </TableRow>
@@ -190,25 +222,67 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
                     <TableCell
                       component="th"
                       scope="row"
-                      style={{ width: 160 }}
+                      style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }}
                       align="center"
                     >
                       {row.name + " " + row.weight + "(gr/ml)"}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.calories}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.carbs === "0" ? "-" : row.carbs}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.proteins === "0" ? "-" : row.proteins}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.fats === "0" ? "-" : row.fats}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
-                      {row.category}
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
+                      {row.category.name}
                     </TableCell>
                   </TableRow>
                 )
@@ -216,7 +290,19 @@ export default function FoodTable({ filterOpen, modalOpen  }) {
             )}
           </TableBody>
         </Table>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: "0",
+            left: "0",
+            right: "0",
+            padding: "10px", // Reducir padding para reducir el espacio
+            backgroundColor: "grey.200", // O el color que desees
+            borderTop: "1px solid #ddd",
+          }}
+        >
           <TablePaginationActions
             count={totalItems}
             page={page}

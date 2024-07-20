@@ -21,7 +21,7 @@ const GoalSelect = ({ onChangeGoal }) => {
 
   const handleGetActiveGoals = async () => {
     const response = await fetch(
-      apiUrl + "/api/goals/activeGoals/" + localStorage.getItem("userId"),
+      apiUrl + "/api/goals/activeGoals/",
       {
         method: "GET",
         headers: {
@@ -31,6 +31,10 @@ const GoalSelect = ({ onChangeGoal }) => {
       }
     );
     const data = await response.json();
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     if (data.filteredData.length > 0) {
       if (selectedGoal === "") {
         setSelectedGoal(data.filteredData[0].name);

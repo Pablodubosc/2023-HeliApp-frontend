@@ -16,22 +16,17 @@ import { formatISO, parseISO } from 'date-fns';
 const apiUrl = getApiUrl();
 
 
-
-
 const initialExerciseDoneState = {
   name: "",
   date: new Date(),
-  exercises: [{ name: "", caloriesBurn: "", time: "", timeDoing: ""}],
-  userId: localStorage.getItem("userId"),
+  exercises: [{ exerciseId: "", timeWasted: ""}],
 };
 
 const initialMealState = {
   name: "",
   date: new Date(),
   hour: new Date(),
-  calories: 0,
-  foods: [{ name: "", calories: "", weight: "", category: "" }],
-  userId: localStorage.getItem("userId"),
+  foods: [{ foodId: "", weightConsumed: ""}],
 };
 
 const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => {
@@ -39,7 +34,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
 
   const [exerciseDoneData, setExerciseDoneData] = useState(initialExerciseDoneState);
   const [mealDoneData, setMealDoneData] = useState(initialMealState);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const handleChangeDate = (e, index) => {
     setMealDoneData((prevData) => ({
       ...prevData,
@@ -55,30 +50,32 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
 
   useEffect(() => {
     if (suggestion) {
+      if (suggestion.suggestion.hasOwnProperty("exercises")){
       setExerciseDoneData({
         ...initialExerciseDoneState,
-        name: suggestion.name,
+        name: suggestion.suggestion.name,
         date: selectedPlan.startDate,
-        exercises : suggestion.exercises
+        exercises : suggestion.suggestion.exercises
       });
-
+     }
+     else {
       setMealDoneData({
-        ...initialExerciseDoneState,
-        name: suggestion.name,
+        ...initialMealState,
+        name: suggestion.suggestion.name,
         date: selectedPlan.startDate,
         hour: selectedPlan.startDate,
-        foods: suggestion.foods
+        foods: suggestion.suggestion.foods
       });
     } 
+  }
   }, [suggestion]);
 
 
   const handleUpdateSuggestion = () => {
-    const selectedPlanModify = selectedPlan.suggestions.find(sugerencia => sugerencia._id === suggestion._id);
+    const index = selectedPlan.suggestions.findIndex(sugerencia => sugerencia._id === suggestion._id);
 
-    if (selectedPlanModify) {
-       selectedPlanModify.done = true; }
-  
+    if (index) {
+       selectedPlan.suggestions[index].done = true; }
       // Envía la sugerencia actualizada al servidor
       fetch(apiUrl + "/api/plans", {
         method: "PUT", // Utiliza el método correcto según tu API
@@ -92,12 +89,8 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
 
   const handleAddSuggestion = () => {
     suggestion.done = true;
-    if(selectedPlan.planType === "calories burn"){
-
-
-      exerciseDoneData.caloriesBurn = exerciseDoneData.exercises
-        .map((exercise) => parseInt(exercise.totalCaloriesBurn))
-        .reduce((acc, caloriesBurn) => acc + caloriesBurn, 0);
+    setIsSubmitting(true);
+    if(selectedPlan.planType === "Calories Burn"){
 
       fetch(apiUrl + "/api/exerciseDone", {
         method: "POST",
@@ -107,39 +100,27 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
         },
         body: JSON.stringify(exerciseDoneData),
       }).then(function (response) {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The exercise was created successfully.", {
             variant: "success",
           });
           handleUpdateSuggestion();
+          setIsSubmitting(false);
           closeModal();
 
         } else {
           enqueueSnackbar("An error occurred while creating the exercise.", {
             variant: "error",
           });
+          setIsSubmitting(false);
         }
       });
     }
     else{
-      mealDoneData.calories = mealDoneData.foods
-        .map((food) => parseInt(food.totalCalories))
-        .reduce((acc, calories) => acc + calories, 0);
-
-        mealDoneData.carbs = mealDoneData.foods
-        .map((food) => parseInt(food.totalCarbs))
-        .reduce((acc, carbs) => acc + carbs, 0);
-
-        mealDoneData.proteins = mealDoneData.foods
-        .map((food) => parseInt(food.totalProteins))
-        .reduce((acc, proteins) => acc + proteins, 0);
-
-        mealDoneData.fats = mealDoneData.foods
-        .map((food) => parseInt(food.totalFats))
-        .reduce((acc, fats) => acc + fats, 0);
-
-       
-
       mealDoneData.hour = mealDoneData.hour.slice(11, 16);
 
       fetch(apiUrl + "/api/meals", {
@@ -150,20 +131,27 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
         },
         body: JSON.stringify(mealDoneData),
       }).then(function (response) {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar("The meal was created successfully.", {
             variant: "success",
           });
           handleUpdateSuggestion();
+          setIsSubmitting(false);
           closeModal();
         } else {
           enqueueSnackbar("An error occurred while creating the meal.", {
             variant: "error",
           });
+          setIsSubmitting(false);
         }
       });
     }
     closeModal();
+    setIsSubmitting(false);
   };
 
   const closeModal = () => {
@@ -212,7 +200,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
                   fullWidth
                   margin="normal"
                   minDate={parseISO(selectedPlan.startDate)}
-                  maxDate={parseISO(selectedPlan.endDate)}
+                  maxDate={new Date() < new Date(selectedPlan.endDate) ? new Date() : parseISO(selectedPlan.endDate)}
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -228,6 +216,7 @@ const SuggestionForm = ({ open, setOpen, suggestion, selectedPlan, doneIt }) => 
             variant="contained"
             color="primary"
             onClick={handleAddSuggestion}
+            disabled={isSubmitting}
             sx={{
               mt: 3,
               mb: 2,

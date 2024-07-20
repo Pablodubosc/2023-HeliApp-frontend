@@ -7,16 +7,16 @@ import {
   Grid,
   IconButton,
   FormControl,
-  FormControlLabel,
-  Radio,
-  FormGroup,
-  RadioGroup,
-  MenuItem,
   InputLabel,
   Select,
+  MenuItem,
+  FormGroup,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from "@mui/material";
-import { useSnackbar } from "notistack";
 import CloseIcon from "@mui/icons-material/Close";
+import { useSnackbar } from "notistack";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -28,14 +28,17 @@ const initialGoalState = {
   name: "",
   type: "",
   objetive: "",
-  userId: localStorage.getItem("userId"),
   startDate: new Date(),
   endDate: new Date(),
+  recurrency: "Non-Recurring",
 };
 
 const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const [selectedRecuringValue, setSelectedRecurringValue] = useState('Non-Recurring');
+  const [selectedRecuringValue, setSelectedRecurringValue] = useState(
+    "Non-Recurring"
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío de la solicitud
 
   const handleSelectChange = (e) => {
     setNewGoal({ ...newGoal, type: e.target.value });
@@ -43,7 +46,7 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
 
   const closeModal = () => {
     setOpen(false);
-    setSelectedRecurringValue("Non-Recurring")
+    setSelectedRecurringValue("Non-Recurring");
     setNewGoal(initialGoalState);
   };
 
@@ -51,17 +54,16 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
     name: "",
     type: "",
     objetive: "",
-    userId: localStorage.getItem("userId"),
     startDate: new Date(),
     endDate: new Date(),
-    recurrency: "Non-Recurring"
+    recurrency: "Non-Recurring",
   });
 
   useEffect(() => {
     if (initialData) {
       const parsedStartDate = new Date(initialData.startDate);
       const parsedEndDate = new Date(initialData.endDate);
-      setSelectedRecurringValue(initialData.recurrency)
+      setSelectedRecurringValue(initialData.recurrency);
       setNewGoal({
         ...initialData,
         startDate: parsedStartDate,
@@ -72,20 +74,19 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
         name: "",
         type: "",
         objetive: "",
-        userId: localStorage.getItem("userId"),
         startDate: new Date(),
         endDate: new Date(),
-        recurrency: "Non-Recurring"
+        recurrency: "Non-Recurring",
       });
     }
   }, [initialData, open]);
 
   const handleAddGoal = () => {
     if (
+      isSubmitting || // Evita múltiples envíos mientras se está enviando
       newGoal.name === "" ||
       newGoal.type === "" ||
       newGoal.objetive === "" ||
-      newGoal.userId === "" ||
       newGoal.startDate === "" ||
       newGoal.endDate === "" ||
       newGoal.endDate < newGoal.startDate
@@ -94,24 +95,31 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
         variant: "error",
       });
       return;
-    } else {
-      const url = initialData
-        ? apiUrl + `/api/goals/${initialData._id}`
-        : apiUrl + "/api/goals";
-      const method = initialData ? "PUT" : "POST";
+    }
 
-      newGoal.startDate.setHours(0, 0);
-      newGoal.endDate.setHours(23, 59);
+    setIsSubmitting(true); // Marca como "submitting" al iniciar la solicitud
 
-      fetch(url, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(newGoal),
-      }).then(function (response) {
+    const url = initialData
+      ? apiUrl + `/api/goals/${initialData._id}`
+      : apiUrl + "/api/goals";
+    const method = initialData ? "PUT" : "POST";
 
+    newGoal.startDate.setHours(-3, 0, 0, 0);
+    newGoal.endDate.setHours(20, 59, 59, 999);
+
+    fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify(newGoal),
+    })
+      .then((response) => {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
         if (response.status === 200) {
           enqueueSnackbar(
             initialData
@@ -130,11 +138,18 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
             variant: "error",
           });
         }
+      })
+      .catch((error) => {
+        enqueueSnackbar("An error occurred while creating the goal.", {
+          variant: "error",
+        });
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Marca como "no submitting" al finalizar
       });
-    }
   };
 
-  const handleCaloriesInputChange = (e, index) => {
+  const handleCaloriesInputChange = (e) => {
     const inputValue = Number(e.target.value);
     if (!isNaN(inputValue) && inputValue >= 1) {
       setNewGoal({ ...newGoal, objetive: inputValue });
@@ -142,8 +157,9 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
       setNewGoal({ ...newGoal, objetive: "" });
     }
   };
+
   const handleRecurrencyChange = (event) => {
-    setSelectedRecurringValue(event.target.value)
+    setSelectedRecurringValue(event.target.value);
     setNewGoal({ ...newGoal, recurrency: event.target.value });
   };
 
@@ -183,6 +199,9 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
         <div>
           <TextField
             label="Name"
+            inputProps={{
+              maxLength: 17, // Establecer el máximo de caracteres permitidos
+            }}
             variant="outlined"
             fullWidth
             margin="normal"
@@ -195,46 +214,45 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
             }}
           />
 
-<Grid container spacing={2}>
-      <Grid item xs={8}>
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel id="goal-type-label">Goal Type</InputLabel>
-          <Select
-            labelId="goal-type-label"
-            id="goal-type-select"
-            value={newGoal.type}
-            onChange={handleSelectChange}
-            label="Goal Type"
-          >
-            <MenuItem value="calories">Calories</MenuItem>
-            <MenuItem value="fats">Fats</MenuItem>
-            <MenuItem value="carbs">Carbs</MenuItem>
-            <MenuItem value="proteins">Proteins</MenuItem>
-            <MenuItem value="calories burn">Calories Burn</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
+          <Grid container spacing={2}>
+            <Grid item xs={8}>
+              <FormControl variant="outlined" fullWidth>
+                <InputLabel id="goal-type-label">Goal Type</InputLabel>
+                <Select
+                  labelId="goal-type-label"
+                  id="goal-type-select"
+                  value={newGoal.type}
+                  onChange={handleSelectChange}
+                  label="Goal Type"
+                >
+                  <MenuItem value="Calories">Calories</MenuItem>
+                  <MenuItem value="Fats">Fats</MenuItem>
+                  <MenuItem value="Carbs">Carbs</MenuItem>
+                  <MenuItem value="Proteins">Proteins</MenuItem>
+                  <MenuItem value="Calories Burn">Calories Burn</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
 
-      <Grid item xs={4}>
-        <TextField
-          InputProps={{
-            inputProps: { min: 1 },
-          }}
-          label="Goal"
-          type="number"
-          variant="outlined"
-          fullWidth
-          value={newGoal.objetive}
-          onChange={handleCaloriesInputChange}
-          style={{ marginBottom: '7px' }}
-          onKeyPress={(event) => {
-            if (event.key === 'Enter') {
-              handleAddGoal();
-            }
-          }}
-        />
-      </Grid>
-    </Grid>
+            <Grid item xs={4}>
+              <TextField
+                inputProps={{
+                  maxLength: 6, // Establecer el máximo de caracteres permitidos
+                }}
+                label="Goal"
+                variant="outlined"
+                fullWidth
+                value={newGoal.objetive}
+                onChange={handleCaloriesInputChange}
+                style={{ marginBottom: "7px" }}
+                onKeyPress={(event) => {
+                  if (event.key === "Enter") {
+                    handleAddGoal();
+                  }
+                }}
+              />
+            </Grid>
+          </Grid>
           <Grid item xs={12} style={{ marginBottom: "7px" }}>
             <FormControl fullWidth>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -272,7 +290,7 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
                   margin="normal"
                   disabled={!newGoal.startDate}
                   minDate={newGoal.startDate}
-                  minDateMessage="La fecha de fin debe ser posterior a la fecha de inicio"
+                  minDateMessage="End date must be after start date"
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -290,22 +308,19 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
               </LocalizationProvider>
             </FormControl>
             <FormGroup>
-              <RadioGroup onChange={handleRecurrencyChange} row value={selectedRecuringValue} style={{ justifyContent: 'center' }}>
+              <RadioGroup
+                onChange={handleRecurrencyChange}
+                row
+                value={selectedRecuringValue}
+                style={{ justifyContent: "center" }}
+              >
                 <FormControlLabel
                   control={<Radio />}
                   label="Non-Recurring"
                   value="Non-Recurring"
                 />
-                <FormControlLabel
-                  control={<Radio />}
-                  label="Weekly"
-                  value="Weekly"
-                />
-                <FormControlLabel
-                  control={<Radio />}
-                  label="Monthly"
-                  value="Monthly"
-                />
+                <FormControlLabel control={<Radio />} label="Weekly" value="Weekly" />
+                <FormControlLabel control={<Radio />} label="Monthly" value="Monthly" />
               </RadioGroup>
             </FormGroup>
           </Grid>
@@ -314,6 +329,7 @@ const GoalForm = ({ open, setOpen, initialData, setSelectedGoal }) => {
             variant="contained"
             color="primary"
             onClick={handleAddGoal}
+            disabled={isSubmitting} // Deshabilita el botón si se está enviando
             sx={{
               mt: 3,
               mb: 2,

@@ -77,12 +77,10 @@ const InfoModal = ({ open, setOpen, newFood, setNewFood }) => {
         <Grid container spacing={2} justifyContent="center" alignItems="center">
           <Grid item xs={10}>
             <TextField
-              InputProps={{
-                inputProps: { min: 1 },
-                sx: { textAlign: "center" },
+              inputProps={{
+                maxLength: 4, // Establecer el máximo de caracteres permitidos
               }}
               label="Carbs"
-              type="number"
               variant="outlined"
               fullWidth
               value={newFood.carbs}
@@ -91,12 +89,10 @@ const InfoModal = ({ open, setOpen, newFood, setNewFood }) => {
           </Grid>
           <Grid item xs={10}>
             <TextField
-              InputProps={{
-                inputProps: { min: 1 },
-                sx: { textAlign: "center" },
+              inputProps={{
+                maxLength: 4, // Establecer el máximo de caracteres permitidos
               }}
               label="Proteins"
-              type="number"
               variant="outlined"
               fullWidth
               value={newFood.proteins}
@@ -105,12 +101,10 @@ const InfoModal = ({ open, setOpen, newFood, setNewFood }) => {
           </Grid>
           <Grid item xs={10}>
             <TextField
-              InputProps={{
-                inputProps: { min: 1 },
-                sx: { textAlign: "center" },
+              inputProps={{
+                maxLength: 4, // Establecer el máximo de caracteres permitidos
               }}
               label="Fats"
-              type="number"
               variant="outlined"
               fullWidth
               value={newFood.fats}

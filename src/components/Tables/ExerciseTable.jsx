@@ -12,7 +12,7 @@ import { TableHead } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import getApiUrl from "../../helpers/apiConfig";
-
+import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
 const apiUrl = getApiUrl();
 
 function TablePaginationActions(props) {
@@ -60,7 +60,7 @@ export default function ExerciseTable({ modalOpen  }) {
   const [totalItems, setTotalItems] = useState(0);
   const [page, setPage] = React.useState(0);
   const [noResults, setNoResults] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
       getExercise();
   }, [ modalOpen]);
@@ -70,6 +70,7 @@ export default function ExerciseTable({ modalOpen  }) {
   }, []);
 
   const getExercise = async () => {
+    setLoading(true)
     const response = await fetch(apiUrl + "/api/exercise" , {
       method: "GET",
       headers: {
@@ -78,8 +79,19 @@ export default function ExerciseTable({ modalOpen  }) {
       },
     });
     const data = await response.json();
-    setExercises(data.data);
-    setTotalItems(data.data.length);
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
+    if (data.data.length === 0) {
+      setNoResults(true);
+      setLoading(false)
+    } else {
+      setNoResults(false);
+      setLoading(false)
+      setExercises(data.data);
+      setTotalItems(data.data.length);
+    }
   };
 
 
@@ -96,30 +108,38 @@ export default function ExerciseTable({ modalOpen  }) {
         margin: "auto",
         minHeight: "400px",
         overflowY: "auto",
+        position: "relative", // Asegúrate de que el contenedor tenga posición relativa
+        paddingBottom: "15px", // Ajusta esto según el alto de tus flechas de paginación
       }}
     >
       <TableContainer
         component={Paper}
-        sx={{ overflowX: "auto", minHeight: "450px" }}
+        sx={{ overflowX: "auto", minHeight: "487px" }}
       >
         <Table aria-label="custom pagination table">
-          <TableHead sx={{ fontWeight: "bold" }}>
+          <TableHead sx={{ height : '80px', bgcolor: "grey.200"  }}>
             <TableRow sx={{ fontWeight: "bold" }}>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 160, padding: "6px" }}>
                 Name 
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 160, padding: "6px" }}>
                 Calories Burn
               </TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold", width: 160, padding: "6px" }}>
                 Time (minutes)
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {noResults ? (
+          {loading ? ( // Muestra CircularProgress si loading es true
               <TableRow>
-                <TableCell colSpan={3} align="center">
+                <TableCell colSpan={6} align="center">
+                  <CircularProgress style={{ margin: "20px" }} />
+                </TableCell>
+              </TableRow>
+            ) : noResults ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
                   No results found.{" "}
                 </TableCell>
               </TableRow>
@@ -130,15 +150,36 @@ export default function ExerciseTable({ modalOpen  }) {
                     <TableCell 
                       component="th"
                       scope="row"
-                      style={{ width: 160, height:70 }}
+                      style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "26px", // Padding en la parte superior
+                        paddingBottom: "26px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }}
                       align="center"
                     >
                       {row.name}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "26px", // Padding en la parte superior
+                        paddingBottom: "26px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.caloriesBurn}
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="center">
+                    <TableCell style={{
+                        width: 160,
+                        border: "1px solid #ddd",
+                        paddingTop: "26px", // Padding en la parte superior
+                        paddingBottom: "26px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                       {row.time}
                     </TableCell>
                   </TableRow>
@@ -147,7 +188,19 @@ export default function ExerciseTable({ modalOpen  }) {
             )}
           </TableBody>
         </Table>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: "0",
+            left: "0",
+            right: "0",
+            padding: "10px", // Reducir padding para reducir el espacio
+            backgroundColor: "grey.200", // O el color que desees
+            borderTop: "1px solid #ddd",
+          }}
+        >
           <TablePaginationActions
             count={totalItems}
             page={page}

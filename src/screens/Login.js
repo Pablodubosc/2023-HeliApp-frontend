@@ -26,10 +26,6 @@ import "../styles/Login.css";
 const apiUrl = getApiUrl();
 const url = getUrl();
 
-function getUID() {
-  return Date.now().toString(36);
-}
-
 const Login = () => {
   const [user, setUser] = React.useState({
     email: "",
@@ -40,6 +36,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const theme = useTheme();
   const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   useEffect(() => {
     function handleResize() {
       setIsMobile(window.innerWidth <= theme.breakpoints.values.sm);
@@ -56,6 +53,7 @@ const Login = () => {
   const images = [carousel1, carousel2, carousel3, carousel4];
 
   const handleRecoverClick = async () => {
+    setIsLoading(true);
     if (recoveryEmail === "") {
       enqueueSnackbar(
         "Please enter your email address to reset your password.",
@@ -63,6 +61,7 @@ const Login = () => {
           variant: "error",
         }
       );
+      setIsLoading(false);
       return;
     } else {
       try {
@@ -82,23 +81,23 @@ const Login = () => {
           });
           return;
         }
+        //SOLO DEBERIA TRAER EL MAIL
         const userId = data.data._id;
         const userName = data.data.firstName + " " + data.data.lastName;
-
         const response1 = await fetch(apiUrl + "/api/notifications/sendEmail", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          //ACA SOLO MANDO EL MAIL
           body: JSON.stringify({
             email: recoveryEmail,
-            token: getUID(),
             userName: userName,
             userId: userId,
             url: url,
           }),
         });
-
+        setIsLoading(false);
         if (response1.status === 200) {
           enqueueSnackbar(
             "An email with the link to recover your password has been sent.",
@@ -111,6 +110,7 @@ const Login = () => {
             variant: "error",
           });
         }
+        setIsLoading(false);
       } catch (error) {
         enqueueSnackbar("There was an issue with sending the email.", {
           variant: "error",
@@ -124,6 +124,7 @@ const Login = () => {
       enqueueSnackbar("Email or password is empty.", { variant: "error" });
       return;
     } else {
+      setIsLoading(true);
       fetch(apiUrl + "/api/auth/login", {
         method: "POST",
         headers: {
@@ -136,20 +137,16 @@ const Login = () => {
           if (data.status === 200) {
             enqueueSnackbar("Successful login.", { variant: "success" });
             localStorage.setItem("token", data.token);
-            localStorage.setItem("userId", data.user._id);
             localStorage.setItem(
               "username",
               data.user.firstName + " " + data.user.lastName
             );
             localStorage.setItem("userMail", data.user.email);
-            localStorage.setItem("viewAs", false);
-            localStorage.setItem("roles", data.user.role);
-            if (data.user.role === "user"|| data.user.role === "admin") {
-              window.location.replace("/main");
-            } else if (data.user.role === "nutritionist") {
-              window.location.replace("/mainNutritionist");
-            }
+
+            window.location.replace("/main");
+            setIsLoading(false);
           } else {
+            setIsLoading(false);
             enqueueSnackbar("Wrong Email or Password.", { variant: "error" });
           }
         });
@@ -272,8 +269,9 @@ const Login = () => {
                 fontWeight: "bold",
               }}
               onClick={() => handleLogin()}
+              disabled={isLoading}
             >
-              Sign In
+              {isLoading ? "Loading..." : "Sign In"}
             </Button>
             <Grid container justifyContent="center">
               <Grid container>
@@ -378,8 +376,9 @@ const Login = () => {
               width: "100%",
             }}
             onClick={handleRecoverClick}
+            disabled={isLoading}
           >
-            Reset Password
+            {isLoading ? "Loading..." : "Reset Password"}
           </Button>
         </Box>
       </Modal>

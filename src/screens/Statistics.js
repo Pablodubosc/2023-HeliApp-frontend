@@ -13,7 +13,6 @@ import Confetti from "react-confetti";
 import getApiUrl from "../helpers/apiConfig";
 import { useSnackbar } from "notistack";
 import IntermittentFastingForm from "../components/Forms/IntermittentFastingForm";
-import ViewingMessage from "../components/ViewingMessage";
 
 const apiUrl = getApiUrl();
 
@@ -49,6 +48,10 @@ const Statistics = () => {
         userId: localStorage.getItem("userId"),
       }),
     }).then(function (response) {
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
       if (response.status === 200) {
         enqueueSnackbar("The water glass was add successfully.", {
           variant: "success",
@@ -97,7 +100,6 @@ const Statistics = () => {
       {showConfetti && (
         <Confetti width={window.innerWidth} height={window.innerHeight} />
       )}
-      {localStorage.getItem("viewAs") === "false" && (
         <SpeedDial
           ariaLabel="SpeedDial basic example"
           sx={{ position: "fixed", bottom: "70px", right: "25px" }}
@@ -112,10 +114,6 @@ const Statistics = () => {
             />
           ))}
         </SpeedDial>
-      )}
-      {localStorage.getItem("viewAs") === "true" && (
-        <ViewingMessage patientUserName={localStorage.getItem("patientUserName")} />
-      )}
       <Row>
         <Col
           xs={12}

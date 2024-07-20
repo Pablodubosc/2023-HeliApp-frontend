@@ -2,7 +2,7 @@ import React from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, Tooltip } from "recharts";
 
 export default function LineChartWithCustomFontSize({ data, type }) {
-  const typeValidator = (type) => {if(type==="calories burn"){return "caloriesBurn" } else{return type}}
+  const typeValidator = (type) => {if(type==="Calories Burn"){return "totalCaloriesBurn" } else{return "total"+type}}
   const caloriasArray = data.map((item) => item[typeValidator(type)]);
   const totalCalorias = caloriasArray.reduce((acc, curr) => acc + curr, 0);
   const promedioCalorias = totalCalorias / caloriasArray.length;

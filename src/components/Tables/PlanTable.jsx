@@ -11,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import { TableHead } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import CircularProgress from "@mui/material/CircularProgress"; // Importa CircularProgress
 import getApiUrl from "../../helpers/apiConfig";
 
 const apiUrl = getApiUrl();
@@ -58,28 +59,40 @@ function TablePaginationActions(props) {
 export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) {
   const [plans, setPlans] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = useState(0);
   const [noResults, setNoResults] = useState(false);
+  const [loading, setLoading] = useState(false); // Estado para controlar la carga
 
   useEffect(() => {
     getPlans();
   }, [modalOpen]);
 
-  useEffect(() => {
-    getPlans();
-  }, []);
-
   const getPlans = async () => {
-    const response = await fetch(apiUrl + "/api/plans/" + localStorage.getItem("userId"), {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const data = await response.json();
-    setPlans(data.data);
-    setTotalItems(data.data.length);
+    if(plans)
+    {
+      setLoading(true); // Inicia el estado de carga
+    }
+    try {
+      const response = await fetch(apiUrl + "/api/plans/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      const data = await response.json();
+      if (response.status == 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
+      setPlans(data.data);
+      setTotalItems(data.data.length);
+    } catch (error) {
+      console.error("Error fetching plans:", error);
+      // Puedes manejar el error aquí según tu lógica de la aplicación
+    } finally {
+      setLoading(false); // Finaliza el estado de carga
+    }
   };
 
   const handleChangePage = (event, newPage) => {
@@ -98,42 +111,78 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
         margin: "auto",
         minHeight: "400px",
         overflowY: "auto",
+        position: "relative", // Asegúrate de que el contenedor tenga posición relativa
+        paddingBottom: "15px", // Ajusta esto según el alto de tus flechas de paginación
       }}
     >
       <TableContainer component={Paper} sx={{ overflowX: "auto", minHeight: "450px" }}>
         <Table aria-label="custom pagination table">
-          <TableHead sx={{ fontWeight: "bold" }}>
+          <TableHead sx={{ fontWeight: "bold", bgcolor: "grey.200"  }}>
             <TableRow sx={{ fontWeight: "bold" }}>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Plan name</TableCell>
-              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Objetive</TableCell>
+              <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Objective</TableCell>
               <TableCell sx={{ fontWeight: "bold" }} align="center">From&nbsp;</TableCell>
               <TableCell sx={{ fontWeight: "bold" }} align="center">To&nbsp;</TableCell>
               <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>Tracking</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {plans.length == 0 ? (
+            {loading ? ( // Muestra CircularProgress si loading es true
               <TableRow>
-                <TableCell colSpan={3} align="center">
-                  You dont have any plans.{" "}
+                <TableCell colSpan={5} align="center">
+                  <CircularProgress style={{ margin: "20px" }} />
+                </TableCell>
+              </TableRow>
+            ) : plans.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <div style={{ textAlign: 'center' }}>You don't have any plans.</div>
                 </TableCell>
               </TableRow>
             ) : (
-              (5 > 0 ? plans.slice(page * 5, page * 5 + 5) : plans).map((row) => (
+              plans.slice(page * 5, page * 5 + 5).map((row) => (
                 <TableRow key={row._id} selected={selectedPlan === row}>
-                  <TableCell component="th" scope="row" style={{ width: 200, height:70 }} align="center">
+                  <TableCell component="th" scope="row" style={{ width: 200, height: 70 }} align="center">
                     {row.name}
                   </TableCell>
-                  <TableCell style={{ width: 100 }} align="center">
-                    {row.planObjetive} {row.planType}
+                  <TableCell style={{
+                        width: 100,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
+                    {row.planObjective} {row.planType}
                   </TableCell>
-                  <TableCell style={{ width: 220 }} align="center">
+                  <TableCell style={{
+                        width: 120,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                     {row.startDate ? row.startDate.substring(0, 10) : ""}
                   </TableCell>
-                  <TableCell style={{ width: 220 }} align="center">
+                  <TableCell style={{
+                        width: 124,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                     {row.endDate ? row.endDate.substring(0, 10) : ""}
                   </TableCell>
-                  <TableCell style={{ width: 50 }} align="center">
+                  <TableCell style={{
+                        width: 10,
+                        border: "1px solid #ddd",
+                        paddingTop: "16px", // Padding en la parte superior
+                        paddingBottom: "16px", // Padding en la parte inferior
+                        paddingLeft: "8px", // Padding a la izquierda (ejemplo, ajustable)
+                        paddingRight: "8px", // Padding a la derecha (ejemplo, ajustable)
+                      }} align="center">
                     <input
                       type="checkbox"
                       checked={selectedPlan === row}
@@ -145,8 +194,24 @@ export default function PlanTable({ modalOpen, selectedPlan, setSelectedPlan }) 
             )}
           </TableBody>
         </Table>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <TablePaginationActions count={totalItems} page={page} onPageChange={handleChangePage} />
+          <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            position: "absolute",
+            bottom: "0",
+            left: "0",
+            right: "0",
+            padding: "10px", // Reducir padding para reducir el espacio
+            backgroundColor: "grey.200", // O el color que desees
+            borderTop: "1px solid #ddd",
+          }}
+        >
+          <TablePaginationActions
+            count={totalItems}
+            page={page}
+            onPageChange={handleChangePage}
+          />
         </Box>
       </TableContainer>
     </div>

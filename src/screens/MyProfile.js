@@ -9,8 +9,6 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import LabelBottomNavigation from "../components/BottomMenu";
-import LabelBottomNavigationNutritionist from "../components/BottomMenuNutritionist";
-import DrawerNutritionist from "../components/DrawerNutritionist";
 import { Autocomplete } from "@mui/material";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import RemoveCircleRoundedIcon from "@mui/icons-material/RemoveCircleRounded";
@@ -33,13 +31,13 @@ const defaultTheme = createTheme();
 const MyProfile = () => {
   const theme = useTheme();
   const [foodOptions, setFoodOptions] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     getFoods();
   }, []);
 
   const getFoods = async () => {
-    const response = await fetch(apiUrl + "/api/foods/", {
+    const response = await fetch(apiUrl + "/api/foods/all", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -47,15 +45,20 @@ const MyProfile = () => {
       },
     });
     const data = await response.json();
-    setFoodOptions(data.data);
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
+    setFoodOptions(data.allFoods);
   };
 
+
   const handleAddFoodAllergyInput = () => {
-    const newFood = { name: '' };
-    setUser((prevData) => ({
-      ...prevData,
-      allergies:  [...prevData.allergies, newFood]
-    }));
+    const updatedAllergies = [
+      ...user.allergies,
+      { allergyId: ""},
+    ];
+    setUser({ ...user, allergies: updatedAllergies });
   };
   
   const handleRemoveFoodAllergyInput = (index) => {
@@ -68,17 +71,13 @@ const MyProfile = () => {
   };
 
   const handleFoodAllergyInputChange = (newValue, index) => {
-    const updatedFoods = [...user.allergies];
-    
-    // Verifica si newValue es null, si es así, establece el nombre en una cadena vacía
-    const updatedName = newValue ? newValue.name : "";
-    updatedFoods[index].name = updatedName;
-  
-    // Actualiza el objeto user manteniendo la inmutabilidad
-    setUser((prevUser) => ({
-      ...prevUser,
-      allergies: updatedFoods,
-    }));
+    const updatedAllergies = [...user.allergies];
+    if (newValue) {
+      updatedAllergies[index].allergyId = newValue._id
+    } else {
+      updatedAllergies[index].allergyId = ""
+    }
+    setUser({ ...user, allergies: updatedAllergies });
   };
 
   const [isMobile, setIsMobile] = useState(false);
@@ -104,7 +103,7 @@ const MyProfile = () => {
     sex: "",
     height: "",
     weight: "",
-    allergies: [{ name: ""}],
+    allergies: [],
   });
 
   React.useEffect(() => {
@@ -112,8 +111,9 @@ const MyProfile = () => {
   }, []);
 
   const getUserById = async () => {
+    setLoading(true)
     const response = await fetch(
-      apiUrl + "/api/auth/users/" + localStorage.getItem("userId"),
+      apiUrl + "/api/auth/users/",
       {
         method: "GET",
         headers: {
@@ -124,8 +124,12 @@ const MyProfile = () => {
     );
 
     const data = await response.json();
-    console.log(data.data)
+    if (response.status == 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
     setUser(data.data);
+    setLoading(false)
   };
 
   const handleWeightInputChange = (e) => {
@@ -159,6 +163,8 @@ const MyProfile = () => {
     setUser({ ...user, sex: event.target.value });
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const handleUpdateUser = () => {
     if (
       user.firstName === "" ||
@@ -169,46 +175,49 @@ const MyProfile = () => {
       user.age === "" ||
       user.height === "" ||
       user.weight === "" ||
-      (user.allergies.length > 1 &&
-      user.allergies.some(
-        (allergy) =>
-          allergy.name == ""
-      ))
+      user.allergies.some((allergy) => allergy.allergyId === "")
     ) {
       enqueueSnackbar("Some fields are empty.", { variant: "error" });
       return;
     }
 
-    fetch(apiUrl + "/api/auth/users/" + localStorage.getItem("userId"), {
+    setIsSubmitting(true); // Activar el estado de envío
+
+    fetch(apiUrl + "/api/auth/users/", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify(user),
-    }).then(function (response) {
-      if (response.status === 200) {
-        enqueueSnackbar("User updated successfully.", { variant: "success" });
-        getUserById();
-        localStorage.setItem("username", user.firstName + " " + user.lastName);
-      } else {
-        enqueueSnackbar("Something went wrong.", { variant: "error" });
-      }
-    });
+    })
+      .then(function (response) {
+        if (response.status == 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        }
+        if (response.status === 200) {
+          enqueueSnackbar("User updated successfully.", { variant: "success" });
+          getUserById();
+          localStorage.setItem(
+            "username",
+            user.firstName + " " + user.lastName
+          );
+        } else {
+          enqueueSnackbar("Something went wrong.", { variant: "error" });
+        }
+      })
+      .catch((error) => {
+        enqueueSnackbar("Error updating user.", { variant: "error" });
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Desactivar el estado de envío
+      });
   };
 
   return (
     <div className="container">
-      {isMobile ? (
-        localStorage.getItem("roles") === "nutritionist" ? (
-          <LabelBottomNavigationNutritionist/>
-        ) :(
-          <LabelBottomNavigation/>
-        )
-      ) : localStorage.getItem("roles") === "nutritionist" ? (
-        <DrawerNutritionist user={localStorage.getItem("username")} />   
-      ) : (
-        <Drawer user={localStorage.getItem("username")} />
-      )}
+      {isMobile ? (<LabelBottomNavigation/>): (<Drawer user={localStorage.getItem("username")} />)}
       <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="s" maxheight="s">
           <CssBaseline />
@@ -232,8 +241,9 @@ const MyProfile = () => {
                     InputLabelProps={{
                       style: { color: "black" },
                     }}
-                    InputProps={{
+                    inputProps={{
                       style: { color: "black" },
+                      maxLength: 25,
                     }}
                     autoFocus
                     value={user.firstName}
@@ -254,8 +264,9 @@ const MyProfile = () => {
                     InputLabelProps={{
                       style: { color: "black" },
                     }}
-                    InputProps={{
+                    inputProps={{
                       style: { color: "black" },
+                      maxLength: 25,
                     }}
                     onChange={(e) =>
                       setUser({ ...user, lastName: e.target.value })
@@ -274,8 +285,9 @@ const MyProfile = () => {
                     InputLabelProps={{
                       style: { color: "black" },
                     }}
-                    InputProps={{
+                    inputProps={{
                       style: { color: "black" },
+                      maxLength: 40,
                     }}
                     onChange={(e) =>
                       setUser({ ...user, email: e.target.value })
@@ -283,20 +295,20 @@ const MyProfile = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
+                <TextField
                     required
                     fullWidth
                     id="age"
                     label="Age"
                     name="age"
-                    type="number"
                     value={user.age}
                     InputLabelProps={{
                       style: { color: "black" },
                     }}
                     InputProps={{
-                      style: { color: "black" },
-                      inputProps: { min: 1 },
+                      inputProps: {
+                        maxLength: 2,
+                      },
                     }}
                     onChange={(e) => handleAgeInputChange(e)}
                   />
@@ -333,16 +345,13 @@ const MyProfile = () => {
                     id="height"
                     label="Height (cm)"
                     name="height"
-                    type="number"
                     value={user.height}
                     InputLabelProps={{
                       style: { color: "black" },
                     }}
-                    InputProps={{
-                      style: {
-                        color: "black",
-                      },
-                      inputProps: { min: 1 },
+                    inputProps={{
+                      style: { color: "black" },
+                      maxLength: 3,
                     }}
                     onChange={(e) => handleHeightInputChange(e)}
                   />
@@ -354,72 +363,65 @@ const MyProfile = () => {
                     id="weight"
                     label="Weight (kg)"
                     name="weight"
-                    type="number"
                     value={user.weight}
                     InputLabelProps={{
                       style: { color: "black" },
                     }}
-                    InputProps={{
-                      style: {
-                        color: "black",
-                      },
-                      inputProps: { min: 1 },
+                    inputProps={{
+                      style: { color: "black" },
+                      maxLength: 3,
                     }}
                     onChange={(e) => handleWeightInputChange(e)}
                   />
                 </Grid>
               </Grid>
 
-              <div style={{ border: '1px solid black', padding: '10px', borderRadius: '5px', maxWidth: '600px', margin: 'auto', marginTop: '20px' }}>
-  <Typography variant="h6" style={{ color: 'black', marginBottom: '10px', textAlign: 'center' }}>
-    Set Your Allergies
-  </Typography>
-
-  {user.allergies.map((food, index) => (
-    <React.Fragment key={index}>
-      <Grid container spacing={2} alignItems="center" style={{ marginTop: 10 }}>
-        <Grid item xs={10}>
-          <Autocomplete
-          id={`food-autocomplete-${index}`}
-          options={foodOptions}
-          value={foodOptions.find((option) => option.name === food.name) || null}
-          onChange={(e, newValue) => handleFoodAllergyInputChange(newValue, index)}
-          getOptionLabel={(option) => option.name}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Food"
-              variant="outlined"
-              fullWidth
-              size="small"
-            />
-          )}
-          noOptionsText="No foods available."
-          ListboxProps={{
-            style: {
-              maxHeight: 90,
-            },
-          }}
-        />
-        </Grid>
-        <Grid item xs={2}>
-          {index === 0 ? (
-            <IconButton color="primary" onClick={handleAddFoodAllergyInput}>
-              <AddCircleRoundedIcon />
-            </IconButton>
-          ) : (
-            <IconButton
-              color="primary"
-              onClick={() => handleRemoveFoodAllergyInput(index)}
-            >
-              <RemoveCircleRoundedIcon />
-            </IconButton>
-          )}
-        </Grid>
-      </Grid>
-    </React.Fragment>
-  ))}
-</div>
+              <div style={{ border: '1px solid black', padding: '10px', borderRadius: '5px', maxWidth: '600px', margin: 'auto', marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant="h6" style={{ color: 'black', marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                  Set Your Allergies
+                  <IconButton color="primary" onClick={handleAddFoodAllergyInput}>
+                    <AddCircleRoundedIcon />
+                  </IconButton>
+              </Typography>
+              {user.allergies.map((allergyId, index) => (
+                <React.Fragment key={index}>
+                  <Grid container spacing={2} alignItems="center" style={{ marginTop: 10 }}>
+                    <Grid item xs={10}>
+                      <Autocomplete
+                        id={`food-autocomplete-${index}`}
+                        options={foodOptions}
+                        value={foodOptions.find((option) => option._id === allergyId.allergyId) || null}
+                        onChange={(e, newValue) => handleFoodAllergyInputChange(newValue, index)}
+                        getOptionLabel={(option) => option.name}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Food"
+                            variant="outlined"
+                            fullWidth
+                            size="small"
+                          />
+                        )}
+                        noOptionsText="No foods available."
+                        ListboxProps={{
+                          style: {
+                            maxHeight: 90,
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={2}>
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleRemoveFoodAllergyInput(index)}
+                      >
+                        <RemoveCircleRoundedIcon />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </React.Fragment>
+              ))}
+            </div>
 
               <Button
                 type="submit"
@@ -433,9 +435,10 @@ const MyProfile = () => {
                   "&:hover": { backgroundColor: "#373D20" },
                   fontWeight: "bold",
                 }}
+                disabled={isSubmitting} // Deshabilitar el botón cuando se esté enviando
                 onClick={handleUpdateUser}
               >
-                Update
+                {isSubmitting ? "Updating..." : "Update"}
               </Button>
             </Box>
           </Box>

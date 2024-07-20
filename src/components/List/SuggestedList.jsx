@@ -17,8 +17,10 @@ const SuggestedList = ({selectedPlan}) => {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-start",
+          justifyContent: "center", // Alinea los elementos al centro horizontalmente
           maxWidth: "100%",
+          width: "160%",
+          marginBottom: "10px", // Agregamos margen inferior para separar del resto del contenido
         }}
       >
         <SuggestedTable selectedPlan={selectedPlan}/>
