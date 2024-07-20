@@ -36,10 +36,16 @@ const ExerciseDoneForm = ({ open, setOpen, initialData }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    if (open && !exercisesLoaded) {
+    if (!exercisesLoaded) {
       getExercise();
     }
-  }, [open, exercisesLoaded]);
+  }, [exercisesLoaded]);
+
+  useEffect(() => {
+    if (open) {
+      getExercise();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (initialData) {
